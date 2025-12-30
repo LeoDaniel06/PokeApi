@@ -1,12 +1,370 @@
 <!DOCTYPE html>
-
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>TODO supply a title</title>
+        <title>Lista de Pokemones</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+
+            @font-face {
+                font-family: 'PokemonSolid';
+                src: url('./pokemon-solid.ttf') format('truetype');
+            }
+
+            @font-face {
+                font-family: 'PokemonHollow';
+                src: url('./pokemon-hollow.ttf') format('truetype');
+            }
+
+
+
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container{
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .header{
+                text-align: center;
+                color: white;
+                margin-bottom: 40px;
+            }
+
+            .header h1{
+                font-family: 'PokemonSolid', sans-serif;
+                font-size: 3rem;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .header p{
+                font-family: 'PokemonSolid', sans-serif;
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+
+            .pokemon-tarjeta{
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 25px;
+                padding: 20px 0;
+            }
+
+            .pokemon-card{
+                background: white;
+                border-radius: 20px;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                opacity: 0;
+                animation: fadeInUp 0.6s ease-out forwards;
+            }
+
+            .pokemon-card:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+            .pokemon-card:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+            .pokemon-card:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+            .pokemon-card:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+            .pokemon-card:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+            .pokemon-card:nth-child(6) {
+                animation-delay: 0.6s;
+            }
+            .pokemon-card:nth-child(7) {
+                animation-delay: 0.7s;
+            }
+            .pokemon-card:nth-child(8) {
+                animation-delay: 0.8s;
+            }
+            .pokemon-card:nth-child(9) {
+                animation-delay: 0.9s;
+            }
+            .pokemon-card:nth-child(10) {
+                animation-delay: 1s;
+            }
+            .pokemon-card:nth-child(n+11) {
+                animation-delay: 1.1s;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .pokemon-card:hover{
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            }
+
+            .pokemon-card::before{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 120px;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                border-radius: 20px 20px 0 0;
+                z-index: 0;
+            }
+
+            .pokemon-numero{
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-weight: bold;
+                color: #667eea;
+                z-index: 2;
+            }
+
+            .pokemon-imagen-container{
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .pokemon-imagen{
+                width: 150px;
+                height: 150px;
+                object-fit: contain;
+                filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            }
+
+            .pokemon-info{
+                text-align: center;
+            }
+
+            .pokemon-nombre{
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+                text-transform: capitalize;
+            }
+
+            .pokemon-tipo{
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .type-badge{
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: white;
+                text-transform: uppercase;
+            }
+
+            .type-normal {
+                background: #A8A878;
+            }
+            .type-fire {
+                background: #F08030;
+            }
+            .type-water {
+                background: #6890F0;
+            }
+            .type-electric {
+                background: #F8D030;
+            }
+            .type-grass {
+                background: #78C850;
+            }
+            .type-ice {
+                background: #98D8D8;
+            }
+            .type-fighting {
+                background: #C03028;
+            }
+            .type-poison {
+                background: #A040A0;
+            }
+            .type-ground {
+                background: #E0C068;
+            }
+            .type-flying {
+                background: #A890F0;
+            }
+            .type-psychic {
+                background: #F85888;
+            }
+            .type-bug {
+                background: #A8B820;
+            }
+            .type-rock {
+                background: #B8A038;
+            }
+            .type-ghost {
+                background: #705898;
+            }
+            .type-dragon {
+                background: #7038F8;
+            }
+            .type-dark {
+                background: #705848;
+            }
+            .type-steel {
+                background: #B8B8D0;
+            }
+            .type-fairy {
+                background: #EE99AC;
+            }
+
+            .pokemon-poderes{
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 15px;
+            }
+
+            .poder-row{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                font-size: 0.9rem;
+            }
+
+            .poder-name{
+                color: #666;
+                font-weight: 600;
+            }
+
+            .poder-value{
+                color: #333;
+                font-weight: bold;
+            }
+
+            .pokemon-habilidades{
+                margin-top: 15px;
+                padding: 10px;
+                background: #e9ecef;
+                border-radius: 8px;
+            }
+
+            .habilidades-title{
+                font-size: 0.85rem;
+                font-weight: bold;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .habilidades-list{
+                font-size: 0.85rem;
+                color: #333;
+                text-transform: capitalize;
+            }
+
+            .loading{
+                text-align: center;
+                color: white;
+                font-size: 1.5rem;
+                padding: 50px;
+            }
+
+            @media(max-width: 768px){
+                .pokemon-tarjeta{
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 15px;
+                }
+
+                .header h1{
+                    font-size: 2rem;
+                }
+            }
+        </style>
     </head>
     <body>
-        <div>TODO write content</div>
+        <div class="container">
+            <div class="header">
+                <h1>Pokedex Digital</h1>
+                <p>Lista de todos los pokemones</p>
+            </div>
+
+            <div class="pokemon-tarjeta">
+                <div class="pokemon-card">
+                    <span class="pokemon-numero">001</span>
+
+                    <div class="pokemon-imagen-container">
+                        <img class="pokemon-imagen"
+                             src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
+                             alt="Pokemon">
+                    </div>
+
+                    <div class="pokemon-info">
+                        <h2 class="pokemon-nombre">Pikachu</h2>
+
+                        <div class="pokemon-tipo">
+                            <span class="type-badge" >
+                                Electric
+                            </span>
+                        </div>
+
+                        <div class="pokemon-poderes">
+                            <div class="poder-row">
+                                <span class="poder-name">HP</span>
+                                <span class="poder-value">35</span>
+                            </div>
+                            <div class="poder-row">
+                                <span class="poder-name">Ataque</span>
+                                <span class="poder-value">55</span>
+                            </div>
+                            <div class="poder-row">
+                                <span class="poder-name">Defensa</span>
+                                <span class="poder-value">40</span>
+                            </div>
+                            <div class="poder-row">
+                                <span class="poder-name">Velocidad</span>
+                                <span class="poder-value">90</span>
+                            </div>
+                        </div>
+
+                        <div class="pokemon-habilidades">
+                            <div class="habilidades-title">Habilidades</div>
+                            <div class="habilidades-list">
+                                Static, Lightning Rod
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
