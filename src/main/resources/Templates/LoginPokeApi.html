@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <title>PokeLogin</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
+         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">           
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </head>
+    <body class="bg-light">
+        <div class="container d-flex justify-content-center align-items-center vh-100">
+            <div class="card shadow-sm p-4 border  border-black" style="width: 100%; max-width: 400px; border-radius: 10px;">
+                <div class="text-center mb-4">
+                    <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" class="MegaCharizard">
+                    <!--                    <img src="https://www.vhv.rs/dpng/d/524-5242149_primal-groudon-png-download-primal-groudon-png-transparent.png" class="GroudonPrimigenio">-->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" alt="Pokeball" class="pokeball-img">
+                    <h1 class="fw-bold" style="color: white">¡Bienvenido Entrenador!</h1>
+                    <p class="text" style="color: white">Por favor ingresa tu usuario y contraseña</p>
+                </div>
+                <form id="loginForm" th:action="@{}" method="post" th:object="${}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label" style="color: white">Usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required th:field="*{username}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label" style="color: white">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required th:field="*{password}">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-danger">Ingresar</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <!--            <div>
+                            <img src="https://cdn.creazilla.com/cliparts/3165340/grass-clipart-lg.png" alt="hierba" class="img-fluid grass-footer">
+                        </div>-->
+        </div>
+
+        <style>
+            body {
+               background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
+        background-repeat: no-repeat;
+        background-position: center center; 
+        background-size: cover;
+        display: flex;
+        position: relative;
+            }
+
+           
+            body::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 0;
+            }
+
+            .container {
+                position: relative;
+                z-index: 1;
+            }
+
+            .card {
+                transition: transform 0.2s;
+                background-color: rgba(30, 30, 30, 0.9);
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+                border: 3px solid #ff4136;
+                max-width: 400px;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .btn-primary {
+                background-color: red;
+                border: thin;
+                border-color: black;
+            }
+
+            .btn-primary:hover {
+                background-color: darkred;
+            }
+
+            .pokeball-img {
+                width: 70px;
+                height: auto;
+                animation: bounce 0.3s infinite alternate;
+            }
+
+            @keyframes bounce {
+                from {
+                    transform: translateY(0);
+                }
+                to {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .MegaCharizard {
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                width: 120px;
+                pointer-events: none;
+            }
+        </style>
+
+    </body>
+</html>
