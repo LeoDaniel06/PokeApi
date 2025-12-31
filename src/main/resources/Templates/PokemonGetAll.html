@@ -16,6 +16,14 @@
                 font-family: 'PokemonHollow';
                 src: url('./pokemon-hollow.ttf') format('truetype');
             }
+            
+            .pkm{
+                font-family: 'PokemonSolid', sans-serif;
+            }
+            
+            .pkm-hollow{
+                font-family: 'PokemonHollow', sans-serif; 
+            }
 
             *{
                 margin: 0;
@@ -47,7 +55,7 @@
             }
 
             .header p{
-                font-family: 'PokemonSolid', sans-serif;
+                font-family: 'PokemonHollow', sans-serif;
                 font-size: 1.2rem;
                 opacity: 0.9;
             }
@@ -341,11 +349,11 @@
     <body>
         <div class="container">
             <div class="header">
-                <h1>Pokedex Digital</h1>
+                <h1>Pokedex</h1>
                 <p>Lista de todos los pokemones</p>
             </div>
 
-            <div class="row mb-4 justify-content-center">
+            <div class="row mb-4 justify-content-center pkm">
                 <div class="col-md-6">
                     <input
                         type="text"
@@ -494,7 +502,7 @@
                     </div>
 
                     <div class="pokemon-info">
-                        <h2 class="pokemon-nombre">${pokemon.name}</h2>
+                        <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
 
                         <div class="pokemon-tipo">
                             ${tipos.map(tipo => `<span class="type-badge type-${tipo}">${tipo}</span>`).join('')}
