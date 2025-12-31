@@ -468,8 +468,8 @@
             const startTime = Date.now();
 
             Promise.all([
-                fetch("https://pokeapi.co/api/v2/pokemon/latias").then(r => r.json()),
-                fetch("https://pokeapi.co/api/v2/pokemon-species/latias").then(r => r.json())
+                fetch("https://pokeapi.co/api/v2/pokemon/darkrai").then(r => r.json()),
+                fetch("https://pokeapi.co/api/v2/pokemon-species/darkrai").then(r => r.json())
             ]).then(([pokemon, species]) => {
                 renderPokemon(pokemon, species);
                 const loader = document.getElementById("loader");
