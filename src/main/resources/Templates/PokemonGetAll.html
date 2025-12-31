@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Lista de Pokemones</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            @font-face {
+                font-family: 'PokemonSolid';
+                src: url('./pokemon-solid.ttf') format('truetype');
+            }
+
+            @font-face {
+                font-family: 'PokemonHollow';
+                src: url('./pokemon-hollow.ttf') format('truetype');
+            }
+            
+            .pkm{
+                font-family: 'PokemonSolid', sans-serif;
+            }
+            
+            .pkm-hollow{
+                font-family: 'PokemonHollow', sans-serif; 
+            }
+
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container{
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .header{
+                text-align: center;
+                color: white;
+                margin-bottom: 40px;
+            }
+
+            .header h1{
+                font-family: 'PokemonSolid', sans-serif;
+                font-size: 3rem;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .header p{
+                font-family: 'PokemonHollow', sans-serif;
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+
+            .pokemon-tarjeta{
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 25px;
+                padding: 20px 0;
+            }
+
+            .pokemon-card{
+                background: white;
+                border-radius: 20px;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                opacity: 0;
+                animation: fadeInUp 0.6s ease-out forwards;
+            }
+
+            .pokemon-card:nth-child(1) { animation-delay: 0.1s; }
+            .pokemon-card:nth-child(2) { animation-delay: 0.2s; }
+            .pokemon-card:nth-child(3) { animation-delay: 0.3s; }
+            .pokemon-card:nth-child(4) { animation-delay: 0.4s; }
+            .pokemon-card:nth-child(5) { animation-delay: 0.5s; }
+            .pokemon-card:nth-child(6) { animation-delay: 0.6s; }
+            .pokemon-card:nth-child(7) { animation-delay: 0.7s; }
+            .pokemon-card:nth-child(8) { animation-delay: 0.8s; }
+            .pokemon-card:nth-child(9) { animation-delay: 0.9s; }
+            .pokemon-card:nth-child(10) { animation-delay: 1s; }
+            .pokemon-card:nth-child(n+11) { animation-delay: 1.1s; }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .pokemon-card:hover{
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            }
+
+            .pokemon-card::before{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 120px;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                border-radius: 20px 20px 0 0;
+                z-index: 0;
+            }
+
+            .pokemon-numero{
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-weight: bold;
+                color: #667eea;
+                z-index: 2;
+            }
+
+            .favorito{
+                position: absolute;
+                top: 15px;
+                left: 20px;
+                font-size: 1.8rem;
+                cursor: pointer;
+                z-index: 3;
+                color: #ccc;
+                transition: transform 0.2s, color 0.2s;
+            }
+
+            .favorito.activo{
+                color: gold;
+                transform: scale(1.2);
+            }
+
+            .pokemon-imagen-container{
+                position: relative;
+                z-index: 1;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .pokemon-imagen{
+                width: 150px;
+                height: 150px;
+                object-fit: contain;
+                filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            }
+
+            .pokemon-info{
+                text-align: center;
+            }
+
+            .pokemon-nombre{
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 10px;
+                text-transform: capitalize;
+            }
+
+            .pokemon-tipo{
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .type-badge{
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: white;
+                text-transform: uppercase;
+            }
+
+            .type-normal { background: #A8A878; }
+            .type-fire { background: #F08030; }
+            .type-water { background: #6890F0; }
+            .type-electric { background: #F8D030; }
+            .type-grass { background: #78C850; }
+            .type-ice { background: #98D8D8; }
+            .type-fighting { background: #C03028; }
+            .type-poison { background: #A040A0; }
+            .type-ground { background: #E0C068; }
+            .type-flying { background: #A890F0; }
+            .type-psychic { background: #F85888; }
+            .type-bug { background: #A8B820; }
+            .type-rock { background: #B8A038; }
+            .type-ghost { background: #705898; }
+            .type-dragon { background: #7038F8; }
+            .type-dark { background: #705848; }
+            .type-steel { background: #B8B8D0; }
+            .type-fairy { background: #EE99AC; }
+
+            .pokemon-poderes{
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 15px;
+            }
+
+            .poder-row{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                font-size: 0.9rem;
+            }
+
+            .poder-name{
+                color: #666;
+                font-weight: 600;
+            }
+
+            .poder-value{
+                color: #333;
+                font-weight: bold;
+            }
+
+            .pokemon-habilidades{
+                margin-top: 15px;
+                padding: 10px;
+                background: #e9ecef;
+                border-radius: 8px;
+            }
+
+            .habilidades-title{
+                font-size: 0.85rem;
+                font-weight: bold;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .habilidades-list{
+                font-size: 0.85rem;
+                color: #333;
+                text-transform: capitalize;
+            }
+
+            .loading{
+                text-align: center;
+                color: white;
+                font-size: 1.5rem;
+                font-family: 'PokemonSolid', sans-serif;
+                padding: 50px;
+            }
+
+            /* Estilos de paginación */
+            .pagination-container{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                margin: 40px 0;
+                flex-wrap: wrap;
+            }
+
+            .pagination-btn{
+                background: white;
+                color: #667eea;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+
+            .pagination-btn:hover:not(:disabled){
+                background: #667eea;
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            }
+
+            .pagination-btn:disabled{
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .pagination-info{
+                color: white;
+                font-size: 1.1rem;
+                font-weight: bold;
+                font-family: 'PokemonSolid', sans-serif;
+            }
+
+            .page-number{
+                background: white;
+                color: #667eea;
+                padding: 10px 16px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                min-width: 45px;
+                text-align: center;
+            }
+
+            .page-number:hover{
+                background: #667eea;
+                color: white;
+            }
+
+            .page-number.active{
+                background: #667eea;
+                color: white;
+                transform: scale(1.1);
+            }
+
+            @media(max-width: 768px){
+                .pokemon-tarjeta{
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 15px;
+                }
+
+                .header h1{
+                    font-size: 2rem;
+                }
+
+                .pagination-container{
+                    gap: 10px;
+                }
+
+                .pagination-btn{
+                    padding: 10px 18px;
+                    font-size: 0.9rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Pokedex</h1>
+                <p>Lista de todos los pokemones</p>
+            </div>
+
+            <div class="row mb-4 justify-content-center pkm">
+                <div class="col-md-6">
+                    <input
+                        type="text"
+                        id="buscador"
+                        class="form-control form-control-lg"
+                        placeholder="Buscar Pokémon por nombre o número...">
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <dotlottie-wc
+                    id="pokeballLoader"
+                    src="https://lottie.host/7e74bdf8-c378-4b20-8aae-76ceb4a30e19/vPIpMiv7jG.lottie"
+                    style="width: 300px; height: 300px;"
+                    autoplay
+                    loop>
+                </dotlottie-wc>
+                <p>Cargando Pokémon...</p>
+            </div>
+
+            <div id="pokemon-tarjeta" class="pokemon-tarjeta"></div>
+
+            <div id="paginacion" class="pagination-container" style="display: none;">
+                <button class="pagination-btn" id="btn-primera">Primera</button>
+                <button class="pagination-btn" id="btn-anterior">Anterior</button>
+                <span class="pagination-info" id="info-pagina">Página 1 de 1</span>
+                <button class="pagination-btn" id="btn-siguiente">Siguiente</button>
+                <button class="pagination-btn" id="btn-ultima">Última</button>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js" type="module"></script>
+
+        <script>
+            let todosLosPokemon = [];
+            let paginaActual = 1;
+            const pokemonPorPagina = 8;
+
+            async function cargarPokemon() {
+                const loading = document.getElementById('loading');
+                const container = document.getElementById('pokemon-tarjeta');
+
+                try {
+                    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
+                    const data = await response.json();
+
+                    loading.style.display = 'none';
+
+                    for (const pokemon of data.results) {
+                        const detalles = await obtenerDetallesPokemon(pokemon.url);
+                        todosLosPokemon.push(detalles);
+                    }
+
+                    mostrarPagina(1);
+                    mostrarPaginacion();
+
+                } catch (error) {
+                    loading.innerHTML = 'Error al cargar los Pokémon';
+                    console.error('Error:', error);
+                }
+            }
+
+            async function obtenerDetallesPokemon(url) {
+                const response = await fetch(url);
+                return await response.json();
+            }
+
+            function mostrarPagina(numeroPagina) {
+                const container = document.getElementById('pokemon-tarjeta');
+                container.innerHTML = '';
+
+                const inicio = (numeroPagina - 1) * pokemonPorPagina;
+                const fin = inicio + pokemonPorPagina;
+                const pokemonPagina = todosLosPokemon.slice(inicio, fin);
+
+                pokemonPagina.forEach(pokemon => {
+                    crearTarjetaPokemon(pokemon, container);
+                });
+
+                paginaActual = numeroPagina;
+                actualizarBotonesPaginacion();
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function mostrarPaginacion() {
+                document.getElementById('paginacion').style.display = 'flex';
+            }
+
+            function actualizarBotonesPaginacion() {
+                const totalPaginas = Math.ceil(todosLosPokemon.length / pokemonPorPagina);
+                const infoPagina = document.getElementById('info-pagina');
+                infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+                document.getElementById('btn-primera').disabled = paginaActual === 1;
+                document.getElementById('btn-anterior').disabled = paginaActual === 1;
+                document.getElementById('btn-siguiente').disabled = paginaActual === totalPaginas;
+                document.getElementById('btn-ultima').disabled = paginaActual === totalPaginas;
+            }
+
+            function obtenerFavoritos() {
+                return JSON.parse(localStorage.getItem('favoritos')) || [];
+            }
+
+            function esPokemonFavorito(id) {
+                return obtenerFavoritos().includes(id);
+            }
+
+            function toggleFavorito(id, elemento) {
+                let favoritos = obtenerFavoritos();
+
+                if (favoritos.includes(id)) {
+                    favoritos = favoritos.filter(f => f !== id);
+                    elemento.classList.remove('activo');
+                } else {
+                    favoritos.push(id);
+                    elemento.classList.add('activo');
+                }
+
+                localStorage.setItem('favoritos', JSON.stringify(favoritos));
+            }
+
+            function crearTarjetaPokemon(pokemon, container) {
+                const hp = pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat;
+                const attack = pokemon.stats.find(stat => stat.stat.name === 'attack').base_stat;
+                const defense = pokemon.stats.find(stat => stat.stat.name === 'defense').base_stat;
+                const speed = pokemon.stats.find(stat => stat.stat.name === 'speed').base_stat;
+
+                const tipos = pokemon.types.map(type => type.type.name);
+                const habilidades = pokemon.abilities.map(ability => ability.ability.name).join(', ');
+
+                const esFavorito = esPokemonFavorito(pokemon.id);
+
+                const card = document.createElement('div');
+                card.className = 'pokemon-card';
+
+                card.innerHTML = `
+                    <span class="favorito ${esFavorito ? 'activo' : ''}">★</span>
+                    <span class="pokemon-numero">${String(pokemon.id).padStart(3, '0')}</span>
+
+                    <div class="pokemon-imagen-container">
+                        <img class="pokemon-imagen"
+                             src="${pokemon.sprites.other['official-artwork'].front_default}"
+                             alt="${pokemon.name}">
+                    </div>
+
+                    <div class="pokemon-info">
+                        <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
+
+                        <div class="pokemon-tipo">
+                            ${tipos.map(tipo => `<span class="type-badge type-${tipo}">${tipo}</span>`).join('')}
+                        </div>
+
+                        <div class="pokemon-poderes">
+                            <div class="poder-row"><span class="poder-name">HP</span><span class="poder-value">${hp}</span></div>
+                            <div class="poder-row"><span class="poder-name">Ataque</span><span class="poder-value">${attack}</span></div>
+                            <div class="poder-row"><span class="poder-name">Defensa</span><span class="poder-value">${defense}</span></div>
+                            <div class="poder-row"><span class="poder-name">Velocidad</span><span class="poder-value">${speed}</span></div>
+                        </div>
+
+                        <div class="pokemon-habilidades">
+                            <div class="habilidades-title">Habilidades</div>
+                            <div class="habilidades-list">${habilidades}</div>
+                        </div>
+                    </div>
+                `;
+
+                const estrella = card.querySelector('.favorito');
+                estrella.addEventListener('click', () => {
+                    toggleFavorito(pokemon.id, estrella);
+                });
+
+                container.appendChild(card);
+            }
+
+            function buscarPokemon() {
+                const searchTerm = document.getElementById('buscador').value.toLowerCase();
+                
+                if (searchTerm === '') {
+                    // Si no hay búsqueda, mostrar paginación normal
+                    document.getElementById('paginacion').style.display = 'flex';
+                    mostrarPagina(paginaActual);
+                } else {
+                    // Ocultar paginación durante búsqueda
+                    document.getElementById('paginacion').style.display = 'none';
+                    
+                    const container = document.getElementById('pokemon-tarjeta');
+                    container.innerHTML = '';
+                    
+                    const resultados = todosLosPokemon.filter(pokemon => 
+                        pokemon.name.toLowerCase().includes(searchTerm) || 
+                        String(pokemon.id).includes(searchTerm)
+                    );
+                    
+                    resultados.forEach(pokemon => {
+                        crearTarjetaPokemon(pokemon, container);
+                    });
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                cargarPokemon();
+
+                const buscador = document.getElementById('buscador');
+                buscador.addEventListener('input', buscarPokemon);
+
+                document.getElementById('btn-primera').addEventListener('click', () => mostrarPagina(1));
+                document.getElementById('btn-anterior').addEventListener('click', () => mostrarPagina(paginaActual - 1));
+                document.getElementById('btn-siguiente').addEventListener('click', () => mostrarPagina(paginaActual + 1));
+                document.getElementById('btn-ultima').addEventListener('click', () => {
+                    const totalPaginas = Math.ceil(todosLosPokemon.length / pokemonPorPagina);
+                    mostrarPagina(totalPaginas);
+                });
+            });
+        </script>
+    </body>
+</html>
