@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>PokeRegistro</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            /* Tipografía Pokémon */
+            @font-face {
+                font-family: 'PokemonSolid';
+                src: url('./pokemon-solid.ttf') format('truetype');
+            }
+
+            @font-face {
+                font-family: 'PokemonHollow';
+                src: url('./pokemon-hollow.ttf') format('truetype');
+            }
+
+            .pkm {
+                font-family: 'PokemonSolid', sans-serif;
+            }
+
+            .pkm-hollow {
+                font-family: 'PokemonHollow', sans-serif;
+            }
+
+            body {
+                background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: cover;
+                display: flex;
+                position: relative;
+                min-height: 100vh;
+            }
+
+            body::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 0;
+            }
+
+            .container {
+                position: relative;
+                z-index: 1;
+                padding: 40px 20px;
+            }
+
+            .card {
+                transition: transform 0.2s;
+                background-color: rgba(30, 30, 30, 0.95);
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+                border: 3px solid #ff4136;
+                max-width: 500px;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+                margin: 0 auto;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .pokeball-img {
+                width: 70px;
+                height: auto;
+                animation: bounce 0.3s infinite alternate;
+            }
+
+            @keyframes bounce {
+                from {
+                    transform: translateY(0);
+                }
+                to {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .MegaCharizard {
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                width: 120px;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .form-label {
+                color: white !important;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .form-control, .form-select {
+                background-color: rgba(255, 255, 255, 0.9);
+                border: 2px solid #ff4136;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background-color: white;
+                border-color: #ff6b61;
+                box-shadow: 0 0 0 0.2rem rgba(255, 65, 54, 0.25);
+            }
+
+            .btn-primary {
+                background-color: #ff4136;
+                border: 2px solid black;
+                font-weight: bold;
+                padding: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                background-color: #dc1f0f;
+                transform: scale(1.05);
+            }
+
+            .btn-secondary {
+                background-color: #555;
+                border: 2px solid black;
+                font-weight: bold;
+                padding: 12px;
+            }
+
+            .btn-secondary:hover {
+                background-color: #333;
+            }
+
+            h1 {
+                color: white;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+
+            .text-white {
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            }
+
+            .form-check {
+                background-color: rgba(255, 255, 255, 0.1);
+                padding: 10px 15px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+            }
+
+            .form-check-label {
+                color: white !important;
+                font-weight: 600;
+            }
+
+            .form-check-input:checked {
+                background-color: #ff4136;
+                border-color: #ff4136;
+            }
+
+            .gender-container {
+                background-color: rgba(255, 255, 255, 0.05);
+                padding: 15px;
+                border-radius: 10px;
+                border: 2px solid rgba(255, 65, 54, 0.3);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="card shadow-sm p-4">
+                <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" 
+                     class="MegaCharizard" alt="Charizard">
+
+                <div class="text-center mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+                         alt="Pokeball" 
+                         class="pokeball-img mb-3">
+                    <h1 class="fw-bold pkm">¡Únete Entrenador!</h1>
+                    <p class="text-white pkm-hollow">Completa el formulario para comenzar tu aventura</p>
+                </div>
+
+                <form id="registroForm" th:action="@{/registro}" method="post" th:object="${usuario}">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre Completo</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="nombre" 
+                               name="nombre" 
+                               placeholder="Ej: Ash Ketchum" 
+                               required 
+                               >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de Usuario</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Ej: ash_maestro" 
+                               required 
+                               >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               placeholder="********" 
+                               required 
+                               t>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="rol" class="form-label">Rol</label>
+                        <select class="form-select" 
+                                id="rol" 
+                                name="rol" 
+                                required 
+                                >
+                            <option value="" selected disabled>Selecciona tu rol</option>
+                            <option value="entrenador">Entrenador Pokémon</option>
+                            <option value="lider">Líder de Gimnasio</option>
+                            <option value="investigador">Investigador</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Sexo</label>
+                        <div class="gender-container">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="sexo" 
+                                       id="masculino" 
+                                       value="M" 
+                                       required
+                                       >
+                                <label class="form-check-label" for="masculino">
+                                    ♂ Masculino
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="sexo" 
+                                       id="femenino" 
+                                       value="F" 
+                                       required
+                                       >
+                                <label class="form-check-label" for="femenino">
+                                    ♀ Femenino
+                                </label>
+                            </div> 
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            Registrarse
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href = '/login'">
+                            Volver al Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
