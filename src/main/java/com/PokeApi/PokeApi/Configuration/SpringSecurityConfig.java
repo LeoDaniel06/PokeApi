@@ -31,6 +31,7 @@ public class SpringSecurityConfig {
     
         http.authorizeHttpRequests(configurer -> configurer
                 .requestMatchers("/login/").permitAll()
+                .requestMatchers("/pokedex/**").permitAll()
                 .anyRequest()
                 .authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
