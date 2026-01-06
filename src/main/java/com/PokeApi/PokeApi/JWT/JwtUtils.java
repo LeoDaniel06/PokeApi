@@ -1,4 +1,3 @@
-
 package com.PokeApi.PokeApi.JWT;
 
 import io.jsonwebtoken.Jwts;
@@ -60,7 +59,7 @@ public class JwtUtils {
                     .setSubject(userDetails.getUsername())
                     .setId(java.util.UUID.randomUUID().toString())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                    .setExpiration(new Date(System.currentTimeMillis() + expiration))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
         }
