@@ -16,32 +16,51 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
 
     private final UserDetailsJPAService usuarioDetailsJPAService;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    public SpringSecurityConfig(UserDetailsJPAService usuarioDetailsJPAService) {
+    public SpringSecurityConfig(UserDetailsJPAService usuarioDetailsJPAService,
+                                JwtAuthFilter jwtAuthFilter) {
         this.usuarioDetailsJPAService = usuarioDetailsJPAService;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable()) // ← Importante: CSRF deshabilitado
-                .authorizeHttpRequests(configurer -> configurer
-                .requestMatchers("/fonts/**").permitAll()
-                .requestMatchers("/login/**", "/LoginPokeApi").permitAll()
-                .requestMatchers("/pokedex/registro").permitAll()
-                .requestMatchers("/pokedex/**").permitAll()
-                .anyRequest().authenticated())
-                .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/login/**",
+                        "/LoginPokeApi",
+                        "/pokedex/registro",
+                        "/pokedex/**",
+                        "/fonts/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(usuarioDetailsJPAService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     @Bean
@@ -53,12 +72,5 @@ public class SpringSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setUserDetailsService(usuarioDetailsJPAService);
-//        provider.setPasswordEncoder(passwordEncoder()); 
-//        return provider;
-//    }
 }
+

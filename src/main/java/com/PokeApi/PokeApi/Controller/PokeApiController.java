@@ -5,6 +5,7 @@ import com.PokeApi.PokeApi.DAO.UsuarioDAOJPAImplementation;
 import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
+import com.PokeApi.PokeApi.JWT.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,10 +32,16 @@ public class PokeApiController {
         return "PokemonGetAll";
     }
 
-    @GetMapping("/detalle/{id}")
+    @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {
         model.addAttribute("pokemonId", id);
-        return "PokemonDetalle";
+        return "DetailPokeApi";
+    }
+    
+    @GetMapping("/login")
+    public String login(Model model){
+        model.addAttribute("loginRequest", new LoginRequest());
+        return "LoginPokeApi";
     }
 
     @GetMapping("/registro")

@@ -5,15 +5,16 @@ package com.PokeApi.PokeApi.JWT;
 public class LoginRequest {
 
     private String username;
-    private String Password;
+    private String password;
 
     public LoginRequest (){
         
     }
     
-    public LoginRequest(String username, String Password){
+    
+    public LoginRequest(String username, String password){
         this.username = username;
-        this.Password = Password;
+        this.password = password;
     }
     
     public String getUsername() {
@@ -25,11 +26,11 @@ public class LoginRequest {
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
-    public void setPassword(String Password) {
-        this.Password = Password;
+    public void setPassword(String password) {
+        this.password = password;
     }
     
     

@@ -16,18 +16,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final UserDetailsJPAService userDetailsJPAService;
+    private final UserDetailsJPAService usuarioDetailsJPAService;
     private final JwtUtils jwtUtils;
 
-    public JwtAuthFilter(UserDetailsJPAService userDetailsJPAService, JwtUtils jwtUtils) {
-        this.userDetailsJPAService = userDetailsJPAService;
+    public JwtAuthFilter(UserDetailsJPAService usuarioDetailsJPAService, JwtUtils jwtUtils) {
+        this.usuarioDetailsJPAService = usuarioDetailsJPAService;
         this.jwtUtils = jwtUtils;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
@@ -51,6 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
         String username;
+
         try {
             username = jwtUtils.extractUsername(jwt);
         } catch (Exception e) {
@@ -60,21 +61,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (username != null
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails
-                    = userDetailsJPAService.loadUserByUsername(username);
+
+            UserDetails userDetails =
+                    usuarioDetailsJPAService.loadUserByUsername(username);
+
             if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken
-                        = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
                                 userDetails.getAuthorities()
                         );
+
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }
