@@ -14,15 +14,15 @@ import jakarta.persistence.Table;
 public class FavoritosJPA {
 
     @Id
-    @Column(name = "idPokemon")
+    @Column(name = "idpokemon")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int IdPokemon;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario")
+    @JoinColumn(name = "idusuario")
     private UsuarioJPA UsuarioJPA;
 
-    @Column(name = "nombrePokemon")
+    @Column(name = "nombrepokemon")
     private String NombrePokemon;
 
     public int getIdPokemon() {

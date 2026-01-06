@@ -1,14 +1,194 @@
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{layout}">
     <head>
         <title>PokeLogin</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <th:block layout:fragment="extra-css">
         <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
-         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">           
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <style>
+            body {
+                background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: cover;
+                display: flex;
+                position: relative;
+                min-height: 100vh;
+            }
+
+            body::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 0;
+            }
+
+            .container {
+                position: relative;
+                z-index: 1;
+                padding: 40px 20px;
+            }
+
+            .card {
+                transition: transform 0.2s;
+                background-color: rgba(30, 30, 30, 0.95);
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+                border: 3px solid #ff4136;
+                max-width: 500px;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+                margin: 0 auto;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .pokeball-img {
+                width: 70px;
+                height: auto;
+                animation: bounce 0.3s infinite alternate;
+            }
+
+            @keyframes bounce {
+                from {
+                    transform: translateY(0);
+                }
+                to {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .MegaCharizard {
+                position: absolute;
+                top: 0px;
+                right: -20px;
+                width: 120px;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .form-label {
+                color: white !important;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .form-control, .form-select {
+                background-color: rgba(255, 255, 255, 0.9);
+                border: 2px solid #ff4136;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background-color: white;
+                border-color: #ff6b61;
+                box-shadow: 0 0 0 0.2rem rgba(255, 65, 54, 0.25);
+            }
+
+            .btn-primary {
+                background-color: #ff4136;
+                border: 2px solid black;
+                font-weight: bold;
+                padding: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                background-color: #dc1f0f;
+                transform: scale(1.05);
+            }
+
+            .btn-secondary {
+                background-color: #555;
+                border: 2px solid black;
+                font-weight: bold;
+                padding: 12px;
+            }
+
+            .btn-secondary:hover {
+                background-color: #333;
+            }
+
+            h1 {
+                color: white;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+
+            .text-white {
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            }
+
+            .form-check {
+                background-color: rgba(255, 255, 255, 0.1);
+                padding: 10px 15px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+            }
+
+            .form-check-label {
+                color: white !important;
+                font-weight: 600;
+            }
+
+            .form-check-input:checked {
+                background-color: #ff4136;
+                border-color: #ff4136;
+            }
+
+            .gender-container {
+                background-color: rgba(255, 255, 255, 0.05);
+                padding: 15px;
+                border-radius: 10px;
+                border: 2px solid rgba(255, 65, 54, 0.3);
+            }
+
+            .alert {
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+
+            .password-container {
+                position: relative;
+            }
+
+            .password-toggle {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #ff4136;
+                font-size: 1.2rem;
+                padding: 5px;
+                transition: color 0.3s;
+                z-index: 10;
+            }
+
+            .password-toggle:hover {
+                color: #dc1f0f;
+            }
+
+            .password-container .form-control {
+                padding-right: 45px;
+            }
+        </style>
+    </th:block>
+        
     </head>
     <body class="bg-light">
-        <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div layout:fragment="content" >
+        <div  class="container d-flex justify-content-center align-items-center vh-100">
             <div class="card shadow-sm p-4 border  border-black" style="width: 100%; max-width: 400px; border-radius: 10px;">
                 <div class="text-center mb-4">
                     <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" class="MegaCharizard">
@@ -17,7 +197,7 @@
                     <h1 class="fw-bold" style="color: white">¡Bienvenido Entrenador!</h1>
                     <p class="text" style="color: white">Por favor ingresa tu usuario y contraseña</p>
                 </div>
-                <form id="loginForm" th:action="@{}" method="post" th:object="${}">
+                <form id="loginForm" th:action="@{/pokedex/login}" method="post" th:object="${loginRequest}">
                     <div class="mb-3">
                         <label for="username" class="form-label" style="color: white">Usuario</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required th:field="*{username}">
@@ -29,8 +209,14 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-danger">Ingresar</button>
+                        <button type="submit" class="btn btn-primary btn-danger">Iniciar Sesion</button>
                     </div>
+                    
+                    <div class="mb-3">
+                        <p class="text" style="color: white">No te has Registrado?</p>
+                        <p class="text" style="color: white">Registrate aqui:<a class="text" style="color: blue"> Crear Usuario</a></p>
+                    </div>
+                    
                 </form>
 
             </div>
@@ -39,8 +225,9 @@
                             <img src="https://cdn.creazilla.com/cliparts/3165340/grass-clipart-lg.png" alt="hierba" class="img-fluid grass-footer">
                         </div>-->
         </div>
+        </div>
 
-        <style>
+<!--        <style>
             body {
                background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
         background-repeat: no-repeat;
@@ -49,8 +236,7 @@
         display: flex;
         position: relative;
             }
-
-           
+ 
             body::before {
                 content: "";
                 position: absolute;
@@ -115,7 +301,7 @@
                 width: 120px;
                 pointer-events: none;
             }
-        </style>
+        </style>-->
 
     </body>
 </html>

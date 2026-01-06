@@ -28,11 +28,14 @@ public class SpringSecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception{
-    
-        http.authorizeHttpRequests(configurer -> configurer
-                .requestMatchers("/login/").permitAll()
-                .anyRequest()
+
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(configurer -> configurer
+                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/pokedex/**").permitAll()
+                .anyRequest()  
                 .authenticated())
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
@@ -48,12 +51,11 @@ public class SpringSecurityConfig {
         return config.getAuthenticationManager();
     }
 
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setUserDetailsService(usuarioDetailsJPAService);
-//        provider.setPasswordEncoder(passwordEncoder()); 
-//        return provider;
-//    }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(usuarioDetailsJPAService);
+        provider.setPasswordEncoder(passwordEncoder()); 
+        return provider;
+    }
     
 }

@@ -1,5 +1,6 @@
 package com.PokeApi.PokeApi.Controller;
 
+import com.PokeApi.PokeApi.JWT.LoginRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +16,15 @@ public class PokeApiController {
         return "PokemonGetAll";
     }
 
-    @GetMapping("/detalle/{id}")
+    @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {
         model.addAttribute("pokemonId", id);
-        return "PokemonDetalle";
+        return "DetailPokeApi";
+    }
+    
+    @GetMapping("/login")
+    public String login(Model model){
+        model.addAttribute("loginRequest", new LoginRequest());
+        return "LoginPokeApi";
     }
 }

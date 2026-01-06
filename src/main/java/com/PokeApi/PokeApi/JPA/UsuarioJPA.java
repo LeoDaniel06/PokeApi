@@ -31,7 +31,7 @@ public class UsuarioJPA {
     private String Sexo;
 
     @ManyToOne
-    @JoinColumn(name = "idrols")
+    @JoinColumn(name = "idrol")
     private RolJPA RolJPA;
 
     public int getIdUsuario() {
