@@ -19,22 +19,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsJPAService usuarioDetailsJPAService;
     private final JwtUtils jwtUtils;
 
-//    private final String AUTH_HEADER = "Authorization";
-//    private final String AUTH_TYPE = "Bearer ";
     public JwtAuthFilter(UserDetailsJPAService usuarioDetailsJPAService, JwtUtils jwtUtils) {
         this.usuarioDetailsJPAService = usuarioDetailsJPAService;
         this.jwtUtils = jwtUtils;
     }
 
-    
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String path = request.getRequestURI();
 
+        if (path.equals("/pokedex/registro")
+                || path.startsWith("/login")
+                || path.startsWith("/LoginPokeApi")
+                || path.startsWith("/fonts/")
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,8 +55,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             username = jwtUtils.extractUsername(jwt);
         } catch (Exception e) {
-            System.out.println("❌ ERROR JWT: " + e.getClass().getSimpleName());
-            System.out.println("❌ MENSAJE: " + e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,12 +62,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (username != null
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails
-                    = usuarioDetailsJPAService.loadUserByUsername(username);
+            UserDetails userDetails =
+                    usuarioDetailsJPAService.loadUserByUsername(username);
 
             if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken
-                        = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
                                 userDetails.getAuthorities()
