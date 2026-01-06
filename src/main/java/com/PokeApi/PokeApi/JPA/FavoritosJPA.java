@@ -9,45 +9,56 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+
+
 @Entity
 @Table(name = "FAVORITOS")
 public class FavoritosJPA {
 
     @Id
-    @Column(name = "idpokemon")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int IdPokemon;
+    @Column(name = "idfavorito")
+    private int idFavorito;
+
+    @Column(name = "idpokemon")
+    private int idPokemon;
+
+    @Column(name = "nombrepokemon")
+    private String nombrePokemon;
 
     @ManyToOne
     @JoinColumn(name = "idusuario")
-    private UsuarioJPA UsuarioJPA;
+    private UsuarioJPA usuario;
 
-    @Column(name = "nombrepokemon")
-    private String NombrePokemon;
+    public int getIdFavorito() {
+        return idFavorito;
+    }
+
+    public void setIdFavorito(int idFavorito) {
+        this.idFavorito = idFavorito;
+    }
 
     public int getIdPokemon() {
-        return IdPokemon;
+        return idPokemon;
     }
 
-    public void setIdPokemon(int IdPokemon) {
-        this.IdPokemon = IdPokemon;
-    }
-
-    public UsuarioJPA getUsuarioJPA() {
-        return UsuarioJPA;
-    }
-
-    public void setUsuarioJPA(UsuarioJPA UsuarioJPA) {
-        this.UsuarioJPA = UsuarioJPA;
+    public void setIdPokemon(int idPokemon) {
+        this.idPokemon = idPokemon;
     }
 
     public String getNombrePokemon() {
-        return NombrePokemon;
+        return nombrePokemon;
     }
 
-    public void setNombrePokemon(String NombrePokemon) {
-        this.NombrePokemon = NombrePokemon;
+    public void setNombrePokemon(String nombrePokemon) {
+        this.nombrePokemon = nombrePokemon;
     }
 
+    public UsuarioJPA getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioJPA usuario) {
+        this.usuario = usuario;
+    }
 }
-

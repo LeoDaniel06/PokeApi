@@ -1,5 +1,6 @@
 package com.PokeApi.PokeApi.JPA;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,47 +8,52 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "USUARIO")
 public class UsuarioJPA {
 
     @Id
-    @Column(name = "idusuario")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int IdUsuario;
+    @Column(name = "idusuario")
+    private int idUsuario;
 
     @Column(name = "nombre")
-    private String Nombre;
+    private String nombre;
 
     @Column(name = "username")
     private String userName;
 
     @Column(name = "password")
-    private String Password;
+    private String password;
 
     @Column(name = "sexo")
-    private String Sexo;
+    private String sexo;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
     private RolJPA RolJPA;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoritosJPA> favoritos;
+
     public int getIdUsuario() {
-        return IdUsuario;
+        return idUsuario;
     }
 
-    public void setIdUsuario(int IdUsuario) {
-        this.IdUsuario = IdUsuario;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNombre() {
-        return Nombre;
+        return nombre;
     }
 
-    public void setNombre(String Nombre) {
-        this.Nombre = Nombre;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getUserName() {
@@ -59,19 +65,19 @@ public class UsuarioJPA {
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
-    public void setPassword(String Password) {
-        this.Password = Password;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getSexo() {
-        return Sexo;
+        return sexo;
     }
 
-    public void setSexo(String Sexo) {
-        this.Sexo = Sexo;
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
     }
 
     public RolJPA getRolJPA() {
@@ -82,5 +88,11 @@ public class UsuarioJPA {
         this.RolJPA = RolJPA;
     }
 
-}
+    public List<FavoritosJPA> getFavoritos() {
+        return favoritos;
+    }
 
+    public void setFavoritos(List<FavoritosJPA> favoritos) {
+        this.favoritos = favoritos;
+    }
+}

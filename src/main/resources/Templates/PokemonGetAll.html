@@ -16,13 +16,13 @@
                 font-family: 'PokemonHollow';
                 src: url('./pokemon-hollow.ttf') format('truetype');
             }
-            
+
             .pkm{
                 font-family: 'PokemonSolid', sans-serif;
             }
-            
+
             .pkm-hollow{
-                font-family: 'PokemonHollow', sans-serif; 
+                font-family: 'PokemonHollow', sans-serif;
             }
 
             *{
@@ -80,17 +80,39 @@
                 animation: fadeInUp 0.6s ease-out forwards;
             }
 
-            .pokemon-card:nth-child(1) { animation-delay: 0.1s; }
-            .pokemon-card:nth-child(2) { animation-delay: 0.2s; }
-            .pokemon-card:nth-child(3) { animation-delay: 0.3s; }
-            .pokemon-card:nth-child(4) { animation-delay: 0.4s; }
-            .pokemon-card:nth-child(5) { animation-delay: 0.5s; }
-            .pokemon-card:nth-child(6) { animation-delay: 0.6s; }
-            .pokemon-card:nth-child(7) { animation-delay: 0.7s; }
-            .pokemon-card:nth-child(8) { animation-delay: 0.8s; }
-            .pokemon-card:nth-child(9) { animation-delay: 0.9s; }
-            .pokemon-card:nth-child(10) { animation-delay: 1s; }
-            .pokemon-card:nth-child(n+11) { animation-delay: 1.1s; }
+            .pokemon-card:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+            .pokemon-card:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+            .pokemon-card:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+            .pokemon-card:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+            .pokemon-card:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+            .pokemon-card:nth-child(6) {
+                animation-delay: 0.6s;
+            }
+            .pokemon-card:nth-child(7) {
+                animation-delay: 0.7s;
+            }
+            .pokemon-card:nth-child(8) {
+                animation-delay: 0.8s;
+            }
+            .pokemon-card:nth-child(9) {
+                animation-delay: 0.9s;
+            }
+            .pokemon-card:nth-child(10) {
+                animation-delay: 1s;
+            }
+            .pokemon-card:nth-child(n+11) {
+                animation-delay: 1.1s;
+            }
 
             @keyframes fadeInUp {
                 from {
@@ -190,24 +212,60 @@
                 text-transform: uppercase;
             }
 
-            .type-normal { background: #A8A878; }
-            .type-fire { background: #F08030; }
-            .type-water { background: #6890F0; }
-            .type-electric { background: #F8D030; }
-            .type-grass { background: #78C850; }
-            .type-ice { background: #98D8D8; }
-            .type-fighting { background: #C03028; }
-            .type-poison { background: #A040A0; }
-            .type-ground { background: #E0C068; }
-            .type-flying { background: #A890F0; }
-            .type-psychic { background: #F85888; }
-            .type-bug { background: #A8B820; }
-            .type-rock { background: #B8A038; }
-            .type-ghost { background: #705898; }
-            .type-dragon { background: #7038F8; }
-            .type-dark { background: #705848; }
-            .type-steel { background: #B8B8D0; }
-            .type-fairy { background: #EE99AC; }
+            .type-normal {
+                background: #A8A878;
+            }
+            .type-fire {
+                background: #F08030;
+            }
+            .type-water {
+                background: #6890F0;
+            }
+            .type-electric {
+                background: #F8D030;
+            }
+            .type-grass {
+                background: #78C850;
+            }
+            .type-ice {
+                background: #98D8D8;
+            }
+            .type-fighting {
+                background: #C03028;
+            }
+            .type-poison {
+                background: #A040A0;
+            }
+            .type-ground {
+                background: #E0C068;
+            }
+            .type-flying {
+                background: #A890F0;
+            }
+            .type-psychic {
+                background: #F85888;
+            }
+            .type-bug {
+                background: #A8B820;
+            }
+            .type-rock {
+                background: #B8A038;
+            }
+            .type-ghost {
+                background: #705898;
+            }
+            .type-dragon {
+                background: #7038F8;
+            }
+            .type-dark {
+                background: #705848;
+            }
+            .type-steel {
+                background: #B8B8D0;
+            }
+            .type-fairy {
+                background: #EE99AC;
+            }
 
             .pokemon-poderes{
                 background: #f8f9fa;
@@ -436,8 +494,8 @@
 
                 paginaActual = numeroPagina;
                 actualizarBotonesPaginacion();
-                
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                window.scrollTo({top: 0, behavior: 'smooth'});
             }
 
             function mostrarPaginacion() {
@@ -521,9 +579,12 @@
                         </div>
                     </div>
                 `;
-
+                card.addEventListener('click', () => {
+                    window.location.href = `/pokedex/detail/${pokemon.id}`;
+                });
                 const estrella = card.querySelector('.favorito');
-                estrella.addEventListener('click', () => {
+                estrella.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     toggleFavorito(pokemon.id, estrella);
                 });
 
@@ -532,7 +593,7 @@
 
             function buscarPokemon() {
                 const searchTerm = document.getElementById('buscador').value.toLowerCase();
-                
+
                 if (searchTerm === '') {
                     // Si no hay búsqueda, mostrar paginación normal
                     document.getElementById('paginacion').style.display = 'flex';
@@ -540,15 +601,15 @@
                 } else {
                     // Ocultar paginación durante búsqueda
                     document.getElementById('paginacion').style.display = 'none';
-                    
+
                     const container = document.getElementById('pokemon-tarjeta');
                     container.innerHTML = '';
-                    
-                    const resultados = todosLosPokemon.filter(pokemon => 
-                        pokemon.name.toLowerCase().includes(searchTerm) || 
-                        String(pokemon.id).includes(searchTerm)
+
+                    const resultados = todosLosPokemon.filter(pokemon =>
+                        pokemon.name.toLowerCase().includes(searchTerm) ||
+                                String(pokemon.id).includes(searchTerm)
                     );
-                    
+
                     resultados.forEach(pokemon => {
                         crearTarjetaPokemon(pokemon, container);
                     });

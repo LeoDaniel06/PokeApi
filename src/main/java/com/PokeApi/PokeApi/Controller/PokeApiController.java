@@ -6,6 +6,8 @@ import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
+import com.PokeApi.PokeApi.Service.FavoritosService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -23,9 +26,12 @@ public class PokeApiController {
 
     @Autowired
     private UsuarioDAOJPAImplementation usuarioDAOJPAImplementation;
-    
+
     @Autowired
     private RolJPADAOImplementation rolJPADAOImplementation;
+
+    @Autowired
+    private FavoritosService favoritosService;
 
     @GetMapping
     public String getAll() {
@@ -37,13 +43,38 @@ public class PokeApiController {
         model.addAttribute("pokemonId", id);
         return "DetailPokeApi";
     }
-    
+
+    // ---------- FAVORITOS (AJAX) ----------
+    @PostMapping("/addFavorito")
+    @ResponseBody
+    public Result agregarFavorito(@RequestParam int idPokemon,
+                                  @RequestParam String nombrePokemon,
+                                  HttpSession session) {
+
+        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = "Usuario no autenticado";
+            return result;
+        }
+
+        return favoritosService.addFavorito(
+                idPokemon,
+                usuario.getIdUsuario(),
+                nombrePokemon
+        );
+    }
+
+    // ---------- LOGIN ----------
     @GetMapping("/login")
-    public String login(Model model){
+    public String login(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
         return "LoginPokeApi";
     }
 
+    // ---------- REGISTRO ----------
     @GetMapping("/registro")
     public String ResgistroFormulario(Model model) {
         model.addAttribute("usuario", new UsuarioJPA());
@@ -55,7 +86,9 @@ public class PokeApiController {
     }
 
     @PostMapping("/registro")
-    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario, @RequestParam("rol") int idRol, RedirectAttributes redirectAttributes) {
+    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario,
+                                    @RequestParam("rol") int idRol,
+                                    RedirectAttributes redirectAttributes) {
 
         RolJPA rol = new RolJPA();
         rol.setIdRol(idRol);
@@ -71,7 +104,5 @@ public class PokeApiController {
             redirectAttributes.addFlashAttribute("tipo", "danger");
             return "redirect:/pokedex/registro";
         }
-
     }
-
 }

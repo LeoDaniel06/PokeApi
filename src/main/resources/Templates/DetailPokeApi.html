@@ -24,7 +24,7 @@
             }
             .loader-content p {
                 color: white;
-                font-family: 'PokemonSolid', cursive;
+                font-family: 'PokemonSolid', sans-serif;
                 font-size: 0.9rem;
             }
             .pokeball {
@@ -74,7 +74,7 @@
                 background-attachment: fixed;
             }
             .pokedex-header h2 {
-                font-family: 'PokemonHollow', cursive;
+                font-family: 'PokemonSolid', cursive;
                 font-size: 3rem;
                 letter-spacing: 2px;
                 color: #fff;
@@ -140,7 +140,6 @@
                 animation: float 1.5s ease-in-out infinite;
             }
 
-            /* Favorito */
             .favorite {
                 position: absolute;
                 top: 10px;
@@ -451,11 +450,6 @@
                     list.appendChild(li);
                 });
             }
-
-            document.getElementById("favoriteBtn").addEventListener("click", function () {
-                this.classList.toggle("active");
-            });
-
             new bootstrap.Carousel(
                     document.getElementById("pokemonCarousel"),
                     {
@@ -464,12 +458,15 @@
                         pause: "hover"
                     }
             );
-
+            function getPokemonIdFromURL() {
+                const path = window.location.pathname;
+                return path.substring(path.lastIndexOf("/") + 1);
+            }
+            const pokemonId = getPokemonIdFromURL();
             const startTime = Date.now();
-
             Promise.all([
-                fetch("https://pokeapi.co/api/v2/pokemon/darkrai").then(r => r.json()),
-                fetch("https://pokeapi.co/api/v2/pokemon-species/darkrai").then(r => r.json())
+                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`).then(r => r.json()),
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`).then(r => r.json())
             ]).then(([pokemon, species]) => {
                 renderPokemon(pokemon, species);
                 const loader = document.getElementById("loader");
@@ -484,7 +481,6 @@
             async function renderEvolutions(species) {
                 const evoContainer = document.getElementById("pokemon-evolutions");
                 evoContainer.innerHTML = "";
-
                 if (!species.evolution_chain) {
                     evoContainer.textContent = "No tiene evoluciones";
                     return;
@@ -506,30 +502,51 @@
             function createEvolutionCard(pokemon) {
                 const card = document.createElement("div");
                 card.className = "text-center";
-
                 const img = document.createElement("img");
                 img.src = pokemon.sprites.other["official-artwork"].front_default;
                 img.className = "rounded-circle border border-3";
                 img.style.width = "100px";
                 img.style.height = "100px";
-
                 const name = document.createElement("p");
                 name.textContent = pokemon.name.toUpperCase();
                 name.className = "mt-2 mb-1 fw-bold";
-
                 const id = document.createElement("small");
                 id.textContent = `N.º ${pokemon.id.toString().padStart(3, "0")}`;
-
                 const type = document.createElement("span");
                 const typeName = pokemon.types[0].type.name;
                 type.className = "badge mt-1";
                 type.style.backgroundColor = typeColors[typeName];
                 type.textContent = typeName.toUpperCase();
-
                 card.append(img, name, id, document.createElement("br"), type);
                 return card;
             }
-        </script>
 
+            document.getElementById("favoriteBtn").addEventListener("click", function () {
+                this.classList.toggle("bi-star");
+                this.classList.toggle("bi-star-fill");
+                this.classList.toggle("active");
+
+                const idPokemon = document.getElementById("pokemon-id").textContent;
+                const nombrePokemon = document.getElementById("pokemon-name").textContent;
+
+                fetch("/pokedex/addFavorito", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        idPokemon: idPokemon,
+                        nombrePokemon: nombrePokemon
+                    })
+                })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.correct) {
+                                alert(data.errorMessage);
+                            }
+                        })
+                        .catch(err => console.error(err));
+            });
+        </script>
     </body>
 </html>
