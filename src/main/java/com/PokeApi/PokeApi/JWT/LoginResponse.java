@@ -10,6 +10,7 @@ public class LoginResponse {
     private final Date ExpiresAt;
     private final Date CreateAt;
     private String rol;
+   
     
     public LoginResponse(String token, Date ExpiresAt, Date CreateAt, String rol){
         this.token = token;

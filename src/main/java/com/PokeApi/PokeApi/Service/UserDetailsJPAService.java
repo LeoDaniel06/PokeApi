@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.User;
 @Service
 public class UserDetailsJPAService implements UserDetailsService{
 
+    
     private final IUsuarioJPARepository iUsuarioJPARepository;
     
     public UserDetailsJPAService(IUsuarioJPARepository iUsuarioJPARepository1){
@@ -24,6 +25,13 @@ public class UserDetailsJPAService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         UsuarioJPA usuario = iUsuarioJPARepository.findByUserName(userName);
+        
+        if (usuario == null) {
+        System.out.println("Usuario NO encontrado con username: " + userName);
+        throw new UsernameNotFoundException("Usuario no encontrado: " + userName);
+    }
+
+    System.out.println("Usuario encontrado: " + usuario.getUserName());
         
         List<GrantedAuthority> authorities = List.of(
         new SimpleGrantedAuthority("ROLE_" + usuario.getRolJPA().getNombreRol().toUpperCase()));

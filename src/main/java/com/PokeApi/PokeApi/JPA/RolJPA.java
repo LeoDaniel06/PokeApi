@@ -10,29 +10,28 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "ROL")
 public class RolJPA {
-   
+
     @Id
-    @Column(name = "idRol")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idrol")
     private int IdRol;
-    
-    @Column(name = "nombreRol")
+
+    @Column(name = "nombrerol")
     private String NombreRol;
-    
+
     public int getIdRol() {
         return IdRol;
     }
 
-    public void setIdRol(int IdRol) {
-        this.IdRol = IdRol;
+    public void setIdRol(int idRol) {
+        IdRol = idRol;
     }
 
     public String getNombreRol() {
         return NombreRol;
     }
 
-    public void setNombreRol(String NombreRol) {
-        this.NombreRol = NombreRol;
+    public void setNombreRol(String nombreRol) {
+        NombreRol = nombreRol;
     }
-    
 }
