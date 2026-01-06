@@ -35,29 +35,21 @@ public class PokeApiController {
     @PostMapping("/addFavorito")
     @ResponseBody
     public Result agregarFavorito(@RequestParam int idPokemon,
-            @RequestParam String nombrePokemon
-    //                                  HttpSession session
-    ) {
+            @RequestParam String nombrePokemon,
+            HttpSession session){
 
-//        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
-//
-//        if (usuario == null) {
-//            Result result = new Result();
-//            result.correct = false;
-//            result.errorMessage = "Usuario no autenticado";
-//            return result;
-//        }
-//
-//        return favoritosService.addFavorito(
-//                idPokemon,
-//                usuario.getIdUsuario(),
-//                nombrePokemon
-//        );
-        int idUsuarioPrueba = 1;
+        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = "Usuario no autenticado";
+            return result;
+        }
 
         return favoritosService.addFavorito(
                 idPokemon,
-                idUsuarioPrueba,
+                usuario.getIdUsuario(),
                 nombrePokemon
         );
     }
