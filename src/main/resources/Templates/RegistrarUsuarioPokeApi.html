@@ -6,16 +6,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <style>
             /* Tipografía Pokémon */
             @font-face {
                 font-family: 'PokemonSolid';
-                src: url('./pokemon-solid.ttf') format('truetype');
+                src: url('/fonts/pokemon-solid.ttf') format('truetype');
             }
 
             @font-face {
                 font-family: 'PokemonHollow';
-                src: url('./pokemon-hollow.ttf') format('truetype');
+                src: url('/fonts/pokemon-hollow.ttf') format('truetype');
             }
 
             .pkm {
@@ -169,6 +170,38 @@
                 border-radius: 10px;
                 border: 2px solid rgba(255, 65, 54, 0.3);
             }
+
+            .alert {
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+
+            .password-container{
+                position: relative;
+            }
+
+            .password-toggle {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #ff4136;
+                font-size: 1.2rem;
+                padding: 5px;
+                transition: color 0.3s;
+            }
+
+            .password-toggle:hover {
+                color: #dc1f0f;
+            }
+
+            .password-container .form-control {
+                padding-right: 45px;
+            }
+
         </style>
     </head>
     <body>
@@ -185,13 +218,24 @@
                     <p class="text-white pkm-hollow">Completa el formulario para comenzar tu aventura</p>
                 </div>
 
-                <form id="registroForm" th:action="@{/registro}" method="post" th:object="${usuario}">
+                <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${mensaje}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <form id="registroForm" th:action="@{/pokedex/registro}" method="post" th:object="${usuario}">
+                    <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo</label>
                         <input type="text" 
                                class="form-control" 
                                id="nombre" 
                                name="nombre" 
+                               th:field="*{nombre}"
                                placeholder="Ej: Ash Ketchum" 
                                required 
                                >
@@ -202,7 +246,8 @@
                         <input type="text" 
                                class="form-control" 
                                id="username" 
-                               name="username" 
+                               name="userName" 
+                               th:field="*{userName}"
                                placeholder="Ej: ash_maestro" 
                                required 
                                >
@@ -210,72 +255,99 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" 
-                               class="form-control" 
-                               id="password" 
-                               name="password" 
-                               placeholder="********" 
-                               required 
-                               t>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="rol" class="form-label">Rol</label>
-                        <select class="form-select" 
-                                id="rol" 
-                                name="rol" 
-                                required 
-                                >
-                            <option value="" selected disabled>Selecciona tu rol</option>
-                            <option value="entrenador">Entrenador Pokémon</option>
-                            <option value="lider">Líder de Gimnasio</option>
-                            <option value="investigador">Investigador</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Sexo</label>
-                        <div class="gender-container">
-                            <div class="form-check">
-                                <input class="form-check-input" 
-                                       type="radio" 
-                                       name="sexo" 
-                                       id="masculino" 
-                                       value="M" 
-                                       required
-                                       >
-                                <label class="form-check-label" for="masculino">
-                                    ♂ Masculino
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" 
-                                       type="radio" 
-                                       name="sexo" 
-                                       id="femenino" 
-                                       value="F" 
-                                       required
-                                       >
-                                <label class="form-check-label" for="femenino">
-                                    ♀ Femenino
-                                </label>
-                            </div> 
+                        <div class="password-container">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   th:field="*{password}"
+                                   placeholder="********" 
+                                   required>
+                            <button type="button" 
+                                    class="password-toggle" 
+                                    id="togglePassword"
+                                    aria-label="Mostrar contraseña">
+                                <i class="bi bi-eye-fill" id="eyeIcon"></i>
+                            </button>
                         </div>
-                    </div>
 
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            Registrarse
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href = '/login'">
-                            Volver al Login
-                        </button>
-                    </div>
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select class="form-select" 
+                                    id="rol" 
+                                    name="rol" 
+                                    required>
+                                <option value="" selected disabled>Selecciona tu rol</option>
+                                <option th:each="rol : ${roles}" 
+                                        th:value="${rol.idRol}" 
+                                        th:text="${rol.nombreRol}">
+                                    Entrenador Pokémon
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Sexo</label>
+                            <div class="gender-container">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="radio" 
+                                           name="sexo" 
+                                           th:field="*{sexo}"
+                                           id="masculino" 
+                                           value="M" 
+                                           required
+                                           >
+                                    <label class="form-check-label" for="masculino">
+                                        ♂ Masculino
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="radio" 
+                                           name="sexo" 
+                                           th:field="*{sexo}"
+                                           id="femenino" 
+                                           value="F" 
+                                           required
+                                           >
+                                    <label class="form-check-label" for="femenino">
+                                        ♀ Femenino
+                                    </label>
+                                </div> 
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                Registrarse
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href = '/login'">
+                                Volver al Login
+                            </button>
+                        </div>
                 </form>
             </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                if (type === 'password') {
+                    eyeIcon.className = 'bi bi-eye-fill';
+                } else {
+                    eyeIcon.className = 'bi bi-eye-slash-fill';
+                }
+            });
+        </script>
+
     </body>
 </html>
