@@ -319,7 +319,6 @@
                 padding: 50px;
             }
 
-            /* Estilos de paginación */
             .pagination-container{
                 display: flex;
                 justify-content: center;
@@ -456,7 +455,7 @@
                 const container = document.getElementById('pokemon-tarjeta');
 
                 try {
-                    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
+                    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100&offset=0');
                     const data = await response.json();
 
                     loading.style.display = 'none';
@@ -535,6 +534,34 @@
                 localStorage.setItem('favoritos', JSON.stringify(favoritos));
             }
 
+            async function guardarFavoritoBackend(pokemon, estrella) {
+                try {
+                    const params = new URLSearchParams();
+                    params.append("idPokemon", pokemon.id);
+                    params.append("nombrePokemon", pokemon.name);
+
+                    const response = await fetch("/pokedex/addFavorito", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: params
+                    });
+
+                    const result = await response.json();
+
+                    if (result.correct) {
+                        // UI
+                        toggleFavorito(pokemon.id, estrella);
+                    } else {
+                        alert(result.errorMessage || "Error al guardar favorito");
+                    }
+
+                } catch (error) {
+                    console.error("Error al guardar favorito:", error);
+                }
+            }
+
             function crearTarjetaPokemon(pokemon, container) {
                 const hp = pokemon.stats.find(stat => stat.stat.name === 'hp').base_stat;
                 const attack = pokemon.stats.find(stat => stat.stat.name === 'attack').base_stat;
@@ -585,7 +612,7 @@
                 const estrella = card.querySelector('.favorito');
                 estrella.addEventListener('click', (event) => {
                     event.stopPropagation();
-                    toggleFavorito(pokemon.id, estrella);
+                    guardarFavoritoBackend(pokemon, estrella);
                 });
 
                 container.appendChild(card);
@@ -595,11 +622,9 @@
                 const searchTerm = document.getElementById('buscador').value.toLowerCase();
 
                 if (searchTerm === '') {
-                    // Si no hay búsqueda, mostrar paginación normal
                     document.getElementById('paginacion').style.display = 'flex';
                     mostrarPagina(paginaActual);
                 } else {
-                    // Ocultar paginación durante búsqueda
                     document.getElementById('paginacion').style.display = 'none';
 
                     const container = document.getElementById('pokemon-tarjeta');
@@ -615,7 +640,6 @@
                     });
                 }
             }
-
             document.addEventListener('DOMContentLoaded', () => {
                 cargarPokemon();
 
