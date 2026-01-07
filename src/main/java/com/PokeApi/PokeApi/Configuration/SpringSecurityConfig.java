@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
@@ -25,7 +24,7 @@ public class SpringSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     public SpringSecurityConfig(UserDetailsJPAService usuarioDetailsJPAService,
-                                JwtAuthFilter jwtAuthFilter) {
+            JwtAuthFilter jwtAuthFilter) {
         this.usuarioDetailsJPAService = usuarioDetailsJPAService;
         this.jwtAuthFilter = jwtAuthFilter;
     }
@@ -33,24 +32,26 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/api/auth/**",
-                        "/login/**",
-                        "/LoginPokeApi",
+                        "/pokedex/login",
                         "/pokedex/registro",
-                        "/pokedex/**",
+                        "/pokedex",
+                        "/api/auth/**",
                         "/fonts/**"
                 ).permitAll()
                 .anyRequest().authenticated()
-            )
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/pokedex/login?logout")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
     }
@@ -72,4 +73,3 @@ public class SpringSecurityConfig {
         return config.getAuthenticationManager();
     }
 }
-
