@@ -58,7 +58,7 @@ public class PokeApiController {
         return "DetailPokeApi";
     }
 
-    // ---------- FAVORITOS (AJAX) ----------
+    // ---------- FAVORITOS ADD ----------
     @PostMapping("/addFavorito")
     @ResponseBody
     public Result agregarFavorito(@RequestParam int idPokemon,
@@ -67,11 +67,15 @@ public class PokeApiController {
 
         UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
 
+//        if (usuario == null) {
+//            Result result = new Result();
+//            result.correct = false;
+//            result.errorMessage = "Usuario no autenticado";
+//            return result;
+//        }
         if (usuario == null) {
-            Result result = new Result();
-            result.correct = false;
-            result.errorMessage = "Usuario no autenticado";
-            return result;
+            usuario = new UsuarioJPA();
+            usuario.setIdUsuario(1); // usuario de prueba en BD
         }
 
         return favoritosService.addFavorito(
@@ -81,7 +85,25 @@ public class PokeApiController {
         );
     }
 
-    // ---------- LOGIN / LOGOUT----------
+    // ---------- FAVORITOS DELETE ----------
+    @GetMapping("/deleteFavorito")
+    public Result deleteFavorito(@RequestParam int idPokemon, HttpSession session) {
+        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
+        Result result = new Result();
+//        if (usuario == null) {
+//            result.correct = false;
+//            result.errorMessage = "Usuario no autenticado";
+//            return result;
+//        }
+        if (usuario == null) {
+            usuario = new UsuarioJPA();
+            usuario.setIdUsuario(1); // usuario de prueba en BD
+        }
+
+        return favoritosService.eliminarFavoritos(idPokemon, usuario.getIdUsuario());
+    }
+
+    // ---------- LOGIN ----------
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
@@ -135,8 +157,8 @@ public class PokeApiController {
 
     @PostMapping("/registro")
     public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario,
-                                    @RequestParam("rol") int idRol,
-                                    RedirectAttributes redirectAttributes) {
+            @RequestParam("rol") int idRol,
+            RedirectAttributes redirectAttributes) {
 
         RolJPA rol = new RolJPA();
         rol.setIdRol(idRol);
@@ -146,7 +168,7 @@ public class PokeApiController {
         if (result.correct) {
             redirectAttributes.addFlashAttribute("mensaje", "El Usuario se Registro Correctamente");
             redirectAttributes.addFlashAttribute("tipo", "success");
-            return "redirect:/LoginPokeApi";
+            return "redirect:/login";
         } else {
             redirectAttributes.addFlashAttribute("error", result.errorMessage);
             redirectAttributes.addFlashAttribute("tipo", "danger");
