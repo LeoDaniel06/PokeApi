@@ -5,4 +5,5 @@ import com.PokeApi.PokeApi.JPA.Result;
 
 public interface IFavoritosJPA {
     Result ADDFavoritos(int idPokemon, int idUsuario, String Nombrepokemon);
+    Result DeleteFavoritos(int idPokemon, int idUsuario);
 }

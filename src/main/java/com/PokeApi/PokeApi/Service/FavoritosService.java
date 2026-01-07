@@ -1,6 +1,5 @@
 package com.PokeApi.PokeApi.Service;
 
-import com.PokeApi.PokeApi.DAO.IFavoritosJPA;
 import com.PokeApi.PokeApi.DAO.FavoritosJAPDAOImplementation;
 import com.PokeApi.PokeApi.JPA.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,5 +13,9 @@ public class FavoritosService {
     
     public Result addFavorito(int idPokemon, int idUsuario, String nombrePokemon) {
         return favoritosJPADAOImplementation.ADDFavoritos(idPokemon, idUsuario, nombrePokemon);
+    }
+    
+    public Result eliminarFavoritos(int idPokemon, int idUsuario){
+        return favoritosJPADAOImplementation.DeleteFavoritos(idPokemon, idUsuario);
     }
 }
