@@ -1,113 +1,113 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Pokédex</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Pokédex</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        
-        /* esto es para tipografia de pokemon*/
-        @font-face {
-            font-family: 'PokemonSolid';
-            src: url('./pokemon-solid.ttf') format('truetype');
-        }
+        <style>
 
-        @font-face {
-            font-family: 'PokemonHollow';
-            src: url('./pokemon-hollow.ttf') format('truetype');
-        }
-
-        /* solo pongan el pkm o pkm hollow en cualquier clase div y ya trae la tipografia*/
-        .pkm {
-            font-family: 'PokemonSolid', sans-serif;
-        }
-
-        .pkm-hollow {
-            font-family: 'PokemonHollow', sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .pokemon-navbar {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 15px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .pokemon-navbar .navbar-brand {
-            font-family: 'PokemonSolid', sans-serif;
-            font-size: 1.8rem;
-            color: #667eea;
-        }
-
-        .pokemon-navbar .nav-link {
-            color: #667eea;
-            font-weight: 600;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
-
-        .pokemon-navbar .nav-link:hover {
-            color: #764ba2;
-            transform: translateY(-2px);
-        }
-
-        .pokemon-navbar .nav-link.active {
-            color: #764ba2;
-            font-weight: bold;
-        }
-
-        .pokemon-footer {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 50px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .pokemon-footer p {
-            margin: 0;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .content-wrapper {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            /* esto es para tipografia de pokemon*/
+            @font-face {
+                font-family: 'PokemonSolid';
+                src: url('./pokemon-solid.ttf') format('truetype');
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            @font-face {
+                font-family: 'PokemonHollow';
+                src: url('./pokemon-hollow.ttf') format('truetype');
             }
-        }
-    </style>
+
+            /* solo pongan el pkm o pkm hollow en cualquier clase div y ya trae la tipografia*/
+            .pkm {
+                font-family: 'PokemonSolid', sans-serif;
+            }
+
+            .pkm-hollow {
+                font-family: 'PokemonHollow', sans-serif;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .pokemon-navbar {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                padding: 15px 30px;
+                margin-bottom: 30px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .pokemon-navbar .navbar-brand {
+                font-family: 'PokemonSolid', sans-serif;
+                font-size: 1.8rem;
+                color: #667eea;
+            }
+
+            .pokemon-navbar .nav-link {
+                color: #667eea;
+                font-weight: 600;
+                margin: 0 10px;
+                transition: all 0.3s ease;
+            }
+
+            .pokemon-navbar .nav-link:hover {
+                color: #764ba2;
+                transform: translateY(-2px);
+            }
+
+            .pokemon-navbar .nav-link.active {
+                color: #764ba2;
+                font-weight: bold;
+            }
+
+            .pokemon-footer {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                padding: 20px;
+                margin-top: 50px;
+                text-align: center;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .pokemon-footer p {
+                margin: 0;
+                color: #667eea;
+                font-weight: 600;
+            }
+
+            .content-wrapper {
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
 
     <th:block layout:fragment="extra-css"></th:block>
 </head>
@@ -128,7 +128,13 @@
                             <a class="nav-link" th:href="@{/favoritos}">Favoritos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/logout}">Cerrar Sesión</a>
+                            <form id="logoutForm" th:action="@{/logout}" method="post">
+                                <button type="button" class="nav-link btn btn-link" style="padding:0; border:none; background:none;" id="logoutBtn">
+                                    Cerrar Sesión
+                                </button>
+
+                            </form>
+
                         </li>
                     </ul>
                 </div>
@@ -146,7 +152,34 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById("logoutBtn").addEventListener("click", function () {
+            Swal.fire({
+                title: '¿Quieres cerrar sesión?',
+                text: "Tu sesión actual se cerrará",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Enviar el formulario de logout
+                    document.getElementById("logoutForm").submit();
 
-    <th:block layout:fragment="extra-scripts"></th:block>
+                    // Mostrar alerta de éxito
+                    Swal.fire({
+                        title: 'Sesión cerrada',
+                        text: 'Has cerrado sesión exitosamente',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+    </script>
+<th:block layout:fragment="extra-scripts"></th:block>
 </body>
 </html>
