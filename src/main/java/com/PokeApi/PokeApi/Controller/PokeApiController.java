@@ -120,7 +120,7 @@ public class PokeApiController {
         if (result.correct) {
             redirectAttributes.addFlashAttribute("mensaje", "El Usuario se Registro Correctamente");
             redirectAttributes.addFlashAttribute("tipo", "success");
-            return "redirect:/LoginPokeApi";
+            return "redirect:/login";
         } else {
             redirectAttributes.addFlashAttribute("error", result.errorMessage);
             redirectAttributes.addFlashAttribute("tipo", "danger");
