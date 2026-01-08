@@ -38,18 +38,20 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
                 
             }
             
-            if (usuario.getRolJPA() != null && usuario.getRolJPA().getIdRol() > 0) {
-                RolJPA rolManaged = entityManager.find(RolJPA.class, usuario.getRolJPA().getIdRol());
-                
-                if (rolManaged != null) {
-                    usuario.setRolJPA(rolManaged);                    
-                } else {
-                    result.correct = false;
-                    result.errorMessage = "Rol no encontrado";
-                    result.status = 404;
-                    return result;
-                }
-            }
+            try {
+            RolJPA rolAdmin = entityManager.createQuery(
+                "SELECT r FROM RolJPA r WHERE r.NombreRol = :nombreRol", RolJPA.class)
+                .setParameter("nombreRol", "Entrenador")
+                .getSingleResult();
+            
+            usuario.setRolJPA(rolAdmin);
+            
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Rol 'Admin' no encontrado en la base de datos";
+            result.status = 404;
+            return result;
+        }
             
             entityManager.persist(usuario);
             entityManager.flush();
