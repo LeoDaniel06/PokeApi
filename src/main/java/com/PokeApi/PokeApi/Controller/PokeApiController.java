@@ -4,17 +4,20 @@ import com.PokeApi.PokeApi.DAO.RolJPADAOImplementation;
 import com.PokeApi.PokeApi.DAO.UsuarioDAOJPAImplementation;
 import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
+import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import com.PokeApi.PokeApi.JWT.JwtUtils;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
 import com.PokeApi.PokeApi.JWT.LoginResponse;
 import com.PokeApi.PokeApi.Service.FavoritosService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,13 +42,12 @@ public class PokeApiController {
 
     @Autowired
     private FavoritosService favoritosService;
-    
+
     @Autowired
     AuthenticationManager authenticationManager;
-    
+
     @Autowired
     JwtUtils jwtUtils;
-            
 
     @GetMapping
     public String getAll() {
@@ -112,33 +114,38 @@ public class PokeApiController {
 
     @PostMapping("/login")
     public String login(@ModelAttribute LoginRequest loginRequest, HttpServletRequest request, Model model) {
-                
-        try{
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                 loginRequest.getPassword()
-                )
-        );
-        
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        
-        String rol = userDetails.getAuthorities().iterator().next().getAuthority();
-        
-       if(rol.startsWith("ROLE_")){
-           rol = rol.substring(5);
-       }
-                
-        request.getSession().setAttribute("RolUsuario", rol);
-        if(rol.equals("ADMIN")){
-            return "redirect:/pokedex";
-        }else if(rol.equals("USUARIO")){
-            return "redirect:/pokedex/detail";
-        }else{
-            return "redirect:/pokedex/login";
-        }
-        
-        }catch(Exception ex){
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            
+//            UsuarioDetails userDetails = (UsuarioDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//            int idUsuario = userDetails.getId();
+            
+            String rol = userDetails.getAuthorities().iterator().next().getAuthority();
+
+            if (rol.startsWith("ROLE_")) {
+                rol = rol.substring(5);
+            }
+           
+            request.getSession().setAttribute("RolUsuario", rol);
+//            request.getSession().setAttribute("idUsuario", idUsuario);
+            
+            if (rol.equals("ADMIN")) {
+                return "redirect:/pokedex";
+            } else if (rol.equals("ENTRENADOR")) {
+                return "redirect:/pokedex/detail";
+            } else {
+                return "redirect:/pokedex/login";
+            }
+
+        } catch (Exception ex) {
             model.addAttribute("Error", "Credenciales Incorrectas");
             return "LoginPokeApi";
         }

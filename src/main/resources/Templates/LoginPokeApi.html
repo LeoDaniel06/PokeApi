@@ -1,9 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
-       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-       layout:decorate="~{layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
     <head>
         <title>PokeLogin</title>
-        <th:block layout:fragment="extra-css">
+    <th:block layout:fragment="extra-css">
         <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <style>
@@ -182,17 +182,36 @@
             .password-container .form-control {
                 padding-right: 45px;
             }
+
+            .hidden {
+                display: none;
+            }
+
+            #loader {
+                position: fixed;
+                inset: 0;
+                background: black;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+
+            #loader video {
+                width: 280px;
+            }
+
         </style>
     </th:block>
-        
-    </head>
-    <body class="bg-light">
-        <div layout:fragment="content" >
-        <div  class="container d-flex justify-content-center align-items-center vh-100">
+
+</head>
+<body class="bg-light">
+    <div layout:fragment="content" >
+        <div  class="container d-flex justify-content-center align-items-center vh-100 pkm">
             <div class="card shadow-sm p-4 border  border-black" style="width: 100%; max-width: 400px; border-radius: 10px;">
                 <div class="text-center mb-4">
                     <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" class="MegaCharizard">
-                    <!--                    <img src="https://www.vhv.rs/dpng/d/524-5242149_primal-groudon-png-download-primal-groudon-png-transparent.png" class="GroudonPrimigenio">-->
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" alt="Pokeball" class="pokeball-img">
                     <h1 class="fw-bold" style="color: white">¡Bienvenido Entrenador!</h1>
                     <p class="text" style="color: white">Por favor ingresa tu usuario y contraseña</p>
@@ -211,97 +230,71 @@
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-danger">Iniciar Sesion</button>
                     </div>
-                    
+
                     <div class="mb-3">
                         <p class="text" style="color: white">No te has Registrado?</p>
                         <p class="text" style="color: white">Registrate aqui:<a class="text" style="color: red"onclick="window.location.href = '/pokedex/registro'"> Crear Usuario</a></p>
                     </div>
-                    
+
                 </form>
 
             </div>
-
-            <!--            <div>
-                            <img src="https://cdn.creazilla.com/cliparts/3165340/grass-clipart-lg.png" alt="hierba" class="img-fluid grass-footer">
-                        </div>-->
         </div>
-        </div>
+    </div>
 
-<!--        <style>
-            body {
-               background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
-        background-repeat: no-repeat;
-        background-position: center center; 
-        background-size: cover;
-        display: flex;
-        position: relative;
-            }
- 
-            body::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 0;
-            }
+    <div id="carga" class="hidden">
+        <video
+            src="Downloads/Fondo de Carga.mp4"
+            autoplay
+            loop
+            muted
+            playsinline>
+            <p>Cargando Pokedex</p>
+    </div>
 
-            .container {
-                position: relative;
-                z-index: 1;
-            }
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("registerForm");
+            const loader = document.getElementById("loader");
 
-            .card {
-                transition: transform 0.2s;
-                background-color: rgba(30, 30, 30, 0.9);
-                border-radius: 15px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-                border: 3px solid #ff4136;
-                max-width: 400px;
-                width: 100%;
-                position: relative;
-                overflow: hidden;
-            }
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-            .card:hover {
-                transform: translateY(-5px);
-            }
 
-            .btn-primary {
-                background-color: red;
-                border: thin;
-                border-color: black;
-            }
+                loader.classList.remove("hidden");
 
-            .btn-primary:hover {
-                background-color: darkred;
-            }
+                try {
 
-            .pokeball-img {
-                width: 70px;
-                height: auto;
-                animation: bounce 0.3s infinite alternate;
-            }
+                    const response = await fetch("http://localhost:8080/pokedex/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            user: document.getElementById("user").value
+                        })
+                    });
 
-            @keyframes bounce {
-                from {
-                    transform: translateY(0);
+                    if (!response.ok) {
+                        throw new Error("Error en el registro");
+                    }
+
+                    const data = await response.json();
+                    console.log("Registro exitoso:", data);
+
+                    // aquí puedes redirigir
+                    // window.location.href = "/dashboard.html";
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Falló el registro");
+                } finally {
+
+                    loader.classList.add("hidden");
                 }
-                to {
-                    transform: translateY(-10px);
-                }
-            }
+            });
+        });
+    </script>
 
-            .MegaCharizard {
-                position: absolute;
-                top: -20px;
-                right: -20px;
-                width: 120px;
-                pointer-events: none;
-            }
-        </style>-->
-
-    </body>
+</body>
 </html>
