@@ -391,122 +391,133 @@
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js" type="module"></script>
 
     <script>
-    let todosLosPokemon = [];
-    let paginaActual = 1;
-    const pokemonPorPagina = 8;
+        let todosLosPokemon = [];
+        let paginaActual = 1;
+        const pokemonPorPagina = 8;
 
-    async function cargarPokemon() {
-        const loading = document.getElementById('loading');
+        async function cargarPokemon() {
+            const loading = document.getElementById('loading');
 
-        try {
-            const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
-            const data = await response.json();
+            try {
+                const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
+                const data = await response.json();
 
-            loading.style.display = 'none';
+                loading.style.display = 'none';
 
-            for (const pokemon of data.results) {
-                const detalles = await obtenerDetallesPokemon(pokemon.url);
-                todosLosPokemon.push(detalles);
+                for (const pokemon of data.results) {
+                    const detalles = await obtenerDetallesPokemon(pokemon.url);
+                    todosLosPokemon.push(detalles);
+                }
+
+                mostrarPagina(1);
+                mostrarPaginacion();
+
+            } catch (error) {
+                loading.innerHTML = 'Error al cargar los Pokémon';
+                console.error(error);
             }
-
-            mostrarPagina(1);
-            mostrarPaginacion();
-
-        } catch (error) {
-            loading.innerHTML = 'Error al cargar los Pokémon';
-            console.error(error);
-        }
-    }
-
-    async function obtenerDetallesPokemon(url) {
-        const response = await fetch(url);
-        return await response.json();
-    }
-
-    function mostrarPagina(numeroPagina) {
-        const container = document.getElementById('pokemon-tarjeta');
-        container.innerHTML = '';
-
-        const inicio = (numeroPagina - 1) * pokemonPorPagina;
-        const fin = inicio + pokemonPorPagina;
-        const pokemonPagina = todosLosPokemon.slice(inicio, fin);
-
-        pokemonPagina.forEach(pokemon => crearTarjetaPokemon(pokemon, container));
-
-        paginaActual = numeroPagina;
-        actualizarBotonesPaginacion();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function mostrarPaginacion() {
-        document.getElementById('paginacion').style.display = 'flex';
-    }
-
-    function actualizarBotonesPaginacion() {
-        const totalPaginas = Math.ceil(todosLosPokemon.length / pokemonPorPagina);
-        document.getElementById('info-pagina').textContent =
-            `Página ${paginaActual} de ${totalPaginas}`;
-
-        document.getElementById('btn-primera').disabled = paginaActual === 1;
-        document.getElementById('btn-anterior').disabled = paginaActual === 1;
-        document.getElementById('btn-siguiente').disabled = paginaActual === totalPaginas;
-        document.getElementById('btn-ultima').disabled = paginaActual === totalPaginas;
-    }
-
-    function obtenerFavoritos() {
-        return JSON.parse(localStorage.getItem('favoritos')) || [];
-    }
-
-    function toggleFavorito(id, estrella) {
-        let favoritos = obtenerFavoritos();
-
-        if (favoritos.includes(id)) {
-            favoritos = favoritos.filter(f => f !== id);
-            estrella.classList.remove('activo');
-        } else {
-            favoritos.push(id);
-            estrella.classList.add('activo');
         }
 
-        localStorage.setItem('favoritos', JSON.stringify(favoritos));
-    }
+        async function obtenerDetallesPokemon(url) {
+            const response = await fetch(url);
+            return await response.json();
+        }
 
-    async function guardarFavoritoBackend(pokemon, estrella) {
-        try {
-            const params = new URLSearchParams();
-            params.append("idPokemon", pokemon.id);
-            params.append("nombrePokemon", pokemon.name);
+        function mostrarPagina(numeroPagina) {
+            const container = document.getElementById('pokemon-tarjeta');
+            container.innerHTML = '';
 
-            const response = await fetch("/pokedex/addFavorito", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: params
-            });
+            const inicio = (numeroPagina - 1) * pokemonPorPagina;
+            const fin = inicio + pokemonPorPagina;
+            const pokemonPagina = todosLosPokemon.slice(inicio, fin);
 
-            const result = await response.json();
+            pokemonPagina.forEach(pokemon => crearTarjetaPokemon(pokemon, container));
 
-            if (result.correct) {
-                toggleFavorito(pokemon.id, estrella);
+            paginaActual = numeroPagina;
+            actualizarBotonesPaginacion();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function mostrarPaginacion() {
+            document.getElementById('paginacion').style.display = 'flex';
+        }
+
+        function actualizarBotonesPaginacion() {
+            const totalPaginas = Math.ceil(todosLosPokemon.length / pokemonPorPagina);
+            document.getElementById('info-pagina').textContent =
+                    `Página ${paginaActual} de ${totalPaginas}`;
+
+            document.getElementById('btn-primera').disabled = paginaActual === 1;
+            document.getElementById('btn-anterior').disabled = paginaActual === 1;
+            document.getElementById('btn-siguiente').disabled = paginaActual === totalPaginas;
+            document.getElementById('btn-ultima').disabled = paginaActual === totalPaginas;
+        }
+
+        function obtenerFavoritos() {
+            return JSON.parse(localStorage.getItem('favoritos')) || [];
+        }
+
+        function toggleFavorito(id, estrella) {
+            let favoritos = obtenerFavoritos();
+
+            if (favoritos.includes(id)) {
+                favoritos = favoritos.filter(f => f !== id);
+                estrella.classList.remove('activo');
             } else {
-                alert(result.errorMessage || "Error al guardar favorito");
+                favoritos.push(id);
+                estrella.classList.add('activo');
             }
-        } catch (error) {
-            console.error("Error al guardar favorito:", error);
+
+            localStorage.setItem('favoritos', JSON.stringify(favoritos));
         }
-    }
 
-    function crearTarjetaPokemon(pokemon, container) {
-        const hp = pokemon.stats.find(s => s.stat.name === 'hp').base_stat;
-        const attack = pokemon.stats.find(s => s.stat.name === 'attack').base_stat;
-        const defense = pokemon.stats.find(s => s.stat.name === 'defense').base_stat;
-        const speed = pokemon.stats.find(s => s.stat.name === 'speed').base_stat;
-        const tipos = pokemon.types.map(t => t.type.name);
-        const habilidades = pokemon.abilities.map(a => a.ability.name).join(', ');
+        async function guardarFavoritoBackend(pokemon, estrella) {
+            try {
+                const params = new URLSearchParams();
+                params.append("idPokemon", pokemon.id);
+                params.append("nombrePokemon", pokemon.name);
 
-        const card = document.createElement('div');
-        card.className = 'pokemon-card';
+                const response = await fetch("/pokedex/addFavorito", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: params,
+                    credentials: "same-origin" // ⭐ CLAVE
+                });
 
-        card.innerHTML = `
+                const contentType = response.headers.get("content-type");
+
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("La respuesta no es JSON");
+                }
+
+                const result = await response.json();
+
+                if (result.correct) {
+                    toggleFavorito(pokemon.id, estrella);
+                } else {
+                    alert(result.errorMessage);
+                }
+
+            } catch (error) {
+                console.error("Error al guardar favorito:", error);
+                alert("Error al guardar favorito");
+            }
+        }
+
+        function crearTarjetaPokemon(pokemon, container) {
+            const hp = pokemon.stats.find(s => s.stat.name === 'hp').base_stat;
+            const attack = pokemon.stats.find(s => s.stat.name === 'attack').base_stat;
+            const defense = pokemon.stats.find(s => s.stat.name === 'defense').base_stat;
+            const speed = pokemon.stats.find(s => s.stat.name === 'speed').base_stat;
+            const tipos = pokemon.types.map(t => t.type.name);
+            const habilidades = pokemon.abilities.map(a => a.ability.name).join(', ');
+
+            const card = document.createElement('div');
+            card.className = 'pokemon-card';
+
+            card.innerHTML = `
             <span class="favorito">★</span>
             <span class="pokemon-numero">${String(pokemon.id).padStart(3, '0')}</span>
 
@@ -537,47 +548,47 @@
             </div>
         `;
 
-        card.addEventListener('click', () => {
-            window.location.href = `/pokedex/detail/${pokemon.id}`;
-        });
+            card.addEventListener('click', () => {
+                window.location.href = `/pokedex/detail/${pokemon.id}`;
+            });
 
-        const estrella = card.querySelector('.favorito');
-        estrella.addEventListener('click', e => {
-            e.stopPropagation();
-            guardarFavoritoBackend(pokemon, estrella);
-        });
+            const estrella = card.querySelector('.favorito');
+            estrella.addEventListener('click', e => {
+                e.stopPropagation();
+                guardarFavoritoBackend(pokemon, estrella);
+            });
 
-        container.appendChild(card);
-    }
-
-    function buscarPokemon() {
-        const term = document.getElementById('buscador').value.toLowerCase();
-        const container = document.getElementById('pokemon-tarjeta');
-
-        if (!term) {
-            document.getElementById('paginacion').style.display = 'flex';
-            mostrarPagina(paginaActual);
-            return;
+            container.appendChild(card);
         }
 
-        document.getElementById('paginacion').style.display = 'none';
-        container.innerHTML = '';
+        function buscarPokemon() {
+            const term = document.getElementById('buscador').value.toLowerCase();
+            const container = document.getElementById('pokemon-tarjeta');
 
-        todosLosPokemon
-            .filter(p => p.name.includes(term) || String(p.id).includes(term))
-            .forEach(p => crearTarjetaPokemon(p, container));
-    }
+            if (!term) {
+                document.getElementById('paginacion').style.display = 'flex';
+                mostrarPagina(paginaActual);
+                return;
+            }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        cargarPokemon();
-        document.getElementById('buscador').addEventListener('input', buscarPokemon);
-        document.getElementById('btn-primera').onclick = () => mostrarPagina(1);
-        document.getElementById('btn-anterior').onclick = () => mostrarPagina(paginaActual - 1);
-        document.getElementById('btn-siguiente').onclick = () => mostrarPagina(paginaActual + 1);
-        document.getElementById('btn-ultima').onclick = () =>
-            mostrarPagina(Math.ceil(todosLosPokemon.length / pokemonPorPagina));
-    });
-</script>
+            document.getElementById('paginacion').style.display = 'none';
+            container.innerHTML = '';
+
+            todosLosPokemon
+                    .filter(p => p.name.includes(term) || String(p.id).includes(term))
+                    .forEach(p => crearTarjetaPokemon(p, container));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarPokemon();
+            document.getElementById('buscador').addEventListener('input', buscarPokemon);
+            document.getElementById('btn-primera').onclick = () => mostrarPagina(1);
+            document.getElementById('btn-anterior').onclick = () => mostrarPagina(paginaActual - 1);
+            document.getElementById('btn-siguiente').onclick = () => mostrarPagina(paginaActual + 1);
+            document.getElementById('btn-ultima').onclick = () =>
+                mostrarPagina(Math.ceil(todosLosPokemon.length / pokemonPorPagina));
+        });
+    </script>
 </th:block>
 </body>
 </html>
