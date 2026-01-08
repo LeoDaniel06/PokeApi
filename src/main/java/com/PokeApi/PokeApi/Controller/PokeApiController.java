@@ -90,15 +90,15 @@ public class PokeApiController {
     public Result deleteFavorito(@RequestParam int idPokemon, HttpSession session) {
         UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
         Result result = new Result();
-//        if (usuario == null) {
-//            result.correct = false;
-//            result.errorMessage = "Usuario no autenticado";
-//            return result;
-//        }
         if (usuario == null) {
-            usuario = new UsuarioJPA();
-            usuario.setIdUsuario(1); // usuario de prueba en BD
+            result.correct = false;
+            result.errorMessage = "Usuario no autenticado";
+            return result;
         }
+//        if (usuario == null) {
+//            usuario = new UsuarioJPA();
+//            usuario.setIdUsuario(1); // usuario de prueba en BD
+//        }
 
         return favoritosService.eliminarFavoritos(idPokemon, usuario.getIdUsuario());
     }

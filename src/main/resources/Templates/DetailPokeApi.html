@@ -5,6 +5,8 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css" type="text/css"/>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <style>
@@ -85,6 +87,14 @@
                     -2px 2px 0 #000;
             }
 
+            .pokedex-header::after {
+                content: "";
+                display: block;
+                height: 6px;
+                margin-top: 10px;
+                background: linear-gradient(to right, transparent, currentColor, transparent);
+            }
+
             .pokedex {
                 background: #e63946;
                 border-radius: 20px;
@@ -92,10 +102,56 @@
                 box-shadow: inset 0 0 15px #000;
                 backdrop-filter: blur(6px);
                 background-color: rgba(230, 57, 70, 0.85);
-                opacity: 0.85;
+                opacity: 0.95;
                 position: relative;
+                overflow: hidden;
             }
 
+            .pokedex::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 20px;
+                background: radial-gradient(
+                    circle at top left,
+                    rgba(255,255,255,0.25),
+                    transparent 60%
+                    );
+                pointer-events: none;
+            }
+
+            .pokedex::after {
+                content: "";
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 14px;
+                height: 14px;
+                background: #00ff5a;
+                border-radius: 50%;
+                box-shadow: 0 0 10px #00ff5a;
+                animation: blink 1.2s infinite;
+            }
+
+            @keyframes blink {
+                0%,100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: .3;
+                }
+            }
+
+            .badge-type {
+                box-shadow: 0 0 8px rgba(0,0,0,.4);
+                text-shadow: 0 0 4px rgba(255,255,255,.6);
+                transition: transform .2s ease;
+            }
+
+            .badge-type:hover {
+                transform: scale(1.1);
+                transition: .2s;
+            }
             .screen {
                 background: #f8f9fa;
                 position: relative;
@@ -103,7 +159,27 @@
                 border-radius: 10px;
                 padding: 10px;
                 height: 100%;
-                animation: slideIn 0.5s ease-in-out;
+                /*animation: slideIn 0.5s ease-in-out;*/
+                animation: popIn 2s ease;
+                box-shadow:
+                    inset 3px 3px 6px rgba(255,255,255,.4),
+                    inset -3px -3px 6px rgba(0,0,0,.4),
+                    0 4px 8px rgba(0,0,0,.6);
+            }
+
+            .screen::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: repeating-linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,.08),
+                    rgba(0,0,0,.08) 1px,
+                    transparent 1px,
+                    transparent 3px
+                    );
+                pointer-events: none;
+                border-radius: 10px;
             }
 
             .screen-auto {
@@ -112,6 +188,17 @@
             .chart-container {
                 max-width: 250px;
                 margin: 0 auto;
+            }
+
+            @keyframes popIn {
+                from {
+                    opacity: 0;
+                    transform: scale(.96);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
             }
 
             /* Animaciones */
@@ -138,6 +225,7 @@
             .pokemon-img {
                 max-height: 250px;
                 animation: float 1.5s ease-in-out infinite;
+                filter: drop-shadow(0 0 15px rgba(255,255,255,.6));
             }
 
             .favorite {
@@ -149,6 +237,19 @@
 
             .favorite.active {
                 color: gold;
+                animation: pulseStar .4s ease;
+            }
+
+            @keyframes pulseStar {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.4);
+                }
+                100% {
+                    transform: scale(1);
+                }
             }
 
             .favorite:hover {
@@ -165,6 +266,9 @@
             .carousel-control-prev-icon,
             .carousel-control-next-icon {
                 filter: invert(1);
+                background-color: rgba(0,0,0,.6);
+                border-radius: 50%;
+                padding: 15px;
             }
 
             #pokemon-types span,
@@ -181,6 +285,33 @@
             #pokemon-evolutions div:hover {
                 transform: scale(1.05);
                 transition: 0.3s;
+            }
+            #pokemon-evolutions div {
+                transform-style: preserve-3d;
+                transition: transform .3s;
+            }
+
+            #pokemon-evolutions div:hover {
+                transform: rotateY(10deg) scale(1.05);
+            }
+            canvas {
+                filter: drop-shadow(0 4px 6px rgba(0,0,0,.4));
+            }
+
+            #pokemon-evolutions div::after {
+                content: "→";
+                margin-left: 10px;
+                font-size: 1.5rem;
+            }
+            #pokemon-evolutions div:last-child::after {
+                content: "";
+            }
+
+            #pokemon-id,
+            #pokemon-weight,
+            #pokemon-height {
+                font-family: "Press Start 2P";
+                letter-spacing: 2px;
             }
         </style>
     </head>
@@ -417,9 +548,10 @@
                         labels: stats.map(s => s.stat.name.toUpperCase()),
                         datasets: [{
                                 data: stats.map(s => s.base_stat),
-                                backgroundColor: "rgba(255,255,255,0.4)",
-                                borderColor: "#000",
-                                borderWidth: 2,
+                                pointBackgroundColor: "#fff",
+                                pointBorderColor: "#000",
+                                borderJoinStyle: "round",
+                                borderWidth: 3,
                                 pointRadius: 3
                             }]
                     },

@@ -39,6 +39,7 @@ public class SpringSecurityConfig {
                         "/pokedex/registro",
                         "/pokedex",
                         "/pokedex/detail/**",
+                        "/pokedex/addFavorito/**",
                         "/api/auth/**",
                         "/fonts/**"
                 ).permitAll()
