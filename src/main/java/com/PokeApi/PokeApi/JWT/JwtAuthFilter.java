@@ -1,5 +1,6 @@
 package com.PokeApi.PokeApi.JWT;
 
+import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import com.PokeApi.PokeApi.Service.UserDetailsJPAService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -51,9 +52,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
         String username;
+        Long idUsuario;
 
         try {
             username = jwtUtils.extractUsername(jwt);
+             idUsuario = jwtUtils.extractUserId(jwt);
+            
+            
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
@@ -66,11 +71,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     usuarioDetailsJPAService.loadUserByUsername(username);
 
             if (jwtUtils.isTokenValid(jwt, userDetails)) {
+                UsuarioDetails usuarioDetails = new UsuarioDetails(
+                            idUsuario.intValue(),         
+                            userDetails.getUsername(),
+                            userDetails.getPassword(),
+                            userDetails.getAuthorities()
+                    );
+                
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
+                                usuarioDetails,
                                 null,
-                                userDetails.getAuthorities()
+                                usuarioDetails.getAuthorities()
                         );
 
                 authToken.setDetails(
