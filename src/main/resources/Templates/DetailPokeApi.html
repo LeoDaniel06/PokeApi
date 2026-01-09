@@ -654,10 +654,7 @@
             }
 
             document.getElementById("favoriteBtn").addEventListener("click", function () {
-                this.classList.toggle("bi-star");
-                this.classList.toggle("bi-star-fill");
-                this.classList.toggle("active");
-
+                const star = this;
                 const idPokemon = document.getElementById("pokemon-id").textContent;
                 const nombrePokemon = document.getElementById("pokemon-name").textContent;
 
@@ -675,7 +672,11 @@
                         .then(data => {
                             if (!data.correct) {
                                 alert(data.errorMessage);
+                                return;
                             }
+                            star.classList.toggle("bi-star");
+                            star.classList.toggle("bi-star-fill");
+                            star.classList.toggle("active");
                         })
                         .catch(err => console.error(err));
             });
