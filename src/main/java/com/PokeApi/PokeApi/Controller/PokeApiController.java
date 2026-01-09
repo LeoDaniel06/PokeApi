@@ -12,6 +12,7 @@ import com.PokeApi.PokeApi.JWT.LoginResponse;
 import com.PokeApi.PokeApi.Service.FavoritosService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -113,8 +114,10 @@ public class PokeApiController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute LoginRequest loginRequest, HttpServletRequest request, Model model) {
-
+    public String login(
+            @ModelAttribute LoginRequest loginRequest,
+            HttpServletResponse response,
+            Model model) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -123,20 +126,26 @@ public class PokeApiController {
                     )
             );
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            
-//            UsuarioDetails userDetails = (UsuarioDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//            int idUsuario = userDetails.getId();
-            
-            String rol = userDetails.getAuthorities().iterator().next().getAuthority();
+            UsuarioDetails usuarioDetails
+                    = (UsuarioDetails) authentication.getPrincipal();
+
+            String jwtToken = jwtUtils.generateToken(usuarioDetails);
+            System.out.println("JWT TOKEN: " + jwtToken);
+
+            Cookie jwtCookie = new Cookie("JWT_TOKEN", jwtToken);
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge((int) (jwtUtils.getExpiration() / 1000));
+
+            response.addCookie(jwtCookie);
+
+            String rol = usuarioDetails.getAuthorities()
+                    .iterator().next().getAuthority();
 
             if (rol.startsWith("ROLE_")) {
                 rol = rol.substring(5);
             }
-           
-            request.getSession().setAttribute("RolUsuario", rol);
-//            request.getSession().setAttribute("idUsuario", idUsuario);
-            
+
             if (rol.equals("ADMIN")) {
                 return "redirect:/pokedex";
             } else if (rol.equals("ENTRENADOR")) {
