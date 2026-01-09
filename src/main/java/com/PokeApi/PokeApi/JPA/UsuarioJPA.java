@@ -32,6 +32,9 @@ public class UsuarioJPA {
 
     @Column(name = "sexo")
     private String sexo;
+    
+    @Column(name = "correo")
+    private String correo;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
@@ -79,6 +82,16 @@ public class UsuarioJPA {
     public void setSexo(String sexo) {
         this.sexo = sexo;
     }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+    
+    
 
     public RolJPA getRolJPA() {
         return RolJPA;
