@@ -4,6 +4,7 @@ import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import com.PokeApi.PokeApi.Service.UserDetailsJPAService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,15 +28,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
 
-        if (path.equals("/pokedex/registro")
-                || path.startsWith("/login")
-                || path.startsWith("/LoginPokeApi")
+        if (path.startsWith("/pokedex/login")
+                || path.startsWith("/pokedex/registro")
                 || path.startsWith("/fonts/")
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
@@ -44,55 +44,63 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String jwt = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String jwt = authHeader.substring(7);
-        String username;
-        Long idUsuario;
 
         try {
-            username = jwtUtils.extractUsername(jwt);
-             idUsuario = jwtUtils.extractUserId(jwt);
-            
-            
-        } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            String username = jwtUtils.extractUsername(jwt);
+            Long idUsuario = jwtUtils.extractUserId(jwt);
 
-        if (username != null
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (username != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails =
-                    usuarioDetailsJPAService.loadUserByUsername(username);
+                UserDetails userDetails
+                        = usuarioDetailsJPAService.loadUserByUsername(username);
 
-            if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                UsuarioDetails usuarioDetails = new UsuarioDetails(
-                            idUsuario.intValue(),         
+                if (jwtUtils.isTokenValid(jwt, userDetails)) {
+
+                    UsuarioDetails usuarioDetails = new UsuarioDetails(
+                            idUsuario.intValue(),
                             userDetails.getUsername(),
                             userDetails.getPassword(),
                             userDetails.getAuthorities()
                     );
-                
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                usuarioDetails,
-                                null,
-                                usuarioDetails.getAuthorities()
-                        );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken authToken
+                            = new UsernamePasswordAuthenticationToken(
+                                    usuarioDetails,
+                                    null,
+                                    usuarioDetails.getAuthorities()
+                            );
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+                }
             }
+
+        } catch (Exception e) {
+            // token inválido → ignorar
         }
 
         filterChain.doFilter(request, response);
-    }
+    
+}
 }
