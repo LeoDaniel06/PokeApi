@@ -181,19 +181,19 @@ public Result deleteFavorito(
     }
 
     @PostMapping("/registro")
-    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario,
-            @RequestParam("rol") int idRol,
+    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario, 
             RedirectAttributes redirectAttributes) {
 
+      /*  int idRol
         RolJPA rol = new RolJPA();
         rol.setIdRol(idRol);
-        usuario.setRolJPA(rol);
+        usuario.setRolJPA(rol);*/
 
         Result result = usuarioDAOJPAImplementation.Add(usuario);
         if (result.correct) {
             redirectAttributes.addFlashAttribute("mensaje", "El Usuario se Registro Correctamente");
             redirectAttributes.addFlashAttribute("tipo", "success");
-            return "redirect:/login";
+            return "redirect:/pokedex/login";
         } else {
             redirectAttributes.addFlashAttribute("error", result.errorMessage);
             redirectAttributes.addFlashAttribute("tipo", "danger");
