@@ -377,6 +377,57 @@
                     font-size: 0.9rem;
                 }
             }
+
+            .pokemon-card {
+                background: transparent;
+                perspective: 1000px;
+                height: 420px;
+            }
+
+            .card-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+
+            .pokemon-card.flipped .card-inner {
+                transform: rotateY(180deg);
+            }
+
+            .card-front, .card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                border-radius: 20px;
+                padding: 20px;
+                background: white;
+            }
+
+            .card-front {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .card-back {
+                transform: rotateY(180deg);
+                overflow-y: auto;
+            }
+
+            .btn-detail {
+                margin-top: 15px;
+                background: #667eea;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 20px;
+                text-decoration: none;
+                font-weight: bold;
+            }
         </style>
     </th:block>
 </head>
@@ -427,19 +478,23 @@ let todosLosPokemon = [];
 let paginaActual = 1;
 const pokemonPorPagina = 8;
 
-function reproducirGritoPokemon(pokemonId) {
-    const cryUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${pokemonId}.ogg`;
-    const cry = new Audio(cryUrl);
-    cry.volume = 0.4;
-    cry.play().catch(() => {});
+/* 🔊 Grito Pokémon */
+function reproducirGritoPokemon(id) {
+    const audio = new Audio(
+        `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`
+    );
+    audio.volume = 0.4;
+    audio.play().catch(() => {});
 }
 
+/* 🚀 Carga inicial */
 async function cargarPokemon() {
     const loading = document.getElementById('loading');
 
     try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1350&offset=0');
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
         const data = await response.json();
+
         loading.style.display = 'none';
 
         for (const pokemon of data.results) {
@@ -461,6 +516,7 @@ async function obtenerDetallesPokemon(url) {
     return await response.json();
 }
 
+/* 📄 Paginación */
 function mostrarPagina(numeroPagina) {
     const container = document.getElementById('pokemon-tarjeta');
     container.innerHTML = '';
@@ -491,10 +547,7 @@ function actualizarBotonesPaginacion() {
     document.getElementById('btn-ultima').disabled = paginaActual === total;
 }
 
-function toggleFavoritoUI(id, estrella) {
-    estrella.classList.toggle('activo');
-}
-
+/* ⭐ Favoritos */
 async function guardarFavoritoBackend(pokemon, estrella) {
     try {
         const params = new URLSearchParams();
@@ -503,16 +556,17 @@ async function guardarFavoritoBackend(pokemon, estrella) {
 
         const response = await fetch("/pokedex/addFavorito", {
             method: "POST",
-            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params,
             credentials: "same-origin"
         });
 
         const result = await response.json();
+
         if (result.correct) {
-            toggleFavoritoUI(pokemon.id, estrella);
+            estrella.classList.toggle('activo');
         } else {
-            alert(result.errorMessage);
+            alert(result.errorMessage || "Debes iniciar sesión");
         }
 
     } catch (error) {
@@ -521,6 +575,7 @@ async function guardarFavoritoBackend(pokemon, estrella) {
     }
 }
 
+/* 🃏 Tarjeta Pokémon */
 function crearTarjetaPokemon(pokemon, container) {
     const hp = pokemon.stats.find(s => s.stat.name === 'hp').base_stat;
     const attack = pokemon.stats.find(s => s.stat.name === 'attack').base_stat;
@@ -567,7 +622,11 @@ function crearTarjetaPokemon(pokemon, container) {
     `;
 
     card.addEventListener('click', e => {
-        if (e.target.classList.contains('favorito')) return;
+        if (
+            e.target.classList.contains('favorito') ||
+            e.target.classList.contains('btn-detail')
+        ) return;
+
         reproducirGritoPokemon(pokemon.id);
         card.classList.toggle('flipped');
     });
@@ -581,6 +640,7 @@ function crearTarjetaPokemon(pokemon, container) {
     container.appendChild(card);
 }
 
+/* 🔍 Buscador */
 function buscarPokemon() {
     const term = document.getElementById('buscador').value.toLowerCase();
     const container = document.getElementById('pokemon-tarjeta');
@@ -599,6 +659,7 @@ function buscarPokemon() {
         .forEach(p => crearTarjetaPokemon(p, container));
 }
 
+/* 🧠 Init */
 document.addEventListener('DOMContentLoaded', () => {
     cargarPokemon();
     document.getElementById('buscador').addEventListener('input', buscarPokemon);

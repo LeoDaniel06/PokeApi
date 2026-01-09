@@ -1,5 +1,6 @@
 package com.PokeApi.PokeApi.JWT;
 
+import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -22,84 +23,96 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtUtils {
- 
+
     @Value("${jwt.secret}")
     private String secret;
-    
+
     @Value("${jwt.expiration}")
     private long expiration;
-    
-    public String extractUsername(String Token){
-        return extractClaim(Token, Claims::getSubject);
+
+    public String generateToken(UsuarioDetails userDetails) {
+
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("idUsuario", userDetails.getId());
+        extraClaims.put("rol", userDetails.getAuthorities()
+                .iterator().next().getAuthority());
+
+        return buildToken(extraClaims, userDetails);
     }
-    
-    
-    private <T> T extractClaim(String Token , Function<Claims, T> claimsResolver){
-        final Claims claims= extractAllClaims(Token);
-        return claimsResolver.apply(claims);
+
+    public long getExpiration() {
+        return expiration;
     }
-    
-    public String generatedToken(UserDetails userDetails){
-        return generatedToken(new HashMap<>(), userDetails);
+
+    public void setExpiration(long expiration) {
+        this.expiration = expiration;
     }
-    
-        public String generatedToken(Map<String, Object> extraClaims, UserDetails userDetails){
-        return buildToken(extraClaims, userDetails, expiration);        
+
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setId(java.util.UUID.randomUUID().toString())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
-        
-        public long getExpirationTime(){
-            return expiration;
+
+    public LoginResponse generateLoginResponse(UsuarioDetails userDetails) {
+        String token = generateToken(userDetails);
+        Date createdAt = extractIssuedAt(token);
+        Date expiresAt = extractExpiration(token);
+        String rol = userDetails.getAuthorities().iterator().next().getAuthority();
+
+        return new LoginResponse(token, createdAt, expiresAt, rol);
     }
-        
-        private String buildToken(Map<String, Object>extraClaims,
-        UserDetails userDetails,
-        long expiration){
-            return Jwts.builder()
-                    .setClaims(extraClaims)
-                    .setSubject(userDetails.getUsername())
-                    .setId(java.util.UUID.randomUUID().toString())
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                    .compact();
-        }
-        
-        public boolean isTokenValid(String token, UserDetails userDetails) {
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-    
-    public Date extractCreatedAt(String token) {
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("idUsuario", Long.class);
+    }
+
+    public String extractRol(String token) {
+        return extractAllClaims(token).get("rol", String.class);
+    }
+
+    public Date extractIssuedAt(String token) {
         return extractClaim(token, Claims::getIssuedAt);
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String Token) {
-        return Jwts
-                .parser()
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parseClaimsJws(Token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public LoginResponse generateLoginResponse(UserDetails userDetails, String  rol) {
-        String token = generatedToken(userDetails);
-        Date createdAt = extractCreatedAt(token);
-        Date expiresAt = extractExpiration(token);
-        return new LoginResponse(token, createdAt, expiresAt,rol);
     }
 }
             

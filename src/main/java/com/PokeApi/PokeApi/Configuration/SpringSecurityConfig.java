@@ -32,27 +32,30 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/pokedex/login",
                         "/pokedex/registro",
                         "/pokedex",
                         "/pokedex/detail/**",
-                        "/pokedex/addFavorito/**",
-                        "/api/auth/**",
                         "/fonts/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(form -> form
+                .loginPage("/pokedex/login")
+                .loginProcessingUrl("/pokedex/login")
+                .defaultSuccessUrl("/pokedex", true)
+                .failureUrl("/pokedex/login?error=true")
+                .permitAll()
+                )
                 .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/pokedex/login?logout")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
                 );
 
         return http.build();
