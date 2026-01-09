@@ -8,7 +8,6 @@ import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import com.PokeApi.PokeApi.JWT.JwtUtils;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
-import com.PokeApi.PokeApi.JWT.LoginResponse;
 import com.PokeApi.PokeApi.Service.FavoritosService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -64,47 +64,53 @@ public class PokeApiController {
     // ---------- FAVORITOS ADD ----------
     @PostMapping("/addFavorito")
     @ResponseBody
-    public Result agregarFavorito(@RequestParam int idPokemon,
+    public Result agregarFavorito(
+            @RequestParam int idPokemon,
             @RequestParam String nombrePokemon,
-            HttpSession session) {
+            Authentication authentication
+    ) {
 
-        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
-
-//        if (usuario == null) {
-//            Result result = new Result();
-//            result.correct = false;
-//            result.errorMessage = "Usuario no autenticado";
-//            return result;
-//        }
-        if (usuario == null) {
-            usuario = new UsuarioJPA();
-            usuario.setIdUsuario(1); // usuario de prueba en BD
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = "Debes iniciar sesion";
+            return result;
         }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        int idUsuario = userDetails.getId();
 
         return favoritosService.addFavorito(
                 idPokemon,
-                usuario.getIdUsuario(),
+                idUsuario,
                 nombrePokemon
         );
     }
 
     // ---------- FAVORITOS DELETE ----------
     @GetMapping("/deleteFavorito")
-    public Result deleteFavorito(@RequestParam int idPokemon, HttpSession session) {
-        UsuarioJPA usuario = (UsuarioJPA) session.getAttribute("usuario");
-        Result result = new Result();
-        if (usuario == null) {
-            result.correct = false;
-            result.errorMessage = "Usuario no autenticado";
-            return result;
-        }
-//        if (usuario == null) {
-//            usuario = new UsuarioJPA();
-//            usuario.setIdUsuario(1); // usuario de prueba en BD
-//        }
+@ResponseBody
+public Result deleteFavorito(
+        @RequestParam int idPokemon,
+        Authentication authentication
+) {
 
-        return favoritosService.eliminarFavoritos(idPokemon, usuario.getIdUsuario());
+    if (authentication == null || !authentication.isAuthenticated()) {
+        Result result = new Result();
+        result.correct = false;
+        result.errorMessage = "Debes iniciar sesión";
+        return result;
     }
+
+    UsuarioDetails userDetails =
+            (UsuarioDetails) authentication.getPrincipal();
+
+    int idUsuario = userDetails.getId();
+
+    return favoritosService.eliminarFavoritos(idPokemon, idUsuario);
+}
 
     // ---------- LOGIN ----------
     @GetMapping("/login")
@@ -118,6 +124,7 @@ public class PokeApiController {
             @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response,
             Model model) {
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -126,21 +133,23 @@ public class PokeApiController {
                     )
             );
 
-            UsuarioDetails usuarioDetails
-                    = (UsuarioDetails) authentication.getPrincipal();
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            UsuarioDetails usuarioDetails =
+                    (UsuarioDetails) authentication.getPrincipal();
 
             String jwtToken = jwtUtils.generateToken(usuarioDetails);
-            System.out.println("JWT TOKEN: " + jwtToken);
 
             Cookie jwtCookie = new Cookie("JWT_TOKEN", jwtToken);
             jwtCookie.setHttpOnly(true);
             jwtCookie.setPath("/");
             jwtCookie.setMaxAge((int) (jwtUtils.getExpiration() / 1000));
-
             response.addCookie(jwtCookie);
 
             String rol = usuarioDetails.getAuthorities()
-                    .iterator().next().getAuthority();
+                    .iterator()
+                    .next()
+                    .getAuthority();
 
             if (rol.startsWith("ROLE_")) {
                 rol = rol.substring(5);
@@ -149,7 +158,7 @@ public class PokeApiController {
             if (rol.equals("ADMIN")) {
                 return "redirect:/pokedex";
             } else if (rol.equals("ENTRENADOR")) {
-                return "redirect:/pokedex/detail";
+                return "redirect:/pokedex";
             } else {
                 return "redirect:/pokedex/login";
             }
@@ -191,4 +200,6 @@ public class PokeApiController {
             return "redirect:/pokedex/registro";
         }
     }
+    
+    
 }

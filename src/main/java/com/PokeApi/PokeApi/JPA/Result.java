@@ -3,7 +3,7 @@ package com.PokeApi.PokeApi.JPA;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Result {
+public class Result<T> {
 
     public boolean correct;
     public String errorMessage;
