@@ -21,39 +21,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsJPAService usuarioDetailsJPAService;
     private final JwtUtils jwtUtils;
 
-    public JwtAuthFilter(UserDetailsJPAService usuarioDetailsJPAService, JwtUtils jwtUtils) {
+    public JwtAuthFilter(UserDetailsJPAService usuarioDetailsJPAService,
+                         JwtUtils jwtUtils) {
         this.usuarioDetailsJPAService = usuarioDetailsJPAService;
         this.jwtUtils = jwtUtils;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
 
+        // 🔓 Rutas públicas
         if (path.startsWith("/pokedex/login")
                 || path.startsWith("/pokedex/registro")
                 || path.startsWith("/fonts/")
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
                 || path.startsWith("/images/")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        String jwt = null;
-
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("JWT_TOKEN".equals(cookie.getName())) {
-                    jwt = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String jwt = getJwtFromRequest(request);
 
         if (jwt == null) {
             filterChain.doFilter(request, response);
@@ -67,8 +61,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails
-                        = usuarioDetailsJPAService.loadUserByUsername(username);
+                UserDetails userDetails =
+                        usuarioDetailsJPAService.loadUserByUsername(username);
 
                 if (jwtUtils.isTokenValid(jwt, userDetails)) {
 
@@ -79,8 +73,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             userDetails.getAuthorities()
                     );
 
-                    UsernamePasswordAuthenticationToken authToken
-                            = new UsernamePasswordAuthenticationToken(
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
                                     usuarioDetails,
                                     null,
                                     usuarioDetails.getAuthorities()
@@ -97,10 +91,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // token inválido → ignorar
+            // Token inválido o expirado → se ignora
         }
 
         filterChain.doFilter(request, response);
-    
-}
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
+    }
 }

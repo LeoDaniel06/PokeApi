@@ -120,9 +120,11 @@ public Result deleteFavorito(
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute LoginRequest loginRequest,
+    public String login(
+            @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response,
             Model model) {
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -130,15 +132,37 @@ public Result deleteFavorito(
                             loginRequest.getPassword()
                     )
             );
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            UsuarioDetails userDetails = (UsuarioDetails) authentication.getPrincipal();
-            String token = jwtUtils.generateToken(userDetails);
-            Cookie jwtCookie = new Cookie("JWT_TOKEN", token);
+
+            UsuarioDetails usuarioDetails =
+                    (UsuarioDetails) authentication.getPrincipal();
+
+            String jwtToken = jwtUtils.generateToken(usuarioDetails);
+
+            Cookie jwtCookie = new Cookie("JWT_TOKEN", jwtToken);
             jwtCookie.setHttpOnly(true);
             jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(60 * 60 * 24);
+            jwtCookie.setMaxAge((int) (jwtUtils.getExpiration() / 1000));
             response.addCookie(jwtCookie);
-            return "redirect:/pokedex";
+
+            String rol = usuarioDetails.getAuthorities()
+                    .iterator()
+                    .next()
+                    .getAuthority();
+
+            if (rol.startsWith("ROLE_")) {
+                rol = rol.substring(5);
+            }
+
+            if (rol.equals("ADMIN")) {
+                return "redirect:/pokedex";
+            } else if (rol.equals("ENTRENADOR")) {
+                return "redirect:/pokedex";
+            } else {
+                return "redirect:/pokedex/login";
+            }
+
         } catch (Exception ex) {
             model.addAttribute("Error", "Credenciales Incorrectas");
             return "LoginPokeApi";

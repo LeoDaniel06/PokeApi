@@ -183,11 +183,8 @@
                 padding-right: 45px;
             }
 
-            .hidden {
-                display: none;
-            }
 
-            #loader {
+            #carga {
                 position: fixed;
                 inset: 0;
                 background: black;
@@ -198,10 +195,13 @@
                 z-index: 9999;
             }
 
-            #loader video {
+            #carga video {
                 width: 280px;
             }
 
+            .hidden {
+                display: none;
+            }
         </style>
     </th:block>
 
@@ -233,68 +233,44 @@
 
                     <div class="mb-3">
                         <p class="text" style="color: white">No te has Registrado?</p>
-                        <p class="text" style="color: white">Registrate aqui:<a class="text" style="color: red"onclick="window.location.href = '/pokedex/registro'"> Crear Usuario</a></p>
+                        <p class="text" style="color: white;">
+                            Regístrate aquí: 
+                            <a href="/pokedex/registro" 
+                               style="color: blue; font-weight: bold; text-decoration: underline;">
+                                Crear Usuario
+                            </a>
+                        </p>
                     </div>
 
-                </form>
+                </form> 
 
             </div>
         </div>
+
+<!--        <div id="carga" class="hidden">
+            <video autoplay loop muted playsinline>
+                <source src="/videoCarga/Fondo de carga.mp4" type="video/mp4">
+            </video>
+            <p style="color:white; margin-top:10px;">Cargando Pokédex...</p>
+        </div>-->
+
     </div>
 
-    <div id="carga" class="hidden">
-        <video
-            src="Downloads/Fondo de Carga.mp4"
-            autoplay
-            loop
-            muted
-            playsinline>
-            <p>Cargando Pokedex</p>
-    </div>
-
-    <script>
+<!--    <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("registerForm");
-            const loader = document.getElementById("loader");
+            const form = document.getElementById("loginForm");
+            const carga = document.getElementById("carga");
 
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            form.addEventListener("submit", (e) => {
 
+                carga.classList.remove("hidden");
 
-                loader.classList.remove("hidden");
-
-                try {
-
-                    const response = await fetch("http://localhost:8080/pokedex/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            user: document.getElementById("user").value
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Error en el registro");
-                    }
-
-                    const data = await response.json();
-                    console.log("Registro exitoso:", data);
-
-                    // aquí puedes redirigir
-                    // window.location.href = "/dashboard.html";
-
-                } catch (error) {
-                    console.error(error);
-                    alert("Falló el registro");
-                } finally {
-
-                    loader.classList.add("hidden");
-                }
+                setTimeout(() => {
+                    form.submit();
+                }, 2000);
             });
         });
-    </script>
+    </script>-->
 
 </body>
 </html>
