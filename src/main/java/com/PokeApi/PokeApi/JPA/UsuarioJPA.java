@@ -35,6 +35,9 @@ public class UsuarioJPA {
     
     @Column(name = "correo")
     private String correo;
+    
+    @Column(name = "isverified")
+    public int isverified;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
@@ -89,6 +92,14 @@ public class UsuarioJPA {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public int getIsverified() {
+        return isverified;
+    }
+
+    public void setIsverified(int isverified) {
+        this.isverified = isverified;
     }
     
     

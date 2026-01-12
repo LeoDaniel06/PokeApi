@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Verificación de Cuenta - Pokédex</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'PokemonSolid';
+            src: url('/fonts/pokemon-solid.ttf') format('truetype');
+        }
+
+        body {
+            background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .verification-card {
+            background-color: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 3px solid #667eea;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .pokeball-animation {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-family: 'PokemonSolid', sans-serif;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .message {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .success-icon {
+            color: #28a745;
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .error-icon {
+            color: #dc3545;
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="verification-card">
+            <div th:if="${mensaje}">
+                <div class="success-icon">✓</div>
+                <h1 class="text-success">¡Cuenta Verificada!</h1>
+                <p class="message" th:text="${mensaje}"></p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+                     class="pokeball-animation" 
+                     alt="Pokeball">
+                <a href="/pokedex/login" class="btn-custom">Iniciar Sesión</a>
+            </div>
+
+            <div th:if="${error}">
+                <div class="error-icon">✗</div>
+                <h1 class="text-danger">Error de Verificación</h1>
+                <p class="message" th:text="${error}"></p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+                     class="pokeball-animation" 
+                     alt="Pokeball">
+                <a href="/pokedex/registro" class="btn-custom">Registrarse de Nuevo</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

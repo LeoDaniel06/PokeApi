@@ -9,6 +9,7 @@ import com.PokeApi.PokeApi.JPA.UsuarioDetails;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import com.PokeApi.PokeApi.JWT.JwtUtils;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
+import com.PokeApi.PokeApi.Service.EmailService;
 import com.PokeApi.PokeApi.Service.FavoritosService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +47,9 @@ public class PokeApiController {
 
     @Autowired
     private FavoritosService favoritosService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -193,14 +197,54 @@ public class PokeApiController {
         usuario.setRolJPA(rol);*/
         Result result = usuarioDAOJPAImplementation.Add(usuario);
         if (result.correct) {
-            redirectAttributes.addFlashAttribute("mensaje", "El Usuario se Registro Correctamente");
-            redirectAttributes.addFlashAttribute("tipo", "success");
+            try {
+                emailService.enviarCorreoVerificacion((UsuarioJPA) result.object);
+
+                redirectAttributes.addFlashAttribute("mensaje",
+                        "¡Registro exitoso! Te hemos enviado un correo de verificación a " + usuario.getCorreo());
+                redirectAttributes.addFlashAttribute("tipo", "success");
+
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("mensaje",
+                        "Usuario registrado pero hubo un error al enviar el correo.");
+                redirectAttributes.addFlashAttribute("tipo", "warning");
+            }
+
             return "redirect:/pokedex/login";
         } else {
             redirectAttributes.addFlashAttribute("error", result.errorMessage);
             redirectAttributes.addFlashAttribute("tipo", "danger");
             return "redirect:/pokedex/registro";
         }
+    }    
+    // ---------- VERIFICACION CUENTA/CORREO ----------
+    @GetMapping("/verificar")
+    public String VerificarCuenta(@RequestParam String token, Model model) {
+        try {
+            if (!jwtUtils.validateVerificationToken(token)) {
+                model.addAttribute("error", "La verificacion expiro");
+                return "VerificacionPokeApi";
+
+            }
+
+            Long idUsuario = jwtUtils.extractUserId(token);
+
+            Result result = usuarioDAOJPAImplementation.VerificarCuenta(idUsuario.intValue());
+
+            if (result.correct) {
+                model.addAttribute("mensaje", "¡Cuenta verificada exitosamente! Ya puedes iniciar sesión");
+                model.addAttribute("tipo", "success");
+            } else {
+                model.addAttribute("error", result.errorMessage);
+                model.addAttribute("tipo", "danger");
+            }
+
+        } catch (Exception ex) {
+            model.addAttribute("error", "Error al verificar la cuenta" + ex.getLocalizedMessage());
+            model.addAttribute("tipo", "danger");
+        }
+
+        return "VerificacionPokeApi";
     }
 //----------------------------------GET FAVORITOS-----------------------------------------------
 
