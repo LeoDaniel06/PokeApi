@@ -5,6 +5,7 @@ import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -108,4 +109,47 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         return result;
     }
 
+    @Override
+    @Transactional
+    public Result GetById(int idUsuario) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, idUsuario);
+            if (usuarioJPA != null) {
+                Hibernate.initialize(usuarioJPA.getRolJPA());
+                result.object = usuarioJPA;
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+            }
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+//----------UPDATE IMAGEN----------//
+
+    @Override
+    @Transactional
+    public Result UpdateImagen(int idUsuario, String NuevaImagenB64) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, idUsuario);
+            if (usuarioJPA != null) {
+                usuarioJPA.setImagen(NuevaImagenB64);
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+            }
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
 }
