@@ -16,6 +16,7 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import static javax.crypto.Cipher.SECRET_KEY;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -23,12 +24,20 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtUtils {
+    
+    private static final String SECRET_KEY = "password123456789012345678901234";
+    private static final long EXPIRATION_TIME = 86400000;
+    private static final long VERIFICATION_EXPIRATION_TIME = 172800000;
 
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private long expiration;
+    
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
 
     public String generateToken(UsuarioDetails userDetails) {
 
@@ -38,6 +47,32 @@ public class JwtUtils {
                 .iterator().next().getAuthority());
 
         return buildToken(extraClaims, userDetails);
+    }
+    
+    public String generateVerificationToken(String correo, int idUsuario) {
+        return Jwts.builder()
+                .claim("idUsuario", idUsuario)
+                .claim("correo", correo)
+                .claim("type", "verification")
+                .setSubject(correo)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + VERIFICATION_EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    
+    public boolean validateVerificationToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            String tokenType = claims.get("type", String.class);
+            return "verification".equals(tokenType) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    public String extractEmail(String token) {
+        return extractAllClaims(token).get("correo", String.class);
     }
 
     public long getExpiration() {
@@ -55,7 +90,7 @@ public class JwtUtils {
                 .setId(java.util.UUID.randomUUID().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -104,7 +139,7 @@ public class JwtUtils {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(getSignInKey())
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -38,6 +38,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(
                         "/pokedex/login",
                         "/pokedex/registro",
+                        "/pokedex/verificar",
                         "/pokedex",
                         "/pokedex/detail/**",
                         "/fonts/**"
