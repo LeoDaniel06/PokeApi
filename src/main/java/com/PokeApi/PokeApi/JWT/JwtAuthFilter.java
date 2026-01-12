@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // 🔓 Rutas públicas
+        
         if (path.startsWith("/pokedex/login")
                 || path.startsWith("/pokedex/registro")
                 || path.startsWith("/fonts/")
@@ -91,7 +91,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // Token inválido o expirado → se ignora
+            
         }
 
         filterChain.doFilter(request, response);

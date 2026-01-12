@@ -183,25 +183,55 @@
                 padding-right: 45px;
             }
 
-
-            #carga {
-                position: fixed;
-                inset: 0;
-                background: black;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
+            progress{
+                clip: rect(1px, 1px, 1px, 1px);
+                clip-path: inset(50%);
+                height: 1px;
+                width: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
             }
 
-            #carga video {
-                width: 280px;
+            .pokebola-barra {
+                background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png");
+                background-repeat: repeat-x;
+                background-size: 30px 30px;
+                background-position: center;
+                animation: girarPokebola 1.2s linear infinite;
             }
 
-            .hidden {
-                display: none;
+            @keyframes girarPokebola {
+                from {
+                    background-position-x: 0;
+                }
+                to {
+                    background-position-x: 30px;
+                }
             }
+
+
+            /*            #carga {
+                            position: fixed;
+                            inset: 0;
+                            background: black;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 9999;
+                        }
+            
+                        #carga video {
+                            width: 280px;
+                        }*/
+
+            .pokemon{
+                width: 80px;
+                pointer-events: none;
+            }
+
         </style>
     </th:block>
 
@@ -247,30 +277,91 @@
             </div>
         </div>
 
-<!--        <div id="carga" class="hidden">
-            <video autoplay loop muted playsinline>
-                <source src="/videoCarga/Fondo de carga.mp4" type="video/mp4">
-            </video>
-            <p style="color:white; margin-top:10px;">Cargando Pokédex...</p>
-        </div>-->
+        <div class="modal fade" id="modalCarga" tabindex="-1"
+             data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title">Cargando Pokédex...</h5>
+                    </div>
 
+                    <div class="modal-body d-flex flex-column align-items-center">
+
+                        <img src="https://i.pinimg.com/originals/a7/a8/d0/a7a8d06c754cfbbbc37e64cb118c513c.gif"
+                             class="pokemon mb-3">
+
+                        <div class="progress w-100">
+                            <div id="barraProgreso"
+                                 class="progress-bar pokebola-barra"
+                                 style="width: 0%">
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--        <div id="carga" style="visibility: hidden;">
+                    <video autoplay loop muted playsinline>
+                        <source src="/videoCarga/Fondo de carga.mp4" type="video/mp4">
+                    </video>
+                    <p style="color:white; margin-top:10px;">Cargando Pokédex...</p>
+                </div>-->
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("loginForm");
+                const modal = new bootstrap.Modal(document.getElementById("modalCarga"));
+                const barra = document.getElementById("barraProgreso");
+                const audio = new Audio();
+
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    modal.show();
+
+                    let progreso = 0;
+
+                    const intervalo = setInterval(() => {
+                        progreso += 1;
+                        barra.style.width = progreso + "%";
+                        barra.textContent = progreso + "%";
+
+                        if (progreso >= 100) {
+                            clearInterval(intervalo);
+
+
+                            setTimeout(() => {
+                                form.submit();
+                            }, 500);
+                        }
+                    }, 200);
+            });
+                });
+            
+            
+           
+            
+        </script>
     </div>
 
-<!--    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("loginForm");
-            const carga = document.getElementById("carga");
-
-            form.addEventListener("submit", (e) => {
-
-                carga.classList.remove("hidden");
-
-                setTimeout(() => {
-                    form.submit();
-                }, 2000);
+    <!--    <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("loginForm");
+                const carga = document.getElementById("carga");
+    
+                form.addEventListener("submit", (e) => {
+    
+                    carga.style.visibility = "visible";
+    
+                    setTimeout(() => {
+                        form.submit();
+                    }, 20000);
+                });
             });
-        });
-    </script>-->
+        </script>-->
 
 </body>
 </html>
