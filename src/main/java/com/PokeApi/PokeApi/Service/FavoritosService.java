@@ -18,4 +18,8 @@ public class FavoritosService {
     public Result eliminarFavoritos(int idPokemon, int idUsuario){
         return favoritosJPADAOImplementation.DeleteFavoritos(idPokemon, idUsuario);
     }
+    
+    public Result getFavoritos(int idUsuario){
+        return favoritosJPADAOImplementation.GetFavoritosByUsuario(idUsuario);
+    }
 }
