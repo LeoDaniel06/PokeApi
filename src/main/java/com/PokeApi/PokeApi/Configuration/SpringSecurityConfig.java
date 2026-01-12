@@ -2,6 +2,7 @@ package com.PokeApi.PokeApi.Configuration;
 
 import com.PokeApi.PokeApi.JWT.JwtAuthFilter;
 import com.PokeApi.PokeApi.Service.UserDetailsJPAService;
+import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,6 +46,7 @@ public class SpringSecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtAuthFilter,UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                 .loginPage("/pokedex/login")
                 .loginProcessingUrl("/pokedex/login")
@@ -55,8 +57,16 @@ public class SpringSecurityConfig {
                 .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/pokedex/login?logout")
+                .addLogoutHandler((request, response, authentication) ->{
+                    Cookie cookie = new Cookie("JWT_TOKEN", null);
+                    cookie.setPath("/");
+                    cookie.setHttpOnly(true);
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                })
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
+                .deleteCookies("JSESSIONID","JWT_TOKEN")
                 );
 
         return http.build();

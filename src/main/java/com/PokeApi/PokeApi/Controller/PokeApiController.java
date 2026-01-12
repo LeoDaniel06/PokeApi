@@ -2,6 +2,7 @@ package com.PokeApi.PokeApi.Controller;
 
 import com.PokeApi.PokeApi.DAO.RolJPADAOImplementation;
 import com.PokeApi.PokeApi.DAO.UsuarioDAOJPAImplementation;
+import com.PokeApi.PokeApi.JPA.FavoritosJPA;
 import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioDetails;
@@ -14,6 +15,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -213,9 +216,7 @@ public class PokeApiController {
             redirectAttributes.addFlashAttribute("tipo", "danger");
             return "redirect:/pokedex/registro";
         }
-    }
-
-    
+    }    
     // ---------- VERIFICACION CUENTA/CORREO ----------
     @GetMapping("/verificar")
     public String VerificarCuenta(@RequestParam String token, Model model) {
@@ -245,5 +246,31 @@ public class PokeApiController {
 
         return "VerificacionPokeApi";
     }
+//----------------------------------GET FAVORITOS-----------------------------------------------
 
+    @GetMapping("/favoritos")
+    @ResponseBody
+    public List<Integer> obtenerFavoritos(Authentication authentication) {
+
+        if (authentication == null 
+                || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return List.of();
+        }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        int idUsuario = userDetails.getId();
+
+        Result result = favoritosService.getFavoritos(idUsuario);
+
+        if (!result.correct || result.objects == null) {
+            return List.of();
+        }
+
+        return result.objects.stream()
+                .map(o -> (Integer) o)
+                .toList();
+    }
 }
