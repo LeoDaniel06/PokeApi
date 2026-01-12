@@ -44,6 +44,7 @@ public class SpringSecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
+                .addFilterBefore(jwtAuthFilter,UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                 .loginPage("/pokedex/login")
                 .loginProcessingUrl("/pokedex/login")

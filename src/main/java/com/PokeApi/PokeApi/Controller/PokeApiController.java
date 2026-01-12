@@ -2,6 +2,7 @@ package com.PokeApi.PokeApi.Controller;
 
 import com.PokeApi.PokeApi.DAO.RolJPADAOImplementation;
 import com.PokeApi.PokeApi.DAO.UsuarioDAOJPAImplementation;
+import com.PokeApi.PokeApi.JPA.FavoritosJPA;
 import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioDetails;
@@ -13,6 +14,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -91,26 +94,26 @@ public class PokeApiController {
 
     // ---------- FAVORITOS DELETE ----------
     @GetMapping("/deleteFavorito")
-@ResponseBody
-public Result deleteFavorito(
-        @RequestParam int idPokemon,
-        Authentication authentication
-) {
+    @ResponseBody
+    public Result deleteFavorito(
+            @RequestParam int idPokemon,
+            Authentication authentication
+    ) {
 
-    if (authentication == null || !authentication.isAuthenticated()) {
-        Result result = new Result();
-        result.correct = false;
-        result.errorMessage = "Debes iniciar sesión";
-        return result;
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = "Debes iniciar sesión";
+            return result;
+        }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        int idUsuario = userDetails.getId();
+
+        return favoritosService.eliminarFavoritos(idPokemon, idUsuario);
     }
-
-    UsuarioDetails userDetails =
-            (UsuarioDetails) authentication.getPrincipal();
-
-    int idUsuario = userDetails.getId();
-
-    return favoritosService.eliminarFavoritos(idPokemon, idUsuario);
-}
 
     // ---------- LOGIN ----------
     @GetMapping("/login")
@@ -135,8 +138,8 @@ public Result deleteFavorito(
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UsuarioDetails usuarioDetails =
-                    (UsuarioDetails) authentication.getPrincipal();
+            UsuarioDetails usuarioDetails
+                    = (UsuarioDetails) authentication.getPrincipal();
 
             String jwtToken = jwtUtils.generateToken(usuarioDetails);
 
@@ -181,14 +184,13 @@ public Result deleteFavorito(
     }
 
     @PostMapping("/registro")
-    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario, 
+    public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario,
             RedirectAttributes redirectAttributes) {
 
-      /*  int idRol
+        /*  int idRol
         RolJPA rol = new RolJPA();
         rol.setIdRol(idRol);
         usuario.setRolJPA(rol);*/
-
         Result result = usuarioDAOJPAImplementation.Add(usuario);
         if (result.correct) {
             redirectAttributes.addFlashAttribute("mensaje", "El Usuario se Registro Correctamente");
@@ -200,6 +202,31 @@ public Result deleteFavorito(
             return "redirect:/pokedex/registro";
         }
     }
-    
-    
+//----------------------------------GET FAVORITOS-----------------------------------------------
+
+    @GetMapping("/favoritos")
+    @ResponseBody
+    public List<Integer> obtenerFavoritos(Authentication authentication) {
+
+        if (authentication == null 
+                || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return List.of();
+        }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        int idUsuario = userDetails.getId();
+
+        Result result = favoritosService.getFavoritos(idUsuario);
+
+        if (!result.correct || result.objects == null) {
+            return List.of();
+        }
+
+        return result.objects.stream()
+                .map(o -> (Integer) o)
+                .toList();
+    }
 }
