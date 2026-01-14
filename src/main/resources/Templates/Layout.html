@@ -86,7 +86,16 @@
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/pokedex/atrapaPokeballs}">Mini Juego 1</a>
+                            <a class="nav-link"
+                               id="btnFavoritos"
+                               th:href="@{/pokedex(favoritos=true)}"
+                               sec:authorize="isAuthenticated()">
+                                Favoritos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/pokedex/atrapaPokeballs}">
+                                Mini Juego 1</a>
                         </li>
                         <li class="nav-item" sec:authorize="isAnonymous()">
                             <a class="nav-link" th:href="@{/pokedex/login}">
