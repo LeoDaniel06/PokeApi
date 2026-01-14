@@ -20,16 +20,14 @@ public class PokeService {
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<PokemonDTO> cachePokemon = new ArrayList<>();
     private final RestTemplate restTemplate;
-    
+
     public PokeService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    private List<PokemonDTO> cachePokemon;
-
     public synchronized List<PokemonDTO> obtenerPokemones() {
 
-        if (cachePokemon != null) {
+        if (!cachePokemon.isEmpty()) {
             return cachePokemon;
         }
 
@@ -45,16 +43,13 @@ public class PokeService {
 
             JsonNode results = mapper.readTree(json).get("results");
 
-            List<PokemonDTO> lista = new ArrayList<>();
-
             for (JsonNode node : results) {
-                lista.add(new PokemonDTO(
+                cachePokemon.add(new PokemonDTO(
                         node.get("name").asText(),
                         node.get("url").asText()
                 ));
             }
 
-            cachePokemon = lista;
             return cachePokemon;
 
         } catch (Exception e) {
@@ -62,21 +57,16 @@ public class PokeService {
         }
     }
 
-    public List<PokemonDTO> obtenerPokemones() {
-        return cachePokemon;
-    }
-    
     @Cacheable(value = "pokemon", key = "#id")
-    public String getPokemon(int id){
-        return restTemplate.getForObject("http://pokeapi.co/v2/pokemon/"+id,String.class);
+    public String getPokemon(int id) {
+        return restTemplate.getForObject("http://pokeapi.co/v2/pokemon/" + id, String.class);
     }
-    
+
     @Cacheable(value = "pokemonSpecies", key = "#id")
     public String getPokemonSpecies(int id) {
         return restTemplate.getForObject(
-            "https://pokeapi.co/api/v2/pokemon-species/" + id,
-            String.class
+                "https://pokeapi.co/api/v2/pokemon-species/" + id,
+                String.class
         );
     }
 }
-
