@@ -11,6 +11,7 @@ import com.PokeApi.PokeApi.JWT.JwtUtils;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
 import com.PokeApi.PokeApi.Service.EmailService;
 import com.PokeApi.PokeApi.Service.FavoritosService;
+import com.PokeApi.PokeApi.Service.PokeService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -57,10 +58,24 @@ public class PokeApiController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    private final PokeService pokeService;
+
+    public PokeApiController(PokeService pokeService) {
+        this.pokeService = pokeService;
+    }
+
     @GetMapping
     public String getAll() {
         return "PokemonGetAll";
     }
+
+//    @GetMapping
+//    public String getAll(Model model) {
+//        List<String> listapokemones = pokeService.pokeHilo();
+//        model.addAttribute("pokemones", listapokemones);
+//        return "prueba";
+//    }
 
     @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {
@@ -216,7 +231,8 @@ public class PokeApiController {
             redirectAttributes.addFlashAttribute("tipo", "danger");
             return "redirect:/pokedex/registro";
         }
-    }    
+    }
+
     // ---------- VERIFICACION CUENTA/CORREO ----------
     @GetMapping("/verificar")
     public String VerificarCuenta(@RequestParam String token, Model model) {
@@ -252,7 +268,7 @@ public class PokeApiController {
     @ResponseBody
     public List<Integer> obtenerFavoritos(Authentication authentication) {
 
-        if (authentication == null 
+        if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication.getPrincipal().equals("anonymousUser")) {
             return List.of();
@@ -273,4 +289,5 @@ public class PokeApiController {
                 .map(o -> (Integer) o)
                 .toList();
     }
+    
 }
