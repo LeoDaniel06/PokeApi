@@ -1,9 +1,7 @@
 package com.PokeApi.PokeApi.Service;
 
 import com.PokeApi.PokeApi.DTO.PokemonDTO;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,11 +25,17 @@ public class PokeService {
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    public void cargarPokemon() {
+    private List<PokemonDTO> cachePokemon;
+
+    public synchronized List<PokemonDTO> obtenerPokemones() {
+
+        if (cachePokemon != null) {
+            return cachePokemon;
+        }
+
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1350"))
+                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=386"))
                     .GET()
                     .build();
 
@@ -39,21 +43,19 @@ public class PokeService {
                     .send(request, HttpResponse.BodyHandlers.ofString())
                     .body();
 
-            JsonNode root = mapper.readTree(json);
-            JsonNode results = root.get("results");
+            JsonNode results = mapper.readTree(json).get("results");
 
-            cachePokemon.clear();
+            List<PokemonDTO> lista = new ArrayList<>();
 
             for (JsonNode node : results) {
-                cachePokemon.add(
-                        new PokemonDTO(
-                                node.get("name").asText(),
-                                node.get("url").asText()
-                        )
-                );
+                lista.add(new PokemonDTO(
+                        node.get("name").asText(),
+                        node.get("url").asText()
+                ));
             }
 
-            System.out.println("Pokémon cargados: " + cachePokemon.size());
+            cachePokemon = lista;
+            return cachePokemon;
 
         } catch (Exception e) {
             throw new RuntimeException("Error cargando Pokémon", e);
@@ -77,5 +79,4 @@ public class PokeService {
         );
     }
 }
-
 
