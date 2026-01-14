@@ -503,11 +503,13 @@
 
             try {
                 await cargarFavoritosUsuario();
-                const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1350&offset=0');
+                const response = await fetch('/api/pokemon');
+                console.log(response);
                 const data = await response.json();
                 loading.style.display = 'none';
 
-                for (const pokemon of data.results) {
+                console.log(data);
+                for (const pokemon of data) {
                     const detalles = await obtenerDetallesPokemon(pokemon.url);
                     todosLosPokemon.push(detalles);
                 }

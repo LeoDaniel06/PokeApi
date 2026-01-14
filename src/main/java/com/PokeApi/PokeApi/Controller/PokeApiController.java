@@ -11,6 +11,7 @@ import com.PokeApi.PokeApi.JWT.JwtUtils;
 import com.PokeApi.PokeApi.JWT.LoginRequest;
 import com.PokeApi.PokeApi.Service.EmailService;
 import com.PokeApi.PokeApi.Service.FavoritosService;
+import com.PokeApi.PokeApi.Service.PokeService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,6 +60,13 @@ public class PokeApiController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    private final PokeService pokeService;
+
+    public PokeApiController(PokeService pokeService) {
+        this.pokeService = pokeService;
+    }
+
     @GetMapping
     public String getAll() {
         return "PokemonGetAll";
@@ -67,6 +75,13 @@ public class PokeApiController {
     public String Minijuego1(){
         return "AtrapaPokeballs";
     }
+
+//    @GetMapping
+//    public String getAll(Model model) {
+//        List<String> listapokemones = pokeService.pokeHilo();
+//        model.addAttribute("pokemones", listapokemones);
+//        return "prueba";
+//    }
 
     @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {

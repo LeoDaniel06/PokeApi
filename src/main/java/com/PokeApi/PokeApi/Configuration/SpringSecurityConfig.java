@@ -36,7 +36,7 @@ public class SpringSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
+                .requestMatchers("/api/thread",
                         "/pokedex/login",
                         "/pokedex/registro",
                         "/pokedex/verificar",
@@ -57,7 +57,7 @@ public class SpringSecurityConfig {
                 )
                 .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/pokedex/login?logout")
+                .logoutSuccessUrl("/pokedex/login")
                 .addLogoutHandler((request, response, authentication) ->{
                     Cookie cookie = new Cookie("JWT_TOKEN", null);
                     cookie.setPath("/");

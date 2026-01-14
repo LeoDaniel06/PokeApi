@@ -183,7 +183,7 @@
                 padding-right: 45px;
             }
 
-            progress{
+/*            progress{
                 clip: rect(1px, 1px, 1px, 1px);
                 clip-path: inset(50%);
                 height: 1px;
@@ -209,7 +209,7 @@
                 to {
                     background-position-x: 30px;
                 }
-            }
+            }*/
 
 
             /*            #carga {
@@ -227,11 +227,104 @@
                             width: 280px;
                         }*/
 
-            .pokemon{
-                width: 80px;
+            .pokemon-sprite{
+                width: 100px;
+                /*                right: 20px;*/
                 pointer-events: none;
+                transform: scaleX(-1);
             }
 
+
+            .pokedex-container {
+                background-color: #dc3545 !important;
+                border: 8px solid #8b0000;
+                border-radius: 20px 20px 20px 60px !important;
+                box-shadow: inset -10px -10px 0px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.4);
+                color: white;
+            }
+
+
+            .pokedex-screen {
+                background-color: #333;
+                border: 15px solid #dedede;
+                border-radius: 10px;
+                box-shadow: inset 0 0 15px #000;
+            }
+
+            .sensor-main {
+                width: 50px;
+                height: 50px;
+                background: radial-gradient(circle, #00f 0%, #000 100%);
+                border: 4px solid white;
+                border-radius: 50%;
+                animation: blink 1.5s infinite alternate;
+            }
+
+            @keyframes blink {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            .sensor-red,
+            .sensor-yellow,
+            .sensor-green {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                border: 1px solid #000;
+                opacity: 0.2;
+            }
+
+            .sensor-red {
+                background: #ff0000;
+            }
+            .sensor-yellow {
+                background: #ffff00;
+            }
+            .sensor-green {
+                background: #00ff00;
+            }
+
+            .sensor-red.active,
+            .sensor-yellow.active,
+            .sensor-green.active {
+                opacity: 1;
+                box-shadow: 0 0 8px currentColor;
+            }
+
+            .font-pixel {
+                font-family: 'Courier New', Courier, monospace;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .custom-progress-container {
+                height: 25px;
+                background-color: #222 !important;
+                border: 2px solid #555;
+            }
+
+            .btn-pokedex-blue {
+                width: 40px;
+                height: 10px;
+                background: #007bff;
+                border-radius: 5px;
+                border-bottom: 3px solid #004a99;
+            }
+
+            .textoAnimado {
+                font-size: 1rem;
+                font-weight: bold;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+            .visible {
+                opacity: 1;
+            }
         </style>
     </th:block>
 
@@ -277,31 +370,47 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalCarga" tabindex="-1"
-             data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal fade" id="modalCarga" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-white">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title">Cargando Pokédex...</h5>
+                <div class="modal-content pokedex-container">
+
+                    <div class="pokedex-sensors d-flex gap-2 p-3">
+                        <div class="sensor-main"></div>
+                        <div class="sensor-red"></div>
+                        <div class="sensor-yellow"></div>
+                        <div class="sensor-green"></div>
+                    </div>
+
+                    <div class="modal-header border-0 flex-column align-items-start pt-0">
+                        <h5 class="modal-title font-pixel text-uppercase">System: Loading Data...</h5>
+                        <small class="text-white-50">Sincronizando con la Pokedex de: <span id="region" class="textoAnimado">Kanto</span></small>
                     </div>
 
                     <div class="modal-body d-flex flex-column align-items-center">
+                        <div class="pokedex-screen w-100 d-flex flex-column align-items-center justify-content-center p-4 mb-4">
+                            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGg2YW9sbHh6eTIxYTRjdGJ2dXE2NTg0Z3MyMGJ0eXNwa2RhaGMzdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/nMy8HTFQRWpudNwbxQ/giphy.gif" 
+                                 class="pokemon-sprite mb-3">
 
-                        <img src="https://i.pinimg.com/originals/a7/a8/d0/a7a8d06c754cfbbbc37e64cb118c513c.gif"
-                             class="pokemon mb-3">
-
-                        <div class="progress w-100">
-                            <div id="barraProgreso"
-                                 class="progress-bar pokebola-barra"
-                                 style="width: 0%">
+                            <div class="progress w-100 custom-progress-container">
+                                <div id="barraProgreso" 
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-info">
+                                </div>
                             </div>
+                            <span id="porcentajeCarga" class="mt-2 font-pixel">0%</span>
                         </div>
 
-
+                        <div class="pokedex-controls d-flex justify-content-between w-100 px-3">
+                            <div class="d-pad"></div>
+                            <div class="action-buttons d-flex gap-2 align-items-center">
+                                <div class="btn-pokedex-blue"></div>
+                                <div class="btn-pokedex-blue"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!--        <div id="carga" style="visibility: hidden;">
                     <video autoplay loop muted playsinline>
@@ -315,7 +424,7 @@
                 const form = document.getElementById("loginForm");
                 const modal = new bootstrap.Modal(document.getElementById("modalCarga"));
                 const barra = document.getElementById("barraProgreso");
-                const audio = new Audio();
+                const progress = document.getElementById("porcentajeCarga");
 
                 form.addEventListener("submit", (e) => {
                     e.preventDefault();
@@ -327,7 +436,8 @@
                     const intervalo = setInterval(() => {
                         progreso += 1;
                         barra.style.width = progreso + "%";
-                        barra.textContent = progreso + "%";
+//                        barra.textContent = progreso + "%";
+                        progress.textContent = progreso + "%";
 
                         if (progreso >= 100) {
                             clearInterval(intervalo);
@@ -337,13 +447,61 @@
                                 form.submit();
                             }, 500);
                         }
-                    }, 200);
-            });
+                    }, 150);
                 });
-            
-            
-           
-            
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("loginForm");
+                const texto = document.getElementById("region");
+
+                const regiones = [
+                    "Kanto", "Johto", "Hoenn", "Sinnoh",
+                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
+                ];
+
+                let indice = 0;
+                let intervaloTexto;
+
+                texto.classList.add("visible");
+
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    intervaloTexto = setInterval(() => {
+                        texto.classList.remove("visible");
+
+                        setTimeout(() => {
+                            indice = (indice + 1) % regiones.length;
+                            texto.textContent = regiones[indice];
+                            texto.classList.add("visible");
+                        }, 500);
+
+                    }, 1900);
+                });
+            });
+
+
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const sensors = [
+                    document.querySelector(".sensor-red"),
+                    document.querySelector(".sensor-yellow"),
+                    document.querySelector(".sensor-green")
+                ];
+
+                let index = 0;
+
+                function startSensorSequence() {
+                    sensors.forEach(s => s.classList.remove("active"));
+
+                    sensors[index].classList.add("active");
+                    index = (index + 1) % sensors.length;
+                }
+
+                setInterval(startSensorSequence, 600);
+            });
+
         </script>
     </div>
 
