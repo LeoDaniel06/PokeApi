@@ -595,6 +595,33 @@
             }
         }
 
+        async function eliminarFavoritoBackend(pokemon, estrella) {
+            try {
+                const params = new URLSearchParams();
+                params.append("idPokemon", pokemon.id);
+
+                const response = await fetch("/pokedex/deleteFavorito", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                    body: params,
+                    credentials: "same-origin"
+                });
+
+                const result = await response.json();
+
+                if (result.correct) {
+                    estrella.classList.remove('activo');
+                    favoritosUsuario.delete(pokemon.id);
+                } else {
+                    alert(result.errorMessage || "No se pudo eliminar el favorito");
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Error al eliminar favorito");
+            }
+        }
+
         function crearTarjetaPokemon(pokemon, container) {
             const hp = pokemon.stats.find(s => s.stat.name === 'hp').base_stat;
             const attack = pokemon.stats.find(s => s.stat.name === 'attack').base_stat;
@@ -657,7 +684,12 @@
             }
             estrella.addEventListener('click', e => {
                 e.stopPropagation();
-                guardarFavoritoBackend(pokemon, estrella);
+
+                if (estrella.classList.contains('activo')) {
+                    eliminarFavoritoBackend(pokemon, estrella);
+                } else {
+                    guardarFavoritoBackend(pokemon, estrella);
+                }
             });
 
             container.appendChild(card);

@@ -22,7 +22,7 @@
                 text-decoration: none;
                 transition: 0.3s;
             }
-            
+
             #loader {
                 position: fixed;
                 inset: 0;
@@ -421,75 +421,33 @@
             };
             const typeEffectiveness = {
                 normal: {weak: ["fighting"], resist: []},
-                fire: {
-                    weak: ["water", "rock", "ground"],
-                    resist: ["fire", "grass", "ice", "bug", "steel", "fairy"]
-                },
-                water: {
-                    weak: ["electric", "grass"],
-                    resist: ["fire", "water", "ice", "steel"]
-                },
-                grass: {
-                    weak: ["fire", "ice", "bug", "flying", "poison"],
-                    resist: ["water", "electric", "grass", "ground"]
-                },
-                electric: {
-                    weak: ["ground"],
-                    resist: ["electric", "flying", "steel"]
-                },
-                ice: {
-                    weak: ["fire", "fighting", "rock", "steel"],
-                    resist: ["ice"]
-                },
-                fighting: {
-                    weak: ["flying", "psychic", "fairy"],
-                    resist: ["bug", "rock", "dark"]
-                },
-                poison: {
-                    weak: ["ground", "psychic"],
-                    resist: ["grass", "fighting", "poison", "bug", "fairy"]
-                },
-                ground: {
-                    weak: ["water", "grass", "ice"],
-                    resist: ["poison", "rock"]
-                },
-                flying: {
-                    weak: ["electric", "ice", "rock"],
-                    resist: ["grass", "fighting", "bug"]
-                },
-                psychic: {
-                    weak: ["bug", "ghost", "dark"],
-                    resist: ["fighting", "psychic"]
-                },
-                bug: {
-                    weak: ["fire", "flying", "rock"],
-                    resist: ["grass", "fighting", "ground"]
-                },
-                rock: {
-                    weak: ["water", "grass", "fighting", "ground", "steel"],
-                    resist: ["fire", "normal", "flying", "poison"]
-                },
-                ghost: {
-                    weak: ["ghost", "dark"],
-                    resist: ["poison", "bug"]
-                },
-                dragon: {
-                    weak: ["ice", "dragon", "fairy"],
-                    resist: ["fire", "water", "grass", "electric"]
-                },
-                dark: {
-                    weak: ["fighting", "bug", "fairy"],
-                    resist: ["ghost", "dark"]
-                },
-                steel: {
-                    weak: ["fire", "fighting", "ground"],
-                    resist: ["normal", "grass", "ice", "flying", "psychic", "bug", "rock", "dragon", "steel", "fairy"]
-                },
-                fairy: {
-                    weak: ["poison", "steel"],
-                    resist: ["fighting", "bug", "dark"]
-                }
+                fire: {weak: ["water", "rock", "ground"], resist: ["fire", "grass", "ice", "bug", "steel", "fairy"]},
+                water: {weak: ["electric", "grass"], resist: ["fire", "water", "ice", "steel"]},
+                grass: {weak: ["fire", "ice", "bug", "flying", "poison"], resist: ["water", "electric", "grass", "ground"]},
+                electric: {weak: ["ground"], resist: ["electric", "flying", "steel"]},
+                ice: {weak: ["fire", "fighting", "rock", "steel"], resist: ["ice"]},
+                fighting: {weak: ["flying", "psychic", "fairy"], resist: ["bug", "rock", "dark"]},
+                poison: {weak: ["ground", "psychic"], resist: ["grass", "fighting", "poison", "bug", "fairy"]},
+                ground: {weak: ["water", "grass", "ice"], resist: ["poison", "rock"]},
+                flying: {weak: ["electric", "ice", "rock"], resist: ["grass", "fighting", "bug"]},
+                psychic: {weak: ["bug", "ghost", "dark"], resist: ["fighting", "psychic"]},
+                bug: {weak: ["fire", "flying", "rock"], resist: ["grass", "fighting", "ground"]},
+                rock: {weak: ["water", "grass", "fighting", "ground", "steel"], resist: ["fire", "normal", "flying", "poison"]},
+                ghost: {weak: ["ghost", "dark"], resist: ["poison", "bug"]},
+                dragon: {weak: ["ice", "dragon", "fairy"], resist: ["fire", "water", "grass", "electric"]},
+                dark: {weak: ["fighting", "bug", "fairy"], resist: ["ghost", "dark"]},
+                steel: {weak: ["fire", "fighting", "ground"], resist: ["normal", "grass", "ice", "flying", "psychic", "bug", "rock", "dragon", "steel", "fairy"]},
+                fairy: {weak: ["poison", "steel"], resist: ["fighting", "bug", "dark"]}
             };
+            async function verificarFavorito(idPokemon) {
+                try {
+                    const response = await fetch("/pokedex/favoritos", {credentials: "same-origin"});
+                    const favoritos = await response.json();
+                    return favoritos.includes(parseInt(idPokemon));
+                } catch {
+                    return false;
+                }
+            }
             let statsChart;
             function renderPokemon(pokemon, species) {
                 document.getElementById("pokemon-name").textContent = pokemon.name.toUpperCase();
@@ -497,21 +455,23 @@
                 document.getElementById("pokemon-weight").textContent = pokemon.weight / 10;
                 document.getElementById("pokemon-height").textContent = pokemon.height / 10;
                 document.getElementById("pokemon-ability").textContent = pokemon.abilities[0].ability.name;
-                document.getElementById("pokemon-image").src =
-                        pokemon.sprites.other.home.front_default;
+                document.getElementById("pokemon-image").src = pokemon.sprites.other.home.front_default;
+
                 const desc = species.flavor_text_entries.find(e => e.language.name === "es");
                 document.getElementById("pokemon-description").textContent =
                         desc ? desc.flavor_text.replace(/\f/g, " ") : "Sin descripción";
+
                 renderTypes(pokemon.types);
                 setPokedexColor(pokemon.types[0].type.name);
                 renderStats(pokemon.stats);
                 renderMoves(pokemon.moves);
+                renderWeaknessesAndResistances(pokemon.types);
+                renderEvolutions(species);
+
                 document.getElementById("pokemon-habitat").textContent =
                         species.habitat ? species.habitat.name : "Desconocido";
                 document.getElementById("pokemon-generation").textContent =
                         species.generation.name.replace("generation-", "").toUpperCase();
-                renderWeaknessesAndResistances(pokemon.types);
-                renderEvolutions(species);
             }
             function renderTypes(types) {
                 const container = document.getElementById("pokemon-types");
@@ -562,25 +522,17 @@
                         labels: stats.map(s => s.stat.name.toUpperCase()),
                         datasets: [{
                                 data: stats.map(s => s.base_stat),
-                                pointBackgroundColor: "#fff",
-                                pointBorderColor: "#000",
-                                borderJoinStyle: "round",
                                 borderWidth: 3,
                                 pointRadius: 3
                             }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: true,
-                        aspectRatio: 1,
                         scales: {
                             r: {
                                 suggestedMin: 0,
                                 suggestedMax: 100,
-                                ticks: {display: false},
-                                pointLabels: {
-                                    font: {size: 10}
-                                }
+                                ticks: {display: false}
                             }
                         }
                     }
@@ -596,53 +548,69 @@
                     list.appendChild(li);
                 });
             }
-            new bootstrap.Carousel(
-                    document.getElementById("pokemonCarousel"),
-                    {
-                        interval: 2000,
-                        wrap: true,
-                        pause: "hover"
-                    }
-            );
             function getPokemonIdFromURL() {
-                const path = window.location.pathname;
-                return path.substring(path.lastIndexOf("/") + 1);
+                return window.location.pathname.split("/").pop();
             }
             const pokemonId = getPokemonIdFromURL();
             const startTime = Date.now();
             Promise.all([
                 fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`).then(r => r.json()),
                 fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`).then(r => r.json())
-            ]).then(([pokemon, species]) => {
+            ]).then(async ([pokemon, species]) => {
                 renderPokemon(pokemon, species);
+                const star = document.getElementById("favoriteBtn");
+                const esFavorito = await verificarFavorito(pokemon.id);
+                if (esFavorito) {
+                    star.classList.add("bi-star-fill", "active");
+                    star.classList.remove("bi-star");
+                } else {
+                    star.classList.add("bi-star");
+                    star.classList.remove("bi-star-fill", "active");
+                }
+                star.addEventListener("click", () => {
+                    const url = star.classList.contains("active")
+                            ? "/pokedex/deleteFavorito"
+                            : "/pokedex/addFavorito";
+                    const params = new URLSearchParams();
+                    params.append("idPokemon", pokemon.id);
+                    if (!star.classList.contains("active")) {
+                        params.append("nombrePokemon", pokemon.name);
+                    }
+                    fetch(url, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                        body: params,
+                        credentials: "same-origin"
+                    })
+                            .then(r => r.json())
+                            .then(res => {
+                                if (!res.correct) {
+                                    alert(res.errorMessage);
+                                    return;
+                                }
+                                star.classList.toggle("bi-star");
+                                star.classList.toggle("bi-star-fill");
+                                star.classList.toggle("active");
+                            });
+                });
                 const loader = document.getElementById("loader");
-                const elapsed = Date.now() - startTime;
-                const minTime = 1500;
-                const remaining = Math.max(minTime - elapsed, 0);
-                setTimeout(() => {
-                    loader.classList.add("hide");
-                    setTimeout(() => loader.remove(), 500);
-                }, remaining);
+                const remaining = Math.max(1500 - (Date.now() - startTime), 0);
+                setTimeout(() => loader.remove(), remaining);
             });
             async function renderEvolutions(species) {
-                const evoContainer = document.getElementById("pokemon-evolutions");
-                evoContainer.innerHTML = "";
+                const container = document.getElementById("pokemon-evolutions");
+                container.innerHTML = "";
                 if (!species.evolution_chain) {
-                    evoContainer.textContent = "No tiene evoluciones";
+                    container.textContent = "No tiene evoluciones";
                     return;
                 }
-                const evoResponse = await fetch(species.evolution_chain.url);
-                const evoData = await evoResponse.json();
-                const evolutions = [];
+                const evoData = await fetch(species.evolution_chain.url).then(r => r.json());
                 let chain = evoData.chain;
                 while (chain) {
-                    evolutions.push(chain.species.name);
-                    chain = chain.evolves_to[0];
-                }
-                for (const name of evolutions) {
-                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${chain.species.name}`);
                     const poke = await res.json();
-                    evoContainer.appendChild(createEvolutionCard(poke));
+                    container.appendChild(createEvolutionCard(poke));
+                    chain = chain.evolves_to[0];
                 }
             }
             function createEvolutionCard(pokemon) {
@@ -650,50 +618,12 @@
                 card.className = "text-center";
                 const img = document.createElement("img");
                 img.src = pokemon.sprites.other["official-artwork"].front_default;
-                img.className = "rounded-circle border border-3";
                 img.style.width = "100px";
-                img.style.height = "100px";
                 const name = document.createElement("p");
                 name.textContent = pokemon.name.toUpperCase();
-                name.className = "mt-2 mb-1 fw-bold";
-                const id = document.createElement("small");
-                id.textContent = `N.º ${pokemon.id.toString().padStart(3, "0")}`;
-                const type = document.createElement("span");
-                const typeName = pokemon.types[0].type.name;
-                type.className = "badge mt-1";
-                type.style.backgroundColor = typeColors[typeName];
-                type.textContent = typeName.toUpperCase();
-                card.append(img, name, id, document.createElement("br"), type);
+                card.append(img, name);
                 return card;
             }
-
-            document.getElementById("favoriteBtn").addEventListener("click", function () {
-                const star = this;
-                const idPokemon = document.getElementById("pokemon-id").textContent;
-                const nombrePokemon = document.getElementById("pokemon-name").textContent;
-
-                fetch("/pokedex/addFavorito", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: new URLSearchParams({
-                        idPokemon: idPokemon,
-                        nombrePokemon: nombrePokemon
-                    })
-                })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (!data.correct) {
-                                alert(data.errorMessage);
-                                return;
-                            }
-                            star.classList.toggle("bi-star");
-                            star.classList.toggle("bi-star-fill");
-                            star.classList.toggle("active");
-                        })
-                        .catch(err => console.error(err));
-            });
         </script>
     </body>
 </html>

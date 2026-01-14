@@ -118,7 +118,7 @@ public class PokeApiController {
     }
 
     // ---------- FAVORITOS DELETE ----------
-    @GetMapping("/deleteFavorito")
+    @PostMapping("/deleteFavorito")
     @ResponseBody
     public Result deleteFavorito(
             @RequestParam int idPokemon,

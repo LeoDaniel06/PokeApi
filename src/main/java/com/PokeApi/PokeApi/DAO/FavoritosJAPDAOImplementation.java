@@ -64,16 +64,20 @@ public class FavoritosJAPDAOImplementation implements IFavoritosJPA {
         Result result = new Result();
         try {
             int rows = entityManager.createQuery(
-                    "DELETE FROM FavoritosJPA f"
-                    + "WHERE f.idPokemon = :idPokemon"
+                    "DELETE FROM FavoritosJPA f "
+                    + "WHERE f.idPokemon = :idPokemon "
                     + "AND f.usuario.idUsuario = :idUsuario")
                     .setParameter("idPokemon", idPokemon)
                     .setParameter("idUsuario", idUsuario)
                     .executeUpdate();
-            result.correct = rows > 0;
-            if (result.correct) {
-                result.errorMessage = "No se encontro el Pokemon favorito a eliminar";
+
+            if (rows > 0) {
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "No se encontró el Pokémon favorito a eliminar";
             }
+
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
