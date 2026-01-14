@@ -202,9 +202,160 @@
                 padding-right: 45px;
             }
 
+            .pokemon-sprite{
+                width: 100px;
+                pointer-events: none;
+                transform: scaleX(-1);
+            }
+
+            .pokedex-container {
+                background-color: #dc3545 !important;
+                border: 8px solid #8b0000;
+                border-radius: 20px 20px 20px 60px !important;
+                box-shadow: inset -10px -10px 0px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.4);
+                color: white;
+            }
+
+            .pokedex-screen {
+                background-color: #333;
+                border: 15px solid #dedede;
+                border-radius: 10px;
+                box-shadow: inset 0 0 15px #000;
+            }
+
+            .sensor-main {
+                width: 50px;
+                height: 50px;
+                background: radial-gradient(circle, #00f 0%, #000 100%);
+                border: 4px solid white;
+                border-radius: 50%;
+                animation: blink 1.5s infinite alternate;
+            }
+
+            @keyframes blink {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            .sensor-red,
+            .sensor-yellow,
+            .sensor-green {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                border: 1px solid #000;
+                opacity: 0.2;
+            }
+
+            .sensor-red {
+                background: #ff0000;
+            }
+            .sensor-yellow {
+                background: #ffff00;
+            }
+            .sensor-green {
+                background: #00ff00;
+            }
+
+            .sensor-red.active,
+            .sensor-yellow.active,
+            .sensor-green.active {
+                opacity: 1;
+                box-shadow: 0 0 8px currentColor;
+            }
+
+            .font-pixel {
+                font-family: 'Courier New', Courier, monospace;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .custom-progress-container {
+                height: 25px;
+                background-color: #222 !important;
+                border: 2px solid #555;
+            }
+
+            .btn-pokedex-blue {
+                width: 40px;
+                height: 10px;
+                background: #007bff;
+                border-radius: 5px;
+                border-bottom: 3px solid #004a99;
+            }
+
+            .textoAnimado {
+                font-size: 1rem;
+                font-weight: bold;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+            .visible {
+                opacity: 1;
+            }
+
+            #pantallaCargaInicial {
+                position: fixed;
+                inset: 0;
+                background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                transition: opacity 0.5s ease-out;
+            }
+
+            #pantallaCargaInicial.ocultar {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .pokeball-carga {
+                width: 150px;
+                height: 150px;
+                animation: rotar 2s linear infinite;
+            }
+
+            @keyframes rotar {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .texto-carga {
+                color: white;
+                font-size: 1.5rem;
+                margin-top: 20px;
+                animation: pulso 1.5s ease-in-out infinite;
+            }
+
+            @keyframes pulso {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
         </style>
     </head>
     <body>
+        <div id="pantallaCargaInicial">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+                 alt="Pokeball" 
+                 class="pokeball-carga">
+            <p class="texto-carga pkm">Cargando Pokédex...</p>
+        </div>
+
         <div class="container d-flex justify-content-center align-items-center">
             <div class="card shadow-sm p-4">
                 <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" 
@@ -228,7 +379,6 @@
                 </div>
 
                 <form id="registroForm" th:action="@{/pokedex/registro}" method="post" th:object="${usuario}">
-                    <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo</label>
                         <input type="text" 
@@ -237,8 +387,7 @@
                                name="nombre" 
                                th:field="*{nombre}"
                                placeholder="Ej: Ash Ketchum" 
-                               required 
-                               >
+                               required>
                     </div>
 
                     <div class="mb-3">
@@ -249,8 +398,7 @@
                                name="userName" 
                                th:field="*{userName}"
                                placeholder="Ej: ash_maestro" 
-                               required 
-                               >
+                               required>
                     </div>
 
                     <div class="mb-3">
@@ -281,83 +429,187 @@
                                 <i class="bi bi-eye-fill" id="eyeIcon"></i>
                             </button>
                         </div>
+                    </div>
 
-                        <!--  <div class="mb-3">
-                            <label for="rol" class="form-label">Rol</label>
-                             <select class="form-select" 
-                                     id="rol" 
-                                     name="rol" 
-                                     required>
-                                 <option value="" selected disabled>Selecciona tu rol</option>
-                                 <option th:each="rol : ${roles}" 
-                                         th:value="${rol.idRol}" 
-                                         th:text="${rol.nombreRol}">
-                                     Entrenador Pokémon
-                                 </option>
-                             </select>
-                         </div> -->
+                    <div class="mb-3">
+                        <label class="form-label">Sexo</label>
+                        <div class="gender-container">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="sexo" 
+                                       th:field="*{sexo}"
+                                       id="masculino" 
+                                       value="M" 
+                                       required>
+                                <label class="form-check-label" for="masculino">
+                                    ♂ Masculino
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="sexo" 
+                                       th:field="*{sexo}"
+                                       id="femenino" 
+                                       value="F" 
+                                       required>
+                                <label class="form-check-label" for="femenino">
+                                    ♀ Femenino
+                                </label>
+                            </div> 
+                        </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Sexo</label>
-                            <div class="gender-container">
-                                <div class="form-check">
-                                    <input class="form-check-input" 
-                                           type="radio" 
-                                           name="sexo" 
-                                           th:field="*{sexo}"
-                                           id="masculino" 
-                                           value="M" 
-                                           required
-                                           >
-                                    <label class="form-check-label" for="masculino">
-                                        ♂ Masculino
-                                    </label>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            Registrarse
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href = '/pokedex/login'">
+                            Volver al Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalCargaRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content pokedex-container">
+
+                    <div class="pokedex-sensors d-flex gap-2 p-3">
+                        <div class="sensor-main"></div>
+                        <div class="sensor-red"></div>
+                        <div class="sensor-yellow"></div>
+                        <div class="sensor-green"></div>
+                    </div>
+
+                    <div class="modal-header border-0 flex-column align-items-start pt-0">
+                        <h5 class="modal-title font-pixel text-uppercase">System: Registering Trainer...</h5>
+                        <small class="text-white-50">Creando perfil en región: <span id="region" class="textoAnimado">Kanto</span></small>
+                    </div>
+
+                    <div class="modal-body d-flex flex-column align-items-center">
+                        <div class="pokedex-screen w-100 d-flex flex-column align-items-center justify-content-center p-4 mb-4">
+                            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGg2YW9sbHh6eTIxYTRjdGJ2dXE2NTg0Z3MyMGJ0eXNwa2RhaGMzdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/nMy8HTFQRWpudNwbxQ/giphy.gif" 
+                                 class="pokemon-sprite mb-3">
+
+                            <div class="progress w-100 custom-progress-container">
+                                <div id="barraProgresoRegistro" 
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success">
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" 
-                                           type="radio" 
-                                           name="sexo" 
-                                           th:field="*{sexo}"
-                                           id="femenino" 
-                                           value="F" 
-                                           required
-                                           >
-                                    <label class="form-check-label" for="femenino">
-                                        ♀ Femenino
-                                    </label>
-                                </div> 
+                            </div>
+                            <span id="porcentajeCargaRegistro" class="mt-2 font-pixel">0%</span>
+                        </div>
+
+                        <div class="pokedex-controls d-flex justify-content-between w-100 px-3">
+                            <div class="d-pad"></div>
+                            <div class="action-buttons d-flex gap-2 align-items-center">
+                                <div class="btn-pokedex-blue"></div>
+                                <div class="btn-pokedex-blue"></div>
                             </div>
                         </div>
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                Registrarse
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="window.location.href = '/pokedex/login'">
-                                Volver al Login
-                            </button>
-                        </div>
-                </form>
+                    </div>
+                </div>
             </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-                                const togglePassword = document.getElementById('togglePassword');
-                                const passwordInput = document.getElementById('password');
-                                const eyeIcon = document.getElementById('eyeIcon');
+            document.addEventListener("DOMContentLoaded", () => {
+                const pantallaCarga = document.getElementById('pantallaCargaInicial');
+                
+                setTimeout(() => {
+                    pantallaCarga.classList.add('ocultar');
+                    setTimeout(() => {
+                        pantallaCarga.style.display = 'none';
+                    }, 500);
+                }, 2000);
+            });
 
-                                togglePassword.addEventListener('click', function () {
-                                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                                    passwordInput.setAttribute('type', type);
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
 
-                                    if (type === 'password') {
-                                        eyeIcon.className = 'bi bi-eye-fill';
-                                    } else {
-                                        eyeIcon.className = 'bi bi-eye-slash-fill';
-                                    }
-                                });
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                if (type === 'password') {
+                    eyeIcon.className = 'bi bi-eye-fill';
+                } else {
+                    eyeIcon.className = 'bi bi-eye-slash-fill';
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("registroForm");
+                const modal = new bootstrap.Modal(document.getElementById("modalCargaRegistro"));
+                const barra = document.getElementById("barraProgresoRegistro");
+                const progress = document.getElementById("porcentajeCargaRegistro");
+                const texto = document.getElementById("region");
+
+                const regiones = [
+                    "Kanto", "Johto", "Hoenn", "Sinnoh",
+                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
+                ];
+
+                let indice = 0;
+                let intervaloTexto;
+
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    modal.show();
+                    texto.classList.add("visible");
+
+                    let progreso = 0;
+
+                    const intervalo = setInterval(() => {
+                        progreso += 1;
+                        barra.style.width = progreso + "%";
+                        progress.textContent = progreso + "%";
+
+                        if (progreso >= 100) {
+                            clearInterval(intervalo);
+                            clearInterval(intervaloTexto);
+
+                            setTimeout(() => {
+                                form.submit();
+                            }, 500);
+                        }
+                    }, 50);
+
+                    intervaloTexto = setInterval(() => {
+                        texto.classList.remove("visible");
+
+                        setTimeout(() => {
+                            indice = (indice + 1) % regiones.length;
+                            texto.textContent = regiones[indice];
+                            texto.classList.add("visible");
+                        }, 500);
+                    }, 1900);
+                });
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const sensors = [
+                    document.querySelector(".sensor-red"),
+                    document.querySelector(".sensor-yellow"),
+                    document.querySelector(".sensor-green")
+                ];
+
+                let index = 0;
+
+                function startSensorSequence() {
+                    sensors.forEach(s => s.classList.remove("active"));
+                    sensors[index].classList.add("active");
+                    index = (index + 1) % sensors.length;
+                }
+
+                setInterval(startSensorSequence, 600);
+            });
         </script>
 
     </body>
