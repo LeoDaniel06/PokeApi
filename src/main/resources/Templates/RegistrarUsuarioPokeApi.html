@@ -380,13 +380,35 @@
 
                 <form id="registroForm" th:action="@{/pokedex/registro}" method="post" th:object="${usuario}">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre Completo</label>
+                        <label for="nombre" class="form-label">Nombre</label>
                         <input type="text" 
                                class="form-control" 
                                id="nombre" 
                                name="nombre" 
                                th:field="*{nombre}"
-                               placeholder="Ej: Ash Ketchum" 
+                               placeholder="Ej: Ketchum" 
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="apellidoPaterno" 
+                               name="apellidoPaterno" 
+                               th:field="*{apellidoPaterno}"
+                               placeholder="Ej: Ketchum" 
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="apellidoPaterno" class="form-label">Apellido Materno</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="apellidoMaterno" 
+                               name="apellidoMaterno" 
+                               th:field="*{apellidoMaterno}"
+                               placeholder="Ej: Oak" 
                                required>
                     </div>
 

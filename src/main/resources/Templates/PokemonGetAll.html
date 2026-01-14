@@ -479,10 +479,6 @@
         let paginaActual = 1;
         let favoritosUsuario = new Set();
         const pokemonPorPagina = 50;
-
-        // ===============================
-        // UTILIDAD: ¿URL con favoritos?
-        // ===============================
         function urlTieneFavoritos() {
             const params = new URLSearchParams(window.location.search);
             return params.get('favoritos') === 'true';
@@ -525,7 +521,6 @@
 
                 todosLosPokemon = detalles;
 
-                // 👉 AQUÍ DECIDIMOS QUÉ MOSTRAR
                 if (urlTieneFavoritos()) {
                     mostrarFavoritos();
                 } else {
