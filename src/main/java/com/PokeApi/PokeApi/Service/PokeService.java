@@ -33,7 +33,7 @@ public class PokeService {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1025"))
+                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1325"))
                     .GET()
                     .build();
 
@@ -70,4 +70,3 @@ public class PokeService {
         );
     }
 }
-

@@ -445,7 +445,7 @@
                     id="buscador"
                     class="form-control form-control-lg"
                     placeholder="Buscar Pokémon por nombre o número...">
-                
+
             </div>
         </div>
 
@@ -477,8 +477,12 @@
     <script>
         let todosLosPokemon = [];
         let paginaActual = 1;
-        let favoritosUsuario = new Set;
-        const pokemonPorPagina = 100;
+        let favoritosUsuario = new Set();
+        const pokemonPorPagina = 50;
+        function urlTieneFavoritos() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('favoritos') === 'true';
+        }
 
         function reproducirGritoPokemon(id) {
             const audio = new Audio(
@@ -491,7 +495,9 @@
 
         async function cargarFavoritosUsuario() {
             try {
-                const response = await fetch('/pokedex/favoritos', {credentials: 'same-origin'});
+                const response = await fetch('/pokedex/favoritos', {
+                    credentials: 'same-origin'
+                });
                 const data = await response.json();
                 favoritosUsuario = new Set(data);
             } catch {
@@ -504,36 +510,28 @@
 
             try {
                 await cargarFavoritosUsuario();
+
                 const response = await fetch('/api/pokemon');
-                console.log(response);
                 const data = await response.json();
                 loading.style.display = 'none';
 
-                console.log(data);
-//                for (const pokemon of data) {
-//                    const detalles = await obtenerDetallesPokemon(pokemon.url);
-//                    todosLosPokemon.push(detalles);
-//                }
-
                 const detalles = await Promise.all(
-                    data.map(p => fetch(p.url).then(r => r.json()))
-                );
+                        data.map(p => fetch(p.url).then(r => r.json()))
+                        );
 
                 todosLosPokemon = detalles;
 
-
-                mostrarPagina(1);
-                mostrarPaginacion();
+                if (urlTieneFavoritos()) {
+                    mostrarFavoritos();
+                } else {
+                    mostrarPagina(1);
+                    mostrarPaginacion();
+                }
 
             } catch (error) {
                 loading.innerHTML = 'Error al cargar los Pokémon';
                 console.error(error);
             }
-        }
-
-        async function obtenerDetallesPokemon(url) {
-            const response = await fetch(url);
-            return await response.json();
         }
 
         function mostrarPagina(numeroPagina) {
@@ -543,7 +541,8 @@
             const inicio = (numeroPagina - 1) * pokemonPorPagina;
             const fin = inicio + pokemonPorPagina;
 
-            todosLosPokemon.slice(inicio, fin)
+            todosLosPokemon
+                    .slice(inicio, fin)
                     .forEach(pokemon => crearTarjetaPokemon(pokemon, container));
 
             paginaActual = numeroPagina;
@@ -557,6 +556,7 @@
 
         function actualizarBotonesPaginacion() {
             const total = Math.ceil(todosLosPokemon.length / pokemonPorPagina);
+
             document.getElementById('info-pagina').textContent =
                     `Página ${paginaActual} de ${total}`;
 
@@ -571,24 +571,22 @@
                 const params = new URLSearchParams();
                 params.append("idPokemon", pokemon.id);
                 params.append("nombrePokemon", pokemon.name);
+
                 const response = await fetch("/pokedex/addFavorito", {
                     method: "POST",
                     headers: {"Content-Type": "application/x-www-form-urlencoded"},
                     body: params,
                     credentials: "same-origin"
                 });
+
                 const result = await response.json();
+
                 if (result.correct) {
-                    estrella.classList.toggle('activo');
-                    if (estrella.classList.contains('activo')) {
-                        favoritosUsuario.add(pokemon.id);
-                    } else {
-                        favoritosUsuario.delete(pokemon.id);
-                    }
+                    estrella.classList.add('activo');
+                    favoritosUsuario.add(pokemon.id);
                 } else {
                     alert(result.errorMessage || "Debes iniciar sesión");
                 }
-
             } catch (error) {
                 console.error(error);
                 alert("Error al guardar favorito");
@@ -615,7 +613,6 @@
                 } else {
                     alert(result.errorMessage || "No se pudo eliminar el favorito");
                 }
-
             } catch (error) {
                 console.error(error);
                 alert("Error al eliminar favorito");
@@ -642,26 +639,21 @@
                      src="${pokemon.sprites.other['official-artwork'].front_default}">
                 <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
             </div>
-
             <div class="card-back">
                 <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
-
                 <div class="pokemon-tipo">
                     ${tipos.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
                 </div>
-
                 <div class="pokemon-poderes">
                     <div class="poder-row"><span>HP</span><span>${hp}</span></div>
                     <div class="poder-row"><span>Ataque</span><span>${attack}</span></div>
                     <div class="poder-row"><span>Defensa</span><span>${defense}</span></div>
                     <div class="poder-row"><span>Velocidad</span><span>${speed}</span></div>
                 </div>
-
                 <div class="pokemon-habilidades">
                     <div class="habilidades-title">Habilidades</div>
                     <div>${habilidades}</div>
                 </div>
-
                 <a href="/pokedex/detail/${pokemon.id}" class="btn-detail">Ver Detalles</a>
             </div>
         </div>
@@ -679,17 +671,16 @@
             });
 
             const estrella = card.querySelector('.favorito');
+
             if (favoritosUsuario.has(pokemon.id)) {
                 estrella.classList.add('activo');
             }
+
             estrella.addEventListener('click', e => {
                 e.stopPropagation();
-
-                if (estrella.classList.contains('activo')) {
-                    eliminarFavoritoBackend(pokemon, estrella);
-                } else {
-                    guardarFavoritoBackend(pokemon, estrella);
-                }
+                estrella.classList.contains('activo')
+                        ? eliminarFavoritoBackend(pokemon, estrella)
+                        : guardarFavoritoBackend(pokemon, estrella);
             });
 
             container.appendChild(card);
@@ -701,7 +692,7 @@
 
             if (!term) {
                 mostrarPagina(paginaActual);
-                document.getElementById('paginacion').style.display = 'flex';
+                mostrarPaginacion();
                 return;
             }
 
@@ -713,14 +704,46 @@
                     .forEach(p => crearTarjetaPokemon(p, container));
         }
 
+        function mostrarFavoritos() {
+            const container = document.getElementById('pokemon-tarjeta');
+            container.innerHTML = '';
+
+            const favoritos = todosLosPokemon.filter(p =>
+                favoritosUsuario.has(p.id)
+            );
+
+            if (favoritos.length === 0) {
+                container.innerHTML = `
+                <div class="loading">
+                    No tienes Pokémon favoritos ⭐
+                </div>`;
+                document.getElementById('paginacion').style.display = 'none';
+                return;
+            }
+
+            favoritos.forEach(p => crearTarjetaPokemon(p, container));
+            document.getElementById('paginacion').style.display = 'none';
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             cargarPokemon();
-            document.getElementById('buscador').addEventListener('input', buscarPokemon);
+
+            document.getElementById('buscador')
+                    ?.addEventListener('input', buscarPokemon);
+
             document.getElementById('btn-primera').onclick = () => mostrarPagina(1);
             document.getElementById('btn-anterior').onclick = () => mostrarPagina(paginaActual - 1);
             document.getElementById('btn-siguiente').onclick = () => mostrarPagina(paginaActual + 1);
             document.getElementById('btn-ultima').onclick = () =>
                 mostrarPagina(Math.ceil(todosLosPokemon.length / pokemonPorPagina));
+
+            const btnFavoritos = document.getElementById('btnFavoritos');
+            if (btnFavoritos) {
+                btnFavoritos.addEventListener('click', e => {
+                    e.preventDefault();
+                    window.location.href = '/pokedex?favoritos=true';
+                });
+            }
         });
     </script>
 </th:block>
