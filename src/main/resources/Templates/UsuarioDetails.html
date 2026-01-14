@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+
+    <head>
+        <title>Perfil de Entrenador</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <style>
+            .perfil-bg {
+                background: linear-gradient(135deg, #d32f2f, #ffffff);
+                min-height: 100vh;
+                padding: 20px 0;
+            }
+
+            .pokedex-card {
+                position: relative;
+                width: 100%;
+                max-width: 520px;
+                background: #f5f5f5;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                overflow: hidden;
+                border: 4px solid #b71c1c;
+                margin: auto;
+            }
+
+            .back-arrow{
+                position: absolute;
+                top: 8px;
+                left: 10px;
+                font-size: 1.9rem;
+                color: white;
+                background: rgba(0,0,0,0.25);
+                padding: 0px 14px;
+                border-radius: 50%;
+                text-decoration: none;
+                transition: 0.3s;
+            }
+
+            .pokedex-header {
+                background: #d32f2f;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .trainer-avatar {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                border: 5px solid #d32f2f;
+                background: white;
+                object-fit: cover;
+            }
+
+            .trainer-name {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-top: 10px;
+            }
+
+            .info-section {
+                padding: 20px;
+            }
+
+            .info-item {
+                background: white;
+                border-radius: 12px;
+                padding: 10px 15px;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 6px solid #d32f2f;
+                flex-wrap: wrap;
+            }
+
+            .info-label {
+                font-weight: bold;
+                color: #555;
+            }
+
+            .info-value {
+                color: #000;
+            }
+
+            .btn-pokemon {
+                background: #d32f2f;
+                color: white;
+                border-radius: 30px;
+                padding: 10px 25px;
+                border: none;
+                transition: 0.3s;
+            }
+
+            .btn-pokemon:hover {
+                background: #b71c1c;
+                transform: scale(1.05);
+            }
+
+            .icono-camara {
+                position: absolute;
+                bottom: 6px;
+                right: 6px;
+                width: 34px;
+                height: 34px;
+                background: #d32f2f;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 1rem;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+                transition: 0.3s;
+            }
+
+            .icono-camara:hover {
+                background: #b71c1c;
+                transform: scale(1.1);
+            }
+
+            @media (max-width: 576px) {
+                .trainer-avatar {
+                    width: 90px;
+                    height: 90px;
+                }
+
+                .trainer-name {
+                    font-size: 1.2rem;
+                }
+
+                .info-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 5px;
+                }
+
+                .btn-pokemon {
+                    width: 100%;
+                }
+            }
+
+            .info-input:disabled {
+                background: transparent;
+                border: none;
+                padding-left: 0;
+                color: #000;
+            }
+
+            .info-input {
+                transition: all 0.3s ease;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div layout:fragment="content">
+
+            <div class="perfil-bg">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+
+                            <div class="pokedex-card">
+
+                                <div class="pokedex-header">
+                                    PERFIL DEL ENTRENADOR
+                                </div>
+                                <a th:href="@{/pokedex}" class="back-arrow">❮</a>
+                                <div class="text-center mt-4">
+
+                                    <form th:action="@{/pokedex/update-imagen}"
+                                          method="post"
+                                          enctype="multipart/form-data">
+
+                                        <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}" />
+
+                                        <input type="file"
+                                               id="inputFoto"
+                                               name="imagen"
+                                               accept="image/*"
+                                               hidden
+                                               onchange="this.form.submit()">
+
+                                        <div class="position-relative d-inline-block">
+
+                                            <img th:if="${usuario.Imagen != null}"
+                                                 th:src="'data:image/*;base64,' + ${usuario.Imagen}"
+                                                 class="trainer-avatar"
+                                                 alt="Imagen de usuario">
+
+                                            <img th:if="${usuario.Imagen == null}"
+                                                 src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+                                                 class="trainer-avatar"
+                                                 alt="Imagen por defecto">
+
+                                            <div class="icono-camara"
+                                                 onclick="document.getElementById('inputFoto').click()">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="text-center trainer-name"
+                                     th:text="${usuario.userName}">
+                                </div>
+
+                                <form class="info-section "
+                                      id="formPerfil"
+                                      th:action="@{/pokedex/update-datos}"
+                                      method="post">
+
+                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+
+                                    <div class="info-item">
+                                        <span class="info-label ">Usuario</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="userName"
+                                               th:value="${usuario.userName}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Nombre</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="nombre"
+                                               th:value="${usuario.nombre}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Género</span>
+                                        <select class="form-select info-input text-center"
+                                                name="sexo"
+                                                disabled>
+                                            <option th:selected="${usuario.sexo == 'Masculino'}">M</option>
+                                            <option th:selected="${usuario.sexo == 'Femenino'}">F</option>
+                                            <option th:selected="${usuario.sexo == 'Otro'}">Otro</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Correo</span>
+                                        <input class="form-control info-input text-center"
+                                               type="email"
+                                               name="correo"
+                                               th:value="${usuario.correo}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Rol</span>
+                                        <input class="form-control text-center"
+                                               type="text"
+                                               th:value="${usuario.rolJPA.nombreRol}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Estado</span>
+                                        <span class="info-value text-success">Activo</span>
+                                    </div>
+
+                                    <div class="text-center mt-4 d-flex justify-content-center gap-2">
+                                        <button type="button"
+                                                id="btnEditar"
+                                                class="btn btn-pokemon">
+                                            Editar Perfil
+                                        </button>
+
+                                        <button type="button"
+                                                id="btnCancelar"
+                                                class="btn btn-secondary d-none"
+                                                onclick="cancelarEdicion()">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+            <script>
+                let editando = false;
+                let valoresOriginales = {};
+
+                document.getElementById('btnEditar').addEventListener('click', function () {
+                    const inputs = document.querySelectorAll('.info-input');
+                    const btnEditar = document.getElementById('btnEditar');
+                    const btnCancelar = document.getElementById('btnCancelar');
+
+                    if (!editando) {
+                        valoresOriginales = {};
+                        inputs.forEach(input => {
+                            valoresOriginales[input.name] = input.value;
+                            input.disabled = false;
+                        });
+
+                        btnEditar.textContent = 'Guardar Datos';
+                        btnEditar.classList.remove('btn-pokemon');
+                        btnEditar.classList.add('btn-success');
+
+                        btnCancelar.classList.remove('d-none');
+                        editando = true;
+
+                    } else {
+                        Swal.fire({
+                            title: '¿Guardar cambios?',
+                            text: 'Se actualizará la información del perfil',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, guardar',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('formPerfil').submit();
+                            }
+                        });
+                    }
+                });
+
+                function cancelarEdicion() {
+                    const inputs = document.querySelectorAll('.info-input');
+                    const btnEditar = document.getElementById('btnEditar');
+                    const btnCancelar = document.getElementById('btnCancelar');
+
+                    inputs.forEach(input => {
+                        input.value = valoresOriginales[input.name];
+                        input.disabled = true;
+                    });
+
+                    btnEditar.textContent = 'Editar Perfil';
+                    btnEditar.classList.remove('btn-success');
+                    btnEditar.classList.add('btn-pokemon');
+
+                    btnCancelar.classList.add('d-none');
+                    editando = false;
+                }
+            </script>
+        </div>
+    </body>
+</html>
