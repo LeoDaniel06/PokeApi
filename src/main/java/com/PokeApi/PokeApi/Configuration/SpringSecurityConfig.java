@@ -42,6 +42,7 @@ public class SpringSecurityConfig {
                         "/pokedex/verificar",
                         "/pokedex",
                         "/pokedex/detail/**",
+                        "/pokedex/perfilUsuario/**",
                         "/fonts/**"
                 ).permitAll()
                 .anyRequest().authenticated()

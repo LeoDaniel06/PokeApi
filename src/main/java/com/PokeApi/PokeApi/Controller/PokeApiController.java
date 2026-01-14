@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -68,6 +70,10 @@ public class PokeApiController {
     @GetMapping
     public String getAll() {
         return "PokemonGetAll";
+    }
+    @GetMapping("/atrapaPokeballs")
+    public String Minijuego1(){
+        return "AtrapaPokeballs";
     }
 
 //    @GetMapping
@@ -262,7 +268,7 @@ public class PokeApiController {
 
         return "VerificacionPokeApi";
     }
-//----------------------------------GET FAVORITOS-----------------------------------------------
+//----------GET FAVORITOS----------//
 
     @GetMapping("/favoritos")
     @ResponseBody
@@ -289,5 +295,82 @@ public class PokeApiController {
                 .map(o -> (Integer) o)
                 .toList();
     }
-    
+
+//----------DetailUsuario----------//
+    @GetMapping("/perfilUsuario/{idUsuario}")
+    public String UsuarioByID(@PathVariable int idUsuario,
+            Model model,
+            Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return "redirect:/pokedex/login";
+        }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        int idSesion = userDetails.getId();
+
+        if (idSesion != idUsuario) {
+            return "redirect:/acceso-denegado";
+        }
+
+        Result result = usuarioDAOJPAImplementation.GetById(idUsuario);
+
+        if (!result.correct) {
+            model.addAttribute("error", result.errorMessage);
+            return "error";
+        }
+
+        model.addAttribute("usuario", (UsuarioJPA) result.object);
+        return "UsuarioDetails";
+    }
+//----------UPDATE IMAGEN----------//
+
+    @PostMapping("/update-imagen")
+    public String updateImagen(@RequestParam("idUsuario") int idUsuario,
+            @RequestParam("imagen") MultipartFile imagen,
+            RedirectAttributes redirectAttributes) {
+        try {
+            if (imagen.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "No se selecciono una imagen");
+                return "redirect:/pokedex/perfilUsuario/" + idUsuario;
+            }
+            byte[] bytes = imagen.getBytes();
+            String imagenBase64 = Base64.getEncoder().encodeToString(bytes);
+            Result result = usuarioDAOJPAImplementation.UpdateImagen(idUsuario, imagenBase64);
+            if (result.correct) {
+                redirectAttributes.addFlashAttribute("error", result.errorMessage);
+            } else {
+                redirectAttributes.addFlashAttribute("success", "Imagen Actualizada");
+            }
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar la imagen");
+        }
+        return "redirect:/pokedex/perfilUsuario/" + idUsuario;
+    }
+//----------UPDATE DATOS USUARIO----------//
+
+    @PostMapping("/update-datos")
+    public String UpdateDatosUsuario(@ModelAttribute UsuarioJPA usuario,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/pokedex/login";
+        }
+        UsuarioDetails userDetails = (UsuarioDetails) authentication.getPrincipal();
+        if (userDetails.getId() != usuario.getIdUsuario()) {
+            return "redirect:/pokedex/login";
+        }
+        Result result = usuarioDAOJPAImplementation.updateUsuario(usuario);
+        if (result.correct) {
+            redirectAttributes.addFlashAttribute("Succes", "Datos Actualizados correctamente");
+        } else{
+            redirectAttributes.addFlashAttribute("error", result.errorMessage);
+        }
+        return "redirect:/pokedex/perfilUsuario/" + usuario.getIdUsuario();
+    }
+
 }

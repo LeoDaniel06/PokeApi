@@ -432,7 +432,7 @@
     </th:block>
 </head>
 
-<body>
+<body >
     <div layout:fragment="content">
         <div class="header">
             <p>Haz clic en una tarjeta para ver más detalles</p>
@@ -574,7 +574,7 @@
                     estrella.classList.toggle('activo');
                     if (estrella.classList.contains('activo')) {
                         favoritosUsuario.add(pokemon.id);
-                    }else{
+                    } else {
                         favoritosUsuario.delete(pokemon.id);
                     }
                 } else {
@@ -599,38 +599,38 @@
             card.className = 'pokemon-card';
 
             card.innerHTML = `
-    <div class="card-inner">
-        <div class="card-front">
-            <span class="favorito">★</span>
-            <span class="pokemon-numero">${String(pokemon.id).padStart(3, '0')}</span>
-            <img class="pokemon-imagen"
-                 src="${pokemon.sprites.other['official-artwork'].front_default}">
-            <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
+        <div class="card-inner">
+            <div class="card-front">
+                <span class="favorito">★</span>
+                <span class="pokemon-numero">${String(pokemon.id).padStart(3, '0')}</span>
+                <img class="pokemon-imagen"
+                     src="${pokemon.sprites.other['official-artwork'].front_default}">
+                <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
+            </div>
+
+            <div class="card-back">
+                <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
+
+                <div class="pokemon-tipo">
+                    ${tipos.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+                </div>
+
+                <div class="pokemon-poderes">
+                    <div class="poder-row"><span>HP</span><span>${hp}</span></div>
+                    <div class="poder-row"><span>Ataque</span><span>${attack}</span></div>
+                    <div class="poder-row"><span>Defensa</span><span>${defense}</span></div>
+                    <div class="poder-row"><span>Velocidad</span><span>${speed}</span></div>
+                </div>
+
+                <div class="pokemon-habilidades">
+                    <div class="habilidades-title">Habilidades</div>
+                    <div>${habilidades}</div>
+                </div>
+
+                <a href="/pokedex/detail/${pokemon.id}" class="btn-detail">Ver Detalles</a>
+            </div>
         </div>
-
-        <div class="card-back">
-            <h2 class="pokemon-nombre pkm">${pokemon.name}</h2>
-
-            <div class="pokemon-tipo">
-                ${tipos.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
-            </div>
-
-            <div class="pokemon-poderes">
-                <div class="poder-row"><span>HP</span><span>${hp}</span></div>
-                <div class="poder-row"><span>Ataque</span><span>${attack}</span></div>
-                <div class="poder-row"><span>Defensa</span><span>${defense}</span></div>
-                <div class="poder-row"><span>Velocidad</span><span>${speed}</span></div>
-            </div>
-
-            <div class="pokemon-habilidades">
-                <div class="habilidades-title">Habilidades</div>
-                <div>${habilidades}</div>
-            </div>
-
-            <a href="/pokedex/detail/${pokemon.id}" class="btn-detail">Ver Detalles</a>
-        </div>
-    </div>
-    `;
+        `;
 
             card.addEventListener('click', e => {
                 if (

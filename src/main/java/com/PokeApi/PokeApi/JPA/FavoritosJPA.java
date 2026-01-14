@@ -1,6 +1,5 @@
 package com.PokeApi.PokeApi.JPA;
 
-import groovy.transform.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

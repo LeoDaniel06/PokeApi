@@ -38,6 +38,9 @@ public class UsuarioJPA {
     
     @Column(name = "isverified")
     public int isverified;
+    
+    @Column(name = "imagen")
+    public String Imagen;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
@@ -100,6 +103,14 @@ public class UsuarioJPA {
 
     public void setIsverified(int isverified) {
         this.isverified = isverified;
+    }
+
+    public String getImagen() {
+        return Imagen;
+    }
+
+    public void setImagen(String Imagen) {
+        this.Imagen = Imagen;
     }
     
     
