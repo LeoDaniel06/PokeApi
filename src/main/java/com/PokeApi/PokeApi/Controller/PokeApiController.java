@@ -63,6 +63,10 @@ public class PokeApiController {
     public String getAll() {
         return "PokemonGetAll";
     }
+    @GetMapping("/atrapaPokeballs")
+    public String Minijuego1(){
+        return "AtrapaPokeballs";
+    }
 
     @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {
@@ -331,6 +335,27 @@ public class PokeApiController {
             redirectAttributes.addFlashAttribute("error", "Error al actualizar la imagen");
         }
         return "redirect:/pokedex/perfilUsuario/" + idUsuario;
+    }
+//----------UPDATE DATOS USUARIO----------//
+
+    @PostMapping("/update-datos")
+    public String UpdateDatosUsuario(@ModelAttribute UsuarioJPA usuario,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/pokedex/login";
+        }
+        UsuarioDetails userDetails = (UsuarioDetails) authentication.getPrincipal();
+        if (userDetails.getId() != usuario.getIdUsuario()) {
+            return "redirect:/pokedex/login";
+        }
+        Result result = usuarioDAOJPAImplementation.updateUsuario(usuario);
+        if (result.correct) {
+            redirectAttributes.addFlashAttribute("Succes", "Datos Actualizados correctamente");
+        } else{
+            redirectAttributes.addFlashAttribute("error", result.errorMessage);
+        }
+        return "redirect:/pokedex/perfilUsuario/" + usuario.getIdUsuario();
     }
 
 }

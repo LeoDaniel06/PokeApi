@@ -148,6 +148,17 @@
                     width: 100%;
                 }
             }
+
+            .info-input:disabled {
+                background: transparent;
+                border: none;
+                padding-left: 0;
+                color: #000;
+            }
+
+            .info-input {
+                transition: all 0.3s ease;
+            }
         </style>
     </head>
 
@@ -165,7 +176,6 @@
                                     PERFIL DEL ENTRENADOR
                                 </div>
                                 <a th:href="@{/pokedex}" class="back-arrow">❮</a>
-                                <!-- Avatar -->
                                 <div class="text-center mt-4">
 
                                     <form th:action="@{/pokedex/update-imagen}"
@@ -174,7 +184,6 @@
 
                                         <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}" />
 
-                                        <!-- Input oculto -->
                                         <input type="file"
                                                id="inputFoto"
                                                name="imagen"
@@ -184,19 +193,16 @@
 
                                         <div class="position-relative d-inline-block">
 
-                                            <!-- Imagen actual -->
                                             <img th:if="${usuario.Imagen != null}"
                                                  th:src="'data:image/*;base64,' + ${usuario.Imagen}"
                                                  class="trainer-avatar"
                                                  alt="Imagen de usuario">
 
-                                            <!-- Imagen por defecto -->
                                             <img th:if="${usuario.Imagen == null}"
                                                  src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
                                                  class="trainer-avatar"
                                                  alt="Imagen por defecto">
 
-                                            <!-- Ícono cámara -->
                                             <div class="icono-camara"
                                                  onclick="document.getElementById('inputFoto').click()">
                                                 <i class="bi bi-camera-fill"></i>
@@ -210,22 +216,57 @@
                                      th:text="${usuario.userName}">
                                 </div>
 
-                                <!-- Info -->
-                                <div class="info-section">
+                                <form class="info-section "
+                                      id="formPerfil"
+                                      th:action="@{/pokedex/update-datos}"
+                                      method="post">
+
+                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
 
                                     <div class="info-item">
-                                        <span class="info-label">Usuario</span>
-                                        <span class="info-value" th:text="${usuario.userName}"></span>
+                                        <span class="info-label ">Usuario</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="userName"
+                                               th:value="${usuario.userName}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Nombre</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="nombre"
+                                               th:value="${usuario.nombre}"
+                                               disabled>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label">Género</span>
+                                        <select class="form-select info-input text-center"
+                                                name="sexo"
+                                                disabled>
+                                            <option th:selected="${usuario.sexo == 'Masculino'}">M</option>
+                                            <option th:selected="${usuario.sexo == 'Femenino'}">F</option>
+                                            <option th:selected="${usuario.sexo == 'Otro'}">Otro</option>
+                                        </select>
                                     </div>
 
                                     <div class="info-item">
                                         <span class="info-label">Correo</span>
-                                        <span class="info-value" th:text="${usuario.correo}"></span>
+                                        <input class="form-control info-input text-center"
+                                               type="email"
+                                               name="correo"
+                                               th:value="${usuario.correo}"
+                                               disabled>
                                     </div>
 
                                     <div class="info-item">
                                         <span class="info-label">Rol</span>
-                                        <span class="info-value" th:text="${usuario.rolJPA.nombreRol}"></span>
+                                        <input class="form-control text-center"
+                                               type="text"
+                                               th:value="${usuario.rolJPA.nombreRol}"
+                                               disabled>
                                     </div>
 
                                     <div class="info-item">
@@ -233,17 +274,88 @@
                                         <span class="info-value text-success">Activo</span>
                                     </div>
 
-                                    <div class="text-center mt-4">
-                                        <button class="btn btn-pokemon">
+                                    <div class="text-center mt-4 d-flex justify-content-center gap-2">
+                                        <button type="button"
+                                                id="btnEditar"
+                                                class="btn btn-pokemon">
                                             Editar Perfil
                                         </button>
+
+                                        <button type="button"
+                                                id="btnCancelar"
+                                                class="btn btn-secondary d-none"
+                                                onclick="cancelarEdicion()">
+                                            Cancelar
+                                        </button>
                                     </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+            <script>
+                let editando = false;
+                let valoresOriginales = {};
+
+                document.getElementById('btnEditar').addEventListener('click', function () {
+                    const inputs = document.querySelectorAll('.info-input');
+                    const btnEditar = document.getElementById('btnEditar');
+                    const btnCancelar = document.getElementById('btnCancelar');
+
+                    if (!editando) {
+                        valoresOriginales = {};
+                        inputs.forEach(input => {
+                            valoresOriginales[input.name] = input.value;
+                            input.disabled = false;
+                        });
+
+                        btnEditar.textContent = 'Guardar Datos';
+                        btnEditar.classList.remove('btn-pokemon');
+                        btnEditar.classList.add('btn-success');
+
+                        btnCancelar.classList.remove('d-none');
+                        editando = true;
+
+                    } else {
+                        Swal.fire({
+                            title: '¿Guardar cambios?',
+                            text: 'Se actualizará la información del perfil',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, guardar',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('formPerfil').submit();
+                            }
+                        });
+                    }
+                });
+
+                function cancelarEdicion() {
+                    const inputs = document.querySelectorAll('.info-input');
+                    const btnEditar = document.getElementById('btnEditar');
+                    const btnCancelar = document.getElementById('btnCancelar');
+
+                    inputs.forEach(input => {
+                        input.value = valoresOriginales[input.name];
+                        input.disabled = true;
+                    });
+
+                    btnEditar.textContent = 'Editar Perfil';
+                    btnEditar.classList.remove('btn-success');
+                    btnEditar.classList.add('btn-pokemon');
+
+                    btnCancelar.classList.add('d-none');
+                    editando = false;
+                }
+            </script>
         </div>
     </body>
 </html>

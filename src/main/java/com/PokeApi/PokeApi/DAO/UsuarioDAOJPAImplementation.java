@@ -152,4 +152,30 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         }
         return result;
     }
+//----------UPDATE DATOS----------//
+    @Override
+    @Transactional
+    public Result updateUsuario(UsuarioJPA usuarioJPA){
+        Result result = new Result();
+        try {
+            UsuarioJPA usuarioBase = entityManager.find(UsuarioJPA.class, usuarioJPA.getIdUsuario());
+            if (usuarioBase == null) {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                return result;
+            }
+            usuarioBase.setUserName(usuarioJPA.getUserName());
+            usuarioBase.setNombre(usuarioJPA.getNombre());
+            usuarioBase.setSexo(usuarioJPA.getSexo());
+            usuarioBase.setCorreo(usuarioJPA.getCorreo());
+            entityManager.merge(usuarioBase);
+            entityManager.flush();
+            result.correct = true;
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
 }
