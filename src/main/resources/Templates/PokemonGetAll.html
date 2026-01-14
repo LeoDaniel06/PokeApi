@@ -445,6 +445,7 @@
                     id="buscador"
                     class="form-control form-control-lg"
                     placeholder="Buscar Pokémon por nombre o número...">
+                
             </div>
         </div>
 
@@ -477,7 +478,7 @@
         let todosLosPokemon = [];
         let paginaActual = 1;
         let favoritosUsuario = new Set;
-        const pokemonPorPagina = 8;
+        const pokemonPorPagina = 50;
 
         function reproducirGritoPokemon(id) {
             const audio = new Audio(
@@ -509,10 +510,17 @@
                 loading.style.display = 'none';
 
                 console.log(data);
-                for (const pokemon of data) {
-                    const detalles = await obtenerDetallesPokemon(pokemon.url);
-                    todosLosPokemon.push(detalles);
-                }
+//                for (const pokemon of data) {
+//                    const detalles = await obtenerDetallesPokemon(pokemon.url);
+//                    todosLosPokemon.push(detalles);
+//                }
+
+                const detalles = await Promise.all(
+                    data.map(p => fetch(p.url).then(r => r.json()))
+                );
+
+                todosLosPokemon = detalles;
+
 
                 mostrarPagina(1);
                 mostrarPaginacion();
