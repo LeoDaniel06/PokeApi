@@ -428,6 +428,35 @@
                 text-decoration: none;
                 font-weight: bold;
             }
+
+            .toast-favorito {
+                position: fixed;
+                bottom: 60px;
+                right: 825px;
+                background: #667eea;
+                color: white;
+                padding: 14px 20px;
+                border-radius: 12px;
+                font-weight: bold;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.4s ease;
+                z-index: 9999;
+            }
+
+            .toast-favorito.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .toast-favorito.error {
+                background: #dc3545;
+            }
+
+            .toast-favorito.remove {
+                background: #6c757d;
+            }
         </style>
     </th:block>
 </head>
@@ -478,7 +507,7 @@
         let todosLosPokemon = [];
         let paginaActual = 1;
         let favoritosUsuario = new Set();
-        const pokemonPorPagina = 50;
+        const pokemonPorPagina = 52;
         function urlTieneFavoritos() {
             const params = new URLSearchParams(window.location.search);
             return params.get('favoritos') === 'true';
@@ -566,6 +595,21 @@
             document.getElementById('btn-ultima').disabled = paginaActual === total;
         }
 
+        function mostrarToast(mensaje, tipo = "success") {
+            const toast = document.createElement('div');
+            toast.className = `toast-favorito ${tipo}`;
+            toast.textContent = mensaje;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 2500);
+        }
+
         async function guardarFavoritoBackend(pokemon, estrella) {
             try {
                 const params = new URLSearchParams();
@@ -584,6 +628,8 @@
                 if (result.correct) {
                     estrella.classList.add('activo');
                     favoritosUsuario.add(pokemon.id);
+
+                    mostrarToast(`⭐ ${pokemon.name.toUpperCase()} agregado a favoritos`);
                 } else {
                     alert(result.errorMessage || "Debes iniciar sesión");
                 }
@@ -610,6 +656,7 @@
                 if (result.correct) {
                     estrella.classList.remove('activo');
                     favoritosUsuario.delete(pokemon.id);
+                    mostrarToast(`❌ ${pokemon.name.toUpperCase()} eliminado de favoritos`, 'remove');
                 } else {
                     alert(result.errorMessage || "No se pudo eliminar el favorito");
                 }
@@ -687,7 +734,7 @@
         }
 
         function buscarPokemon() {
-            const term = document.getElementById('buscador').value.toLowerCase();
+            const term = document.getElementById('buscador').value.toLowerCase().trim();
             const container = document.getElementById('pokemon-tarjeta');
 
             if (!term) {
@@ -699,9 +746,28 @@
             document.getElementById('paginacion').style.display = 'none';
             container.innerHTML = '';
 
-            todosLosPokemon
-                    .filter(p => p.name.includes(term) || String(p.id).includes(term))
-                    .forEach(p => crearTarjetaPokemon(p, container));
+            const filtrados = todosLosPokemon.filter(pokemon => {
+                const nombre = pokemon.name.toLowerCase();
+                const id = String(pokemon.id);
+
+                const tipos = pokemon.types.map(t => t.type.name.toLowerCase());
+
+                return (
+                        nombre.includes(term) ||
+                        id.includes(term) ||
+                        tipos.some(tipo => tipo.includes(term))
+                        );
+            });
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `
+            <div class="loading">
+                No se encontraron Pokémon 🧐
+            </div>`;
+                return;
+            }
+
+            filtrados.forEach(p => crearTarjetaPokemon(p, container));
         }
 
         function mostrarFavoritos() {

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+
+    <head>
+        <title>Atrapa las Bayas Pokémon</title>
+
+        <style>
+            .game-wrapper {
+                display: flex;
+                justify-content: center;
+                margin-top: 40px;
+            }
+
+            .game-container {
+                width: 420px;
+                height: 720px;
+                display: flex;
+                flex-direction: column;
+                border-radius: 20px;
+                border: 5px solid #c62828;
+                box-shadow: 0 15px 40px rgba(0,0,0,.35);
+                overflow: hidden;
+            }
+
+            .game-header {
+                background: #c62828;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .score-board {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 15px;
+                font-weight: bold;
+                background: rgba(255,255,255,.9);
+            }
+
+            .play-area {
+                flex: 1;
+                position: relative;
+                overflow: hidden;
+
+                background-image: url("https://external-preview.redd.it/aC7zQKO6GH1UVuAB_K31hwncC23H-O3C1-CJODnHB_U.png?width=1080&crop=smart&auto=webp&s=88042b154a774059cbd1378001c29c32b299f67c");
+                background-repeat: repeat-x;
+                background-size: cover;
+                background-position: 0 0;
+
+                animation: scrollBackground 30s linear infinite;
+            }
+
+            @keyframes scrollBackground {
+                from {
+                    background-position: 0 0;
+                }
+                to {
+                    background-position: -2000px 0;
+                }
+            }
+
+            .player {
+                width: 120px;
+                height: 120px;
+                position: absolute;
+                bottom: 10px;
+                left: 150px;
+                background-image: url("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png");
+                background-size: contain;
+                background-repeat: no-repeat;
+                z-index: 2;
+            }
+
+            .hitbox {
+                width: 60px;
+                height: 60px;
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .item {
+                width: 40px;
+                height: 40px;
+                position: absolute;
+                top: -40px;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+
+            .item.caught {
+                animation: pop 0.3s ease-out forwards;
+            }
+
+            @keyframes pop {
+                to {
+                    transform: scale(1.5);
+                    opacity: 0;
+                }
+            }
+
+            .damage {
+                animation: damageFlash 0.3s;
+            }
+
+            @keyframes damageFlash {
+                from {
+                    background-color: rgba(255,0,0,0.3);
+                }
+                to {
+                    background-color: transparent;
+                }
+            }
+
+            .game-over {
+                position: absolute;
+                inset: 0;
+                background: rgba(0,0,0,.85);
+                color: white;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                z-index: 10;
+            }
+
+            .btn-restart {
+                margin-top: 10px;
+                padding: 10px 25px;
+                border-radius: 30px;
+                border: none;
+                background: #ffcb05;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: space-around;
+                padding: 12px;
+                background: #fff3;
+            }
+
+            .game-btn {
+                padding: 10px 22px;
+                border-radius: 25px;
+                border: none;
+                font-weight: bold;
+                font-size: 15px;
+                cursor: pointer;
+                transition: transform .15s ease, box-shadow .15s ease;
+                box-shadow: 0 4px 10px rgba(0,0,0,.3);
+            }
+
+            .game-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 14px rgba(0,0,0,.4);
+            }
+
+            .game-btn.start {
+                background: #43a047;
+                color: white;
+            }
+
+            .game-btn.pause {
+                background: #fbc02d;
+                color: #333;
+            }
+
+            .floating-text {
+                position: absolute;
+                font-weight: bold;
+                font-size: 16px;
+                pointer-events: none;
+                animation: floatUp 1s ease-out forwards;
+                text-shadow: 0 0 6px rgba(0,0,0,.6);
+            }
+
+            @keyframes floatUp {
+                to {
+                    transform: translateY(-40px);
+                    opacity: 0;
+                }
+            }
+
+            .item.rare {
+                filter: drop-shadow(0 0 10px gold);
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div layout:fragment="content">
+
+            <div class="game-wrapper">
+                <div class="game-container">
+
+                    <div class="game-header">ATRAPA LAS BAYAS</div>
+
+                    <div class="score-board">
+                        <div>Score: <span id="score">0</span></div>
+                        <div>Max: <span id="highScore">0</span></div>
+                        <div>Vidas: <span id="lives">3</span></div>
+                    </div>
+
+                    <div class="controls">
+                        <button id="startBtn" class="game-btn start">▶ Iniciar</button>
+                        <button id="pauseBtn" class="game-btn pause">⏸ Pausa</button>
+                    </div>
+
+                    <div class="play-area" id="playArea">
+                        <div class="player" id="player">
+                            <div class="hitbox"></div>
+                        </div>
+                    </div>
+
+                    <div class="game-over" id="gameOver">
+                        <h1>Game Over</h1>
+                        <p>Puntaje final: <span id="finalScore"></span></p>
+                        <button class="btn-restart" onclick="location.reload()">Reintentar</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <audio id="bgMusic" loop src="/fonts/audio/Epics8Bit.mp3"></audio>
+            <audio id="catchSound" src="/fonts/audio/sfx_pick.mp3"></audio>
+            <audio id="loseSound" src="/fonts/audio/losegamemusic.mp3"></audio>
+            <audio id="gameOverSound" src="/fonts/audio/Game-over.mp3"></audio>
+
+            <script>
+                const playArea = document.getElementById('playArea');
+                const player = document.getElementById('player');
+                const hitbox = player.querySelector('.hitbox');
+
+                const scoreEl = document.getElementById('score');
+                const livesEl = document.getElementById('lives');
+                const highScoreEl = document.getElementById('highScore');
+                const gameOverScreen = document.getElementById('gameOver');
+                const finalScoreEl = document.getElementById('finalScore');
+
+                const bgMusic = document.getElementById('bgMusic');
+                const catchSound = document.getElementById('catchSound');
+                const loseSound = document.getElementById('loseSound');
+                const gameOverSound = document.getElementById('gameOverSound');
+
+                bgMusic.volume = 0.25;
+                catchSound.volume = 0.8;
+                loseSound.volume = 0.8;
+                gameOverSound.volume = 0.9;
+
+                let score = 0;
+                let lives = 3;
+                let speed = 3;
+                let spawnInterval = 1200;
+                let spawnLoop;
+
+                let gameRunning = false;
+                let gameStarted = false;
+                let paused = false;
+                let musicStarted = false;
+
+                // High score
+                let highScore = localStorage.getItem('highScore') || 0;
+                highScoreEl.textContent = highScore;
+
+                // Bayas con efectos
+                const berries = [
+                    {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oran-berry.png", type: "score", value: 1, weight: 50},
+                    {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/sitrus-berry.png", type: "score1", value: 5, weight: 30},
+                    {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pecha-berry.png", type: "score2", value: 10, weight: 12},
+                    {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cheri-berry.png", type: "score3", value: 15, weight: 8}
+                ];
+
+                // Movimiento + inicio música
+                playArea.addEventListener('mousemove', (e) => {
+                    if (!gameRunning)
+                        return;
+
+                    if (!musicStarted) {
+                        bgMusic.play();
+                        musicStarted = true;
+                    }
+
+                    const rect = playArea.getBoundingClientRect();
+                    player.style.left = (e.clientX - rect.left - 60) + 'px';
+                });
+
+                function showFloatingText(text, x, y, color = "#fff") {
+                    const el = document.createElement("div");
+                    el.className = "floating-text";
+                    el.textContent = text;
+                    el.style.left = x + "px";
+                    el.style.top = y + "px";
+                    el.style.color = color;
+                    playArea.appendChild(el);
+
+                    setTimeout(() => el.remove(), 1000);
+                }
+
+                function createBerry() {
+                    if (!gameRunning)
+                        return;
+
+                    const berry = getRandomBerry();
+                    const item = document.createElement('div');
+                    item.classList.add('item');
+                    item.style.backgroundImage = `url(${berry.img})`;
+                    item.style.left = Math.random() * (playArea.clientWidth - 40) + 'px';
+
+                    playArea.appendChild(item);
+                    let y = -40;
+
+                    const fall = setInterval(() => {
+                        if (!gameRunning)
+                            return;
+
+                        y += speed;
+                        item.style.top = y + 'px';
+
+                        const i = item.getBoundingClientRect();
+                        const h = hitbox.getBoundingClientRect();
+
+                        // Colisión
+                        if (i.bottom >= h.top && i.left < h.right && i.right > h.left) {
+
+                            switch (berry.type) {
+                                case "score":
+                                    score += berry.value;
+                                    scoreEl.textContent = score;
+                                    break;
+                                case "score1":
+                                    score += berry.value;
+                                    scoreEl.textContent = score;
+                                    break;
+                                case "score2":
+                                    score += berry.value;
+                                    scoreEl.textContent = score;
+                                    break;
+                                case "score3":
+                                    score += berry.value;
+                                    scoreEl.textContent = score;
+                                    break;
+                            }
+
+                            catchSound.currentTime = 0;
+                            catchSound.play();
+
+                            item.classList.add('caught');
+                            clearInterval(fall);
+                            setTimeout(() => item.remove(), 300);
+                        }
+
+                        // Se cayó
+                        if (y > playArea.clientHeight) {
+                            lives--;
+                            livesEl.textContent = lives;
+
+                            loseSound.currentTime = 0;
+                            loseSound.play();
+
+                            playArea.classList.add('damage');
+                            setTimeout(() => playArea.classList.remove('damage'), 300);
+
+                            item.remove();
+                            clearInterval(fall);
+
+                            if (lives <= 0)
+                                endGame();
+                        }
+                    }, 20);
+                }
+
+                function startSpawning() {
+                    spawnLoop = setInterval(createBerry, spawnInterval);
+                }
+
+                // Dificultad progresiva
+                setInterval(() => {
+                    if (!gameRunning)
+                        return;
+
+                    speed++;
+
+                    if (spawnInterval > 300) {
+                        spawnInterval -= 100;
+                        clearInterval(spawnLoop);
+                        startSpawning();
+                    }
+                }, 5000);
+
+                function endGame() {
+                    gameRunning = false;
+                    finalScoreEl.textContent = score;
+                    gameOverScreen.style.display = 'flex';
+
+                    if (score > highScore) {
+                        localStorage.setItem('highScore', score);
+                        highScoreEl.textContent = score;
+                    }
+
+                    bgMusic.pause();
+                    gameOverSound.play();
+                    clearInterval(spawnLoop);
+                }
+
+                // BOTÓN INICIAR
+                document.getElementById('startBtn').addEventListener('click', () => {
+                    if (gameStarted)
+                        return;
+
+                    gameStarted = true;
+                    gameRunning = true;
+                    bgMusic.play();
+                    startSpawning();
+                });
+
+                // BOTÓN PAUSA
+                document.getElementById('pauseBtn').addEventListener('click', () => {
+                    if (!gameStarted)
+                        return;
+
+                    paused = !paused;
+                    gameRunning = !paused;
+
+                    paused ? bgMusic.pause() : bgMusic.play();
+                });
+
+                function getRandomBerry() {
+                    const totalWeight = berries.reduce((sum, b) => sum + b.weight, 0);
+                    let random = Math.random() * totalWeight;
+
+                    for (const berry of berries) {
+                        if (random < berry.weight) {
+                            return berry;
+                        }
+                        random -= berry.weight;
+                    }
+                }
+            </script>
+
+        </div>
+    </body>
+</html>
+

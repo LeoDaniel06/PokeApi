@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Layout}">
+    <head>
+        <meta charset="UTF-8">
+        <title>Usuarios | Pokédex Admin</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+        <style>
+            body {
+                min-height: 100vh;
+            }
+
+            /* CARD */
+            .pokedex-card {
+                border-radius: 22px;
+                box-shadow: 0 15px 35px rgba(0,0,0,.35);
+                overflow: hidden;
+                border: 4px solid #b71c1c;
+            }
+
+            /* HEADER POKEDEX */
+            .pokedex-header {
+                position: relative;
+                background: linear-gradient(90deg, #b71c1c, #ef5350);
+                color: white;
+                padding: 26px;
+                text-align: center;
+                border-bottom: 6px solid #7f0000;
+            }
+
+            .pokedex-header h2 {
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .pokedex-header small {
+                letter-spacing: 1px;
+                opacity: .85;
+            }
+
+            /* Pokéball tenue */
+            .pokedex-header::after {
+                content: "⚪";
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 80px;
+                opacity: .08;
+            }
+
+            /* TABLA */
+            .table thead {
+                background: linear-gradient(90deg, #c62828, #ef5350);
+                color: white;
+                text-transform: uppercase;
+                font-size: .85rem;
+            }
+
+            .table td, .table th {
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .table tbody tr {
+                transition: all .2s ease-in-out;
+            }
+
+            .table tbody tr:hover {
+                background-color: #fff3e0;
+                transform: scale(1.01);
+            }
+
+            /* JERARQUÍA VISUAL */
+            .td-id {
+                color: #9e9e9e;
+                font-size: .85rem;
+            }
+
+            .td-username {
+                font-weight: 700;
+            }
+
+            .td-correo {
+                color: #6c757d;
+                font-size: .9rem;
+            }
+
+            /* ROLES */
+            .badge-admin {
+                background: linear-gradient(45deg, #d32f2f, #ff5252);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 20px;
+            }
+
+            .badge-entrenador {
+                background: linear-gradient(45deg, #1976d2, #42a5f5);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 20px;
+            }
+
+            /* ESTADO ACTIVO ANIMADO */
+            .estado-activo {
+                animation: pulse 1.8s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(40,167,69,.6);
+                }
+                70% {
+                    box-shadow: 0 0 0 6px rgba(40,167,69,0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(40,167,69,0);
+                }
+            }
+        </style>
+    </head>
+
+    <body layout:fragment="content">
+
+        <div class="container py-5">
+
+            <div class="card pokedex-card">
+
+                <!-- HEADER -->
+                <div class="pokedex-header">
+                    <h2>
+                        <i class="bi bi-people-fill"></i> Administración de Usuarios
+                    </h2>
+                    <small>Pokédex • Control Panel</small>
+                </div>
+
+                <div class="card-body bg-white">
+
+                    <!-- BUSCADOR -->
+                    <div class="row mb-3">
+                        <div class="col-md-4 ms-auto">
+                            <input type="text"
+                                   id="buscadorUsuarios"
+                                   class="form-control"
+                                   placeholder="🔍 Buscar usuario...">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="tablaUsuarios">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>UserName</th>
+                                    <th>Nombre</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Estatus</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr th:each="usuario : ${usuarios}">
+                                    <td class="td-id" th:text="${usuario.idUsuario}"></td>
+
+                                    <td class="td-username" th:text="${usuario.userName}"></td>
+
+                                    <td th:text="${usuario.nombre} + ' ' + ${usuario.apellidoPaterno} + ' ' + ${usuario.apellidoMaterno}"></td>
+
+                                    <td class="td-correo" th:text="${usuario.correo}"></td>
+
+                                    <td>
+                                        <span th:text="${usuario.RolJPA.NombreRol}"
+                                              th:classappend="${usuario.RolJPA.NombreRol == 'ADMIN'
+                                              ? ' badge-admin'
+                                              : ' badge-entrenador'}">
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge"
+                                              th:text="${usuario.isverified == 1 ? 'Activo' : 'Inactivo'}"
+                                              th:classappend="${usuario.isverified == 1
+                                              ? ' bg-success estado-activo'
+                                              : ' bg-secondary'}">
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <a th:href="@{/pokedex/perfilUsuario/{id}(id=${usuario.idUsuario})}"
+                                           class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <button class="btn btn-danger btn-sm"
+                                                th:onclick="'abrirModalEliminar(' + ${usuario.idUsuario} + ')'">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <form th:id="'formEliminar_' + ${usuario.idUsuario}"
+                                              th:action="@{/pokedex/delete}"
+                                              method="post">
+                                            <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL -->
+        <div class="modal fade" id="modalEliminar" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body text-center">
+                        <p class="fs-5">¿Estás seguro de eliminar este usuario?</p>
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            let formEliminarActual = null;
+
+            function abrirModalEliminar(idUsuario) {
+                formEliminarActual = document.getElementById("formEliminar_" + idUsuario);
+                new bootstrap.Modal(document.getElementById("modalEliminar")).show();
+            }
+
+            document.getElementById("btnConfirmarEliminar").addEventListener("click", function () {
+                if (formEliminarActual) {
+                    formEliminarActual.submit();
+                }
+            });
+
+            // BUSCADOR
+            document.getElementById("buscadorUsuarios").addEventListener("keyup", function () {
+                const filtro = this.value.toLowerCase();
+                const filas = document.querySelectorAll("#tablaUsuarios tbody tr");
+
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    fila.style.display = texto.includes(filtro) ? "" : "none";
+                });
+            });
+        </script>
+
+    </body>
+</html>
+

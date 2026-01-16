@@ -240,13 +240,29 @@
                                                th:value="${usuario.nombre}"
                                                disabled>
                                     </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Apellido Paterno</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="apellidoPaterno"
+                                               th:value="${usuario.apellidoPaterno}"
+                                               disabled>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Apellido Materno</span>
+                                        <input class="form-control info-input text-center"
+                                               type="text"
+                                               name="apellidoMaterno"
+                                               th:value="${usuario.apellidoMaterno}"
+                                               disabled>
+                                    </div>
 
                                     <div class="info-item">
                                         <span class="info-label">Género</span>
                                         <select class="form-select info-input text-center"
                                                 name="sexo"
                                                 disabled>
-                                            
+
                                             <option value="F"
                                                     th:selected="${usuario.sexo == 'F'}">F</option>
                                             <option value="M"
@@ -269,11 +285,15 @@
                                                type="text"
                                                th:value="${usuario.rolJPA.nombreRol}"
                                                disabled>
-                                    </div>
+                                    </div>  
 
                                     <div class="info-item">
                                         <span class="info-label">Estado</span>
-                                        <span class="info-value text-success">Activo</span>
+
+                                        <span class="info-value"
+                                              th:text="${usuario.isverified == 1 ? 'Activo' : 'Inactivo'}"
+                                              th:classappend="${usuario.isverified == 1 ? ' text-success' : ' text-danger'}">
+                                        </span>
                                     </div>
 
                                     <div class="text-center mt-4 d-flex justify-content-center gap-2">
