@@ -8,6 +8,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.JsonNode;
@@ -69,4 +71,44 @@ public class PokeService {
                 String.class
         );
     }
+
+    private static class CodigoCache {
+
+        String codigo;
+        long expiracion;
+
+        CodigoCache(String codigo, long expiracion) {
+            this.codigo = codigo;
+            this.expiracion = expiracion;
+        }
+    }
+
+    private final Map<String, CodigoCache> cache = new ConcurrentHashMap<>();
+
+    private static final long TIEMPO_EXPIRACION = 10 * 60 * 1000;
+
+    public String generarCodigo(String correo) {
+        String codigo = String.valueOf((int) (100000 + Math.random() * 900000));
+        long expiracion = System.currentTimeMillis() + TIEMPO_EXPIRACION;
+
+        cache.put(correo, new CodigoCache(codigo, expiracion));
+        return codigo;
+    }
+
+    public boolean validarCodigo(String correo, String codigoIngresado) {
+        CodigoCache data = cache.get(correo);
+        if (data == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() > data.expiracion) {
+            cache.remove(correo);
+            return false;
+        }
+        return data.codigo.equals(codigoIngresado);
+    }
+
+    public void eliminarCodigo(String correo) {
+        cache.remove(correo);
+    }
+
 }

@@ -183,33 +183,33 @@
                 padding-right: 45px;
             }
 
-/*            progress{
-                clip: rect(1px, 1px, 1px, 1px);
-                clip-path: inset(50%);
-                height: 1px;
-                width: 1px;
-                margin: -1px;
-                overflow: hidden;
-                padding: 0;
-                position: absolute;
-            }
-
-            .pokebola-barra {
-                background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png");
-                background-repeat: repeat-x;
-                background-size: 30px 30px;
-                background-position: center;
-                animation: girarPokebola 1.2s linear infinite;
-            }
-
-            @keyframes girarPokebola {
-                from {
-                    background-position-x: 0;
-                }
-                to {
-                    background-position-x: 30px;
-                }
-            }*/
+            /*            progress{
+                            clip: rect(1px, 1px, 1px, 1px);
+                            clip-path: inset(50%);
+                            height: 1px;
+                            width: 1px;
+                            margin: -1px;
+                            overflow: hidden;
+                            padding: 0;
+                            position: absolute;
+                        }
+            
+                        .pokebola-barra {
+                            background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png");
+                            background-repeat: repeat-x;
+                            background-size: 30px 30px;
+                            background-position: center;
+                            animation: girarPokebola 1.2s linear infinite;
+                        }
+            
+                        @keyframes girarPokebola {
+                            from {
+                                background-position-x: 0;
+                            }
+                            to {
+                                background-position-x: 30px;
+                            }
+                        }*/
 
 
             /*            #carga {
@@ -226,6 +226,83 @@
                         #carga video {
                             width: 280px;
                         }*/
+
+            .swal2-popup {
+                overflow: visible !important;
+                padding-top: 65px !important;
+            }
+
+            .pokemon-alert {
+                position: relative;
+                border-radius: 26px;
+                border: 6px solid;
+                animation: popupIn 0.4s ease-out;
+            }
+
+            .rayquaza-theme {
+                background: linear-gradient(180deg, #0f3d2e, #06251b);
+                border-color: #00ff9c;
+                color: #eafff6;
+            }
+
+            .charizard-theme {
+                background: linear-gradient(180deg, #3b1a00, #1a0c00);
+                border-color: #ff6a00;
+                color: #ffe2c6;
+            }
+
+            .pokemon-alert::before,
+            .pokemon-alert::after {
+                content: "";
+                position: absolute;
+                top: -70px;
+                width: 42px;
+                height: 85px;
+                border-radius: 22px;
+                animation: earFloat 2s infinite ease-in-out;
+            }
+
+            .pokemon-alert::before {
+                left: 55px;
+                transform: rotate(-18deg);
+            }
+
+            .pokemon-alert::after {
+                right: 55px;
+                transform: rotate(18deg);
+            }
+
+            .rayquaza-theme::before,
+            .rayquaza-theme::after {
+                background: linear-gradient(180deg, #00ff9c, #0f3d2e);
+                box-shadow: 0 0 12px rgba(0, 255, 156, 0.6);
+            }
+
+            .charizard-theme::before,
+            .charizard-theme::after {
+                background: linear-gradient(180deg, #ffb347, #ff6a00);
+                box-shadow: 0 0 12px rgba(255, 106, 0, 0.6);
+            }
+
+            @keyframes popupIn {
+                from {
+                    transform: scale(0.7);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes earFloat {
+                0%, 100% {
+                    transform: translateY(0) rotate(-18deg);
+                }
+                50% {
+                    transform: translateY(-6px) rotate(-25deg);
+                }
+            }
 
             .pokemon-sprite{
                 width: 100px;
@@ -342,28 +419,42 @@
                 <form id="loginForm" th:action="@{/pokedex/login}" method="post" th:object="${loginRequest}">
                     <div class="mb-3">
                         <label for="username" class="form-label" style="color: white">Usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required th:field="*{username}">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario"  th:field="*{username}">
+                        <span id="username-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label" style="color: white">Contraseña</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required th:field="*{password}">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"  th:field="*{password}">
+                        <span id="username-error" style="color: red;"></span>
                     </div>
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-danger">Iniciar Sesion</button>
                     </div>
 
+                    <!--                    <div class="mb-3">
+                                            <p class="text" style="color: white">No te has Registrado?</p>
+                                            <p class="text" style="color: white;">
+                                                Regístrate aquí: 
+                                                <a href="/pokedex/registro" 
+                                                   style="color: blue; font-weight: bold; text-decoration: underline;">
+                                                    Crear Usuario
+                                                </a>
+                                            </p>
+                                        </div>-->
+
                     <div class="mb-3">
-                        <p class="text" style="color: white">No te has Registrado?</p>
+                        <p class="text" style="color: white">Se te olvido la Contraseña?</p>
                         <p class="text" style="color: white;">
-                            Regístrate aquí: 
-                            <a href="/pokedex/registro" 
+                            Recuperala aqui­: 
+                            <a href="/pokedex/recuperarPass" 
                                style="color: blue; font-weight: bold; text-decoration: underline;">
-                                Crear Usuario
+                                Olvide la Contraseña
                             </a>
                         </p>
                     </div>
+
 
                 </form> 
 
@@ -419,9 +510,12 @@
                     <p style="color:white; margin-top:10px;">Cargando Pokédex...</p>
                 </div>-->
 
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");
+                const usernameInput = document.getElementById("username");
+                const passwordInput = document.getElementById("password");
                 const modal = new bootstrap.Modal(document.getElementById("modalCarga"));
                 const barra = document.getElementById("barraProgreso");
                 const progress = document.getElementById("porcentajeCarga");
@@ -429,7 +523,65 @@
                 form.addEventListener("submit", (e) => {
                     e.preventDefault();
 
+                    const username = usernameInput.value.trim();
+                    const password = passwordInput.value.trim();
+
+                    if (username === "" || password === "") {
+                        Swal.fire({
+                            html: `
+                    <div class="text-center">
+                    <img src="https://www.pngplay.com/wp-content/uploads/11/Rayquaza-Pokemon-PNG-Images-HD.png"
+                        style="width:120px"
+                        class="mb-3 animate__animated animate__fadeInDown">
+
+                    <h4 class="fw-bold" style="color:#00ff9c">
+                            ¡Rayquaza te observa!
+                    </h4>
+                    <p>
+                        Ingresa tu <strong>usuario</strong> y <strong>contraseña</strong>
+                    </p>
+                    <h6>Antes de que te lanze un ¡Ascenso Draco!</h6>
+                    </div>
+                `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#00ff9c',
+                            customClass: {
+                                popup: 'pokemon-alert rayquaza-theme shadow-lg',
+                                confirmButton: 'btn btn-success fw-bold px-4'
+                            }
+                        });
+                        return;
+                    }
+
+                    if (username.length < 4 || password.length < 8) {
+                        Swal.fire({
+                            html: `
+                    <div class="text-center">
+                        <img src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/006.png"
+                            style="width:120px"
+                            class="mb-3 animate__animated animate__shakeX">
+
+                        <h4 class="fw-bold text-warning">
+                            Â¡Datos incorrectos!
+                        </h4>
+                        <p>
+                            Usuario mi­nimo <strong>4 caracteres</strong><br>
+                            Contraseña mÃ­nimo <strong>8 a 16 caracteres</strong>
+                        </p>
+                    </div>
+                `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#ff6a00',
+                            customClass: {
+                                popup: 'pokemon-alert charizard-theme shadow-lg',
+                                confirmButton: 'btn btn-warning fw-bold px-4'
+                            }
+                        });
+                        return;
+                    }
+
                     modal.show();
+
 
                     let progreso = 0;
 
@@ -450,6 +602,41 @@
                     }, 150);
                 });
             });
+
+            //-----Validacion ReGex UserName------//
+            $(document).ready(function () {
+                $('#username').blur('blur', function () {
+                    const nameRegex = /^[a-zA-Z0-9_]{4,16}$/;
+                    const nameValue = $(this).val();
+                    const errorSpan = $('#username-error');
+
+                    if (nameRegex.test(nameValue)) {
+                        $(this).css('border-color', 'green');
+                        errorSpan.text(' ');
+                    } else {
+                        $(this).css('border-color', 'red');
+                        errorSpan.text('User Name invalido');
+                    }
+                });
+            });
+
+            //-----Validacion ReGex Password------//
+            $(document).ready(function () {
+                $('#password').blur('blur', function () {
+                    const nameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,16}$/;
+                    const nameValue = $(this).val();
+                    const errorSpan = $('#password-error');
+
+                    if (nameRegex.test(nameValue)) {
+                        $(this).css('border-color', 'green');
+                        errorSpan.text(' ');
+                    } else {
+                        $(this).css('border-color', 'red');
+                        errorSpan.text('Password invalido');
+                    }
+                });
+            });
+
 
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");

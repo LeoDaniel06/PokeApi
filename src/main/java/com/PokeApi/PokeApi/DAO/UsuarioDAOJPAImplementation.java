@@ -153,9 +153,10 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         return result;
     }
 //----------UPDATE DATOS----------//
+
     @Override
     @Transactional
-    public Result updateUsuario(UsuarioJPA usuarioJPA){
+    public Result updateUsuario(UsuarioJPA usuarioJPA) {
         Result result = new Result();
         try {
             UsuarioJPA usuarioBase = entityManager.find(UsuarioJPA.class, usuarioJPA.getIdUsuario());
@@ -178,4 +179,50 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         }
         return result;
     }
+
+    @Override
+    @Transactional()
+    public Result GetByEmail(String correo) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuario = entityManager
+                    .createQuery("SELECT u FROM UsuarioJPA u WHERE u.correo = :correo", UsuarioJPA.class)
+                    .setParameter("correo", correo)
+                    .getSingleResult();
+
+            result.correct = true;
+            result.object = usuario;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    @Transactional
+    @Override
+    public Result UpdatePassword(int IdUsuario, String password) {
+        Result result = new Result();
+        try {
+            entityManager.createNativeQuery(
+                    "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
+                    .setParameter("password", password)
+                    .setParameter("idUsuario", IdUsuario)
+                    .executeUpdate();
+
+            result.correct = true;
+            result.status = 202;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
 }

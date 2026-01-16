@@ -197,4 +197,25 @@ public class EmailService {
             </html>
             """, nombreCompleto, enlaceVerificacion);
     }
+
+    public void enviarCorreoCodigo(UsuarioJPA usuario, String codigo) throws MessagingException {
+        String destinatario = usuario.getCorreo();
+        String asunto = "Código de recuperación de contraseña";
+
+        String contenidoHtml = "<h3>Hola " + usuario.getNombre() + "</h3>"
+                + "<p>Tu código de verificación es: <b>" + codigo + "</b></p>"
+                + "<p>Si no solicitaste este cambio, ignora este correo.</p>";
+
+        MimeMessage mensaje = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
+
+        helper.setFrom(fromEmail);
+        helper.setTo(destinatario);
+        helper.setSubject(asunto);
+        helper.setText(contenidoHtml, true);
+
+        mailSender.send(mensaje);
+        System.out.println("Correo enviado a: " + destinatario + " con código: " + codigo);
+    }
+
 }
