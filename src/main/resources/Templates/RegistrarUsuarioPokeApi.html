@@ -7,8 +7,8 @@
         <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <style>
-            /* Tipografía Pokémon */
             @font-face {
                 font-family: 'PokemonSolid';
                 src: url('/fonts/pokemon-solid.ttf') format('truetype');
@@ -209,8 +209,8 @@
             }
 
             .pokedex-container {
-                background-color: #dc3545 !important;
-                border: 8px solid #8b0000;
+                background-color: #ffcc00 !important;
+                border: 8px solid #ffaa00;
                 border-radius: 20px 20px 20px 60px !important;
                 box-shadow: inset -10px -10px 0px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.4);
                 color: white;
@@ -221,6 +221,30 @@
                 border: 15px solid #dedede;
                 border-radius: 10px;
                 box-shadow: inset 0 0 15px #000;
+            }
+
+            .pokedex-container .modal-title {
+                color: #000 !important;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+            }
+
+            .pokedex-container .modal-header small {
+                color: #333 !important;
+            }
+
+            .pokedex-container #region {
+                color: #000 !important;
+                font-weight: bold;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            .pokedex-container #statusMessage {
+                color: #222 !important;
+            }
+
+            .pokedex-container .font-pixel {
+                color: #000 !important;
+                font-weight: bold;
             }
 
             .sensor-main {
@@ -346,6 +370,52 @@
                 }
             }
 
+            .custom-file-upload {
+                position: relative;
+                border: 3px dashed #ff4136;
+                border-radius: 15px;
+                background-color: rgba(255, 65, 54, 0.1);
+                transition: all 0.3s ease;
+                overflow: hidden;
+            }
+
+            .custom-file-upload:hover {
+                border-color: #ff6b61;
+                background-color: rgba(255, 65, 54, 0.2);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 65, 54, 0.3);
+            }
+
+            .file-upload-label {
+                display: block;
+                padding: 30px 20px;
+                cursor: pointer;
+                text-align: center;
+                margin: 0;
+            }
+
+            .file-upload-content {
+                pointer-events: none;
+            }
+
+            .custom-file-upload:hover .bi-cloud-arrow-up-fill {
+                animation: bounce-upload 0.6s ease infinite;
+            }
+
+            @keyframes bounce-upload {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .custom-file-upload.drag-over {
+                border-color: #28a745;
+                background-color: rgba(40, 167, 69, 0.2);
+            }
+
         </style>
     </head>
     <body>
@@ -356,7 +426,7 @@
             <p class="texto-carga pkm">Cargando Pokédex...</p>
         </div>
 
-        <div class="container d-flex justify-content-center align-items-center">
+        <div class="container d-flex justify-content-center align-items-center pkm">
             <div class="card shadow-sm p-4">
                 <img src="https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/2025/10/24/inline/01.png" 
                      class="MegaCharizard" alt="Charizard">
@@ -380,14 +450,39 @@
 
                 <form id="registroForm" th:action="@{/pokedex/registro}" method="post" th:object="${usuario}">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre Completo</label>
+                        <label for="nombre" class="form-label">Nombre</label>
                         <input type="text" 
                                class="form-control" 
                                id="nombre" 
                                name="nombre" 
                                th:field="*{nombre}"
-                               placeholder="Ej: Ash Ketchum" 
+                               placeholder="Ej: Ketchum" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="apellidoPaterno" 
+                               name="apellidoPaterno" 
+                               th:field="*{apellidoPaterno}"
+                               placeholder="Ej: Ketchum" 
+                               required>
+                        <span id="ap-error" style="color: red;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="apellidoMaterno" 
+                               name="apellidoMaterno" 
+                               th:field="*{apellidoMaterno}"
+                               placeholder="Ej: Oak" 
+                               required>
+                        <span id="am-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -399,6 +494,7 @@
                                th:field="*{userName}"
                                placeholder="Ej: ash_maestro" 
                                required>
+                        <span id="username-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -410,6 +506,7 @@
                                th:field="*{correo}"
                                placeholder="Ej: ash@pokemon.com" 
                                required>
+                        <span id="email-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -429,6 +526,7 @@
                                 <i class="bi bi-eye-fill" id="eyeIcon"></i>
                             </button>
                         </div>
+                        <span id="password-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -461,6 +559,71 @@
                         </div>
                     </div>
 
+                    <!-- AÑADIDO: Campo de imagen con drag & drop -->
+                    <div class="mb-3">
+                        <label for="imagen" class="form-label">
+                            <i class="bi bi-image-fill me-2"></i>Foto de Perfil (Opcional)
+                        </label>
+                        <div class="text-center mb-3" id="previewContainer" style="display: none;">
+                            <div style="position: relative; display: inline-block;">
+                                <img id="imagePreview" 
+                                     src="" 
+                                     alt="Vista previa" 
+                                     style="max-width: 150px;
+                                     max-height: 150px;
+                                     border-radius: 50%;
+                                     border: 4px solid #ff4136;
+                                     object-fit: cover;
+                                     box-shadow: 0 8px 16px rgba(255, 65, 54, 0.5);">
+
+                                <button type="button" 
+                                        onclick="removeImage()" 
+                                        style="position: absolute;
+                                        top: 0;
+                                        right: 0;
+                                        background: #ff4136;
+                                        color: white;
+                                        border: 2px solid white;
+                                        border-radius: 50%;
+                                        width: 35px;
+                                        height: 35px;
+                                        cursor: pointer;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                                        font-size: 18px;
+                                        line-height: 1;">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="custom-file-upload" id="customFileUpload">
+                            <input type="file" 
+                                   class="form-control d-none" 
+                                   id="imagen" 
+                                   name="imagenFile"
+                                   accept="image/*"
+                                   onchange="previewImage(event)">
+
+                            <label for="imagen" class="file-upload-label">
+                                <div class="file-upload-content">
+                                    <i class="bi bi-cloud-arrow-up-fill" style="font-size: 3rem; color: #ff4136; margin-bottom: 10px;"></i>
+                                    <p class="mb-1" style="font-weight: 600; color: white;">
+                                        Haz clic o arrastra tu imagen aquí
+                                    </p>
+                                    <small class="text-white-50">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        JPG, PNG 
+                                    </small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <input type="hidden" id="imagenBase64" name="imagen" th:field="*{imagen}">
+                    </div>
+
                     <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">
                             Registrarse
@@ -473,6 +636,7 @@
             </div>
         </div>
 
+        <!-- Modal de carga con animaciones -->
         <div class="modal fade" id="modalCargaRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content pokedex-container">
@@ -485,8 +649,13 @@
                     </div>
 
                     <div class="modal-header border-0 flex-column align-items-start pt-0">
-                        <h5 class="modal-title font-pixel text-uppercase">System: Registering Trainer...</h5>
-                        <small class="text-white-50">Creando perfil en región: <span id="region" class="textoAnimado">Kanto</span></small>
+                        <h5 id="systemMessage" class="modal-title font-pixel text-uppercase">SYSTEM: INITIALIZING...</h5>
+                        <small class="text-white-50">
+                            <span id="statusMessage">Preparando registro...</span>
+                        </small>
+                        <small class="text-white-50">
+                            Región: <span id="region" class="textoAnimado">Kanto</span>
+                        </small>
                     </div>
 
                     <div class="modal-body d-flex flex-column align-items-center">
@@ -496,7 +665,7 @@
 
                             <div class="progress w-100 custom-progress-container">
                                 <div id="barraProgresoRegistro" 
-                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success">
+                                     class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="background-color: #ffc107 !important;">
                                 </div>
                             </div>
                             <span id="porcentajeCargaRegistro" class="mt-2 font-pixel">0%</span>
@@ -515,101 +684,310 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const pantallaCarga = document.getElementById('pantallaCargaInicial');
-                
-                setTimeout(() => {
-                    pantallaCarga.classList.add('ocultar');
-                    setTimeout(() => {
-                        pantallaCarga.style.display = 'none';
-                    }, 500);
-                }, 2000);
-            });
+                            $(document).ready(function () {
 
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
+                                //----- Validación Regex Nombre(s) -----
+                                $('#nombre').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#name-error');
 
-            togglePassword.addEventListener('click', function () {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Nombre(s) inválido(s)');
+                                    }
+                                });
 
-                if (type === 'password') {
-                    eyeIcon.className = 'bi bi-eye-fill';
-                } else {
-                    eyeIcon.className = 'bi bi-eye-slash-fill';
-                }
-            });
+                                //----- Validación Regex Apellido Paterno -----
+                                $('#apellidoPaterno').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:[-\s][A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#ap-error');
 
-            document.addEventListener("DOMContentLoaded", () => {
-                const form = document.getElementById("registroForm");
-                const modal = new bootstrap.Modal(document.getElementById("modalCargaRegistro"));
-                const barra = document.getElementById("barraProgresoRegistro");
-                const progress = document.getElementById("porcentajeCargaRegistro");
-                const texto = document.getElementById("region");
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Apellido Paterno inválido');
+                                    }
+                                });
 
-                const regiones = [
-                    "Kanto", "Johto", "Hoenn", "Sinnoh",
-                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
-                ];
+                                //----- Validación Regex Apellido Materno -----
+                                $('#apellidoMaterno').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:[-\s][A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#am-error');
 
-                let indice = 0;
-                let intervaloTexto;
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Apellido Materno inválido');
+                                    }
+                                });
 
-                form.addEventListener("submit", (e) => {
-                    e.preventDefault();
+                                //----- Validación Regex Username -----
+                                $('#username').blur(function () {
+                                    const nameRegex = /^[a-zA-Z0-9_]{4,16}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#username-error');
 
-                    modal.show();
-                    texto.classList.add("visible");
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Username inválido');
+                                    }
+                                });
 
-                    let progreso = 0;
+                                //----- Validación Regex Correo -----
+                                $('#correo').blur(function () {
+                                    const nameRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#email-error');
 
-                    const intervalo = setInterval(() => {
-                        progreso += 1;
-                        barra.style.width = progreso + "%";
-                        progress.textContent = progreso + "%";
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Correo inválido');
+                                    }
+                                });
 
-                        if (progreso >= 100) {
-                            clearInterval(intervalo);
-                            clearInterval(intervaloTexto);
+                                //----- Validación Regex Password -----
+                                $('#password').blur(function () {
+                                    const nameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,16}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#password-error');
 
-                            setTimeout(() => {
-                                form.submit();
-                            }, 500);
-                        }
-                    }, 50);
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Password inválido');
+                                    }
+                                });
 
-                    intervaloTexto = setInterval(() => {
-                        texto.classList.remove("visible");
+                            });
 
-                        setTimeout(() => {
-                            indice = (indice + 1) % regiones.length;
-                            texto.textContent = regiones[indice];
-                            texto.classList.add("visible");
-                        }, 500);
-                    }, 1900);
-                });
-            });
+                            // Pantalla de carga inicial
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const pantallaCarga = document.getElementById('pantallaCargaInicial');
 
-            document.addEventListener("DOMContentLoaded", () => {
-                const sensors = [
-                    document.querySelector(".sensor-red"),
-                    document.querySelector(".sensor-yellow"),
-                    document.querySelector(".sensor-green")
-                ];
+                                setTimeout(() => {
+                                    pantallaCarga.classList.add('ocultar');
+                                    setTimeout(() => {
+                                        pantallaCarga.style.display = 'none';
+                                    }, 500);
+                                }, 2000);
+                            });
+                            // Toggle password
+                            const togglePassword = document.getElementById('togglePassword');
+                            const passwordInput = document.getElementById('password');
+                            const eyeIcon = document.getElementById('eyeIcon');
 
-                let index = 0;
+                            togglePassword.addEventListener('click', function () {
+                                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                                passwordInput.setAttribute('type', type);
 
-                function startSensorSequence() {
-                    sensors.forEach(s => s.classList.remove("active"));
-                    sensors[index].classList.add("active");
-                    index = (index + 1) % sensors.length;
-                }
+                                if (type === 'password') {
+                                    eyeIcon.className = 'bi bi-eye-fill';
+                                } else {
+                                    eyeIcon.className = 'bi bi-eye-slash-fill';
+                                }
+                            });
 
-                setInterval(startSensorSequence, 600);
-            });
+                            // Modal de registro con animaciones mejoradas
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const form = document.getElementById("registroForm");
+                                const modal = new bootstrap.Modal(document.getElementById("modalCargaRegistro"));
+                                const barra = document.getElementById("barraProgresoRegistro");
+                                const progress = document.getElementById("porcentajeCargaRegistro");
+                                const texto = document.getElementById("region");
+                                const systemMessage = document.getElementById("systemMessage");
+                                const statusMessage = document.getElementById("statusMessage");
+
+                                const regiones = [
+                                    "Kanto", "Johto", "Hoenn", "Sinnoh",
+                                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
+                                ];
+
+                                const mensajesSistema = [
+                                    {progreso: 0, titulo: "SYSTEM: INITIALIZING...", estado: "Preparando registro..."},
+                                    {progreso: 15, titulo: "SYSTEM: VALIDATING DATA...", estado: "Verificando credenciales..."},
+                                    {progreso: 30, titulo: "SYSTEM: CREATING PROFILE...", estado: "Generando ID de entrenador..."},
+                                    {progreso: 50, titulo: "SYSTEM: ASSIGNING STARTER...", estado: "Eligiendo Pokémon inicial..."},
+                                    {progreso: 70, titulo: "SYSTEM: LINKING POKÉDEX...", estado: "Conectando con Pokédex..."},
+                                    {progreso: 85, titulo: "SYSTEM: FINALIZING...", estado: "Guardando datos..."},
+                                    {progreso: 95, titulo: "SYSTEM: COMPLETE!", estado: "¡Registro exitoso!"}
+                                ];
+
+                                let indice = 0;
+                                let intervaloTexto;
+
+                                form.addEventListener("submit", (e) => {
+                                    e.preventDefault();
+
+                                    modal.show();
+                                    texto.classList.add("visible");
+
+                                    let progreso = 0;
+
+                                    const intervalo = setInterval(() => {
+                                        progreso += 1;
+                                        barra.style.width = progreso + "%";
+                                        progress.textContent = progreso + "%";
+
+                                        const mensajeActual = mensajesSistema.find(m => progreso >= m.progreso && progreso < (mensajesSistema[mensajesSistema.indexOf(m) + 1]?.progreso || 101));
+                                        if (mensajeActual) {
+                                            systemMessage.textContent = mensajeActual.titulo;
+                                            statusMessage.textContent = mensajeActual.estado;
+                                        }
+
+                                        if (progreso >= 100) {
+                                            clearInterval(intervalo);
+                                            clearInterval(intervaloTexto);
+
+                                            setTimeout(() => {
+                                                form.submit();
+                                            }, 500);
+                                        }
+                                    }, 50);
+
+                                    intervaloTexto = setInterval(() => {
+                                        texto.classList.remove("visible");
+
+                                        setTimeout(() => {
+                                            indice = (indice + 1) % regiones.length;
+                                            texto.textContent = regiones[indice];
+                                            texto.classList.add("visible");
+                                        }, 500);
+                                    }, 1900);
+                                });
+                            });
+
+                            // Sensores animados
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const sensors = [
+                                    document.querySelector(".sensor-red"),
+                                    document.querySelector(".sensor-yellow"),
+                                    document.querySelector(".sensor-green")
+                                ];
+
+                                let index = 0;
+
+                                function startSensorSequence() {
+                                    sensors.forEach(s => s.classList.remove("active"));
+                                    sensors[index].classList.add("active");
+                                    index = (index + 1) % sensors.length;
+                                }
+
+                                setInterval(startSensorSequence, 600);
+                            });
+
+                            // FUNCIONES DE IMAGEN
+                            function removeImage() {
+                                document.getElementById('imagen').value = '';
+                                document.getElementById('previewContainer').style.display = 'none';
+                                document.getElementById('imagenBase64').value = '';
+                                document.getElementById('customFileUpload').style.display = 'block';
+                            }
+
+                            function previewImage(event) {
+                                const file = event.target.files[0];
+
+                                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                                if (file && !allowedTypes.includes(file.type)) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: '¡Formato no válido!',
+                                        text: 'Solo se permiten imágenes JPG, PNG',
+                                        background: 'rgba(30, 30, 30, 0.95)',
+                                        color: '#fff',
+                                        confirmButtonColor: '#ff4136',
+                                        confirmButtonText: 'Entendido',
+                                        iconColor: '#ff4136'
+                                    });
+                                    event.target.value = '';
+                                    return;
+                                }
+
+                                if (file) {
+                                    const reader = new FileReader();
+
+                                    reader.onload = function (e) {
+                                        const preview = document.getElementById('imagePreview');
+                                        const previewContainer = document.getElementById('previewContainer');
+                                        preview.src = e.target.result;
+                                        previewContainer.style.display = 'block';
+
+                                        document.getElementById('customFileUpload').style.display = 'none';
+
+                                        const base64String = e.target.result.split(',')[1];
+                                        document.getElementById('imagenBase64').value = base64String;
+
+                                        console.log('Imagen convertida a Base64 exitosamente');
+                                    };
+
+                                    reader.onerror = function () {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'No se pudo cargar la imagen. Intenta de nuevo.',
+                                            background: 'rgba(30, 30, 30, 0.95)',
+                                            color: '#fff',
+                                            confirmButtonColor: '#ff4136',
+                                            confirmButtonText: 'Entendido',
+                                            iconColor: '#ff4136'
+                                        });
+                                    };
+
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+
+                            // Drag & Drop
+                            const dropZone = document.getElementById('customFileUpload');
+
+                            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                                dropZone.addEventListener(eventName, preventDefaults, false);
+                            });
+
+                            function preventDefaults(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+
+                            ['dragenter', 'dragover'].forEach(eventName => {
+                                dropZone.addEventListener(eventName, () => {
+                                    dropZone.classList.add('drag-over');
+                                }, false);
+                            });
+
+                            ['dragleave', 'drop'].forEach(eventName => {
+                                dropZone.addEventListener(eventName, () => {
+                                    dropZone.classList.remove('drag-over');
+                                }, false);
+                            });
+
+                            dropZone.addEventListener('drop', (e) => {
+                                const dt = e.dataTransfer;
+                                const files = dt.files;
+                                document.getElementById('imagen').files = files;
+                                previewImage({target: {files: files}});
+                            }, false);
         </script>
 
     </body>

@@ -37,9 +37,15 @@ public class SpringSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/thread",
+                        // AÑADIDO: Rutas para recuperación de contraseña
+                        "/recuperarPass",
+                        "/recuperarPass/enviarCodigo",
+                        "/recuperarPass/actualizarPass",
+                        "/pokedex/recuperarPass",
                         "/pokedex/login",
                         "/pokedex/registro",
                         "/pokedex/verificar",
+                        "/pokedex/reenviarVerificacion", // AÑADIDO
                         "/pokedex",
                         "/pokedex/detail/**",
                         "/pokedex/perfilUsuario/**",
@@ -47,10 +53,10 @@ public class SpringSecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter,UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                 .loginPage("/pokedex/login")
-                .loginProcessingUrl("/pokedex/login")
+                .loginProcessingUrl("/pokedex/spring-login")
                 .defaultSuccessUrl("/pokedex", true)
                 .failureUrl("/pokedex/login?error=true")
                 .permitAll()
@@ -58,7 +64,7 @@ public class SpringSecurityConfig {
                 .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/pokedex/login")
-                .addLogoutHandler((request, response, authentication) ->{
+                .addLogoutHandler((request, response, authentication) -> {
                     Cookie cookie = new Cookie("JWT_TOKEN", null);
                     cookie.setPath("/");
                     cookie.setHttpOnly(true);
@@ -67,7 +73,7 @@ public class SpringSecurityConfig {
                 })
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID","JWT_TOKEN")
+                .deleteCookies("JSESSIONID", "JWT_TOKEN")
                 );
 
         return http.build();

@@ -37,10 +37,16 @@ public class UsuarioJPA {
     private String correo;
     
     @Column(name = "isverified")
-    public int isverified;
+    private int isverified;
     
     @Column(name = "imagen")
-    public String Imagen;
+    private String Imagen;
+    
+    @Column(name = "apellidopaterno")
+    private String apellidoPaterno;
+    
+    @Column(name= "apellidomaterno")
+    private String apellidoMaterno;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
@@ -112,7 +118,22 @@ public class UsuarioJPA {
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
-    
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
     
 
     public RolJPA getRolJPA() {
