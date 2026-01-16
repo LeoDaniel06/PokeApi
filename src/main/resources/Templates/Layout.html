@@ -9,6 +9,81 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <style>
+            body {
+                position: relative;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+
+                background:
+                    radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.5), transparent 50%),
+                    radial-gradient(circle at 50% 15%, rgba(102, 126, 234, 0.35),transparent 55%),
+                    radial-gradient(circle at 50% 15%,rgba(255, 203, 5, 0.25),transparent 60%);
+
+                animation: ambientLight 20s ease-in-out infinite;
+            }
+
+            body::after {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+
+                background:
+                    radial-gradient(circle at 8% 12%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 18% 38%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 32% 65%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 48% 28%, rgba(255,255,255,255), transparent 2.8%),
+                    radial-gradient(circle at 62% 52%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 78% 18%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 92% 42%, rgba(255,255,255,255), transparent 3.2%),
+                    radial-gradient(circle at 12% 78%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 38% 88%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 70% 85%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 22% 18%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 55% 18%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 82% 72%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 65% 22%, rgba(255,255,255,255), transparent 3.5%),
+                    radial-gradient(circle at 88% 88%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 42% 12%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 15% 55%, rgba(255,255,255,255), transparent 3%),
+                    radial-gradient(circle at 75% 35%, rgba(255,255,255,255), transparent 3.2%);
+
+                animation: sparkle 6s ease-in-out infinite;
+            }
+
+            @keyframes sparkle {
+                0%, 100% {
+                    opacity: 0.18;
+                    filter: blur(1.5px);
+                }
+                50% {
+                    opacity: 2;
+                    filter: blur(0.4px);
+                }
+            }
+
+            Animación lenta y elegante
+            @keyframes ambientLight {
+                0%   {
+                    filter: blur(0px);
+                    opacity: 0.8;
+                }
+                50%  {
+                    filter: blur(8px);
+                    opacity: 1;
+                }
+                100% {
+                    filter: blur(0px);
+                    opacity: 0.8;
+                }
+            }
             @font-face {
                 font-family: 'PokemonSolid';
                 src: url('/fonts/pokemon-solid.ttf') format('truetype');
@@ -34,9 +109,13 @@
             }
 
             body {
-                background: linear-gradient(135deg, #d32f2f, #ffffff);
+                background-image: url("https://wallpapers.com/images/high/totodile-looking-at-friends-in-creek-lu1576wfu8mk6d0k.webp");
+                background-size: cover;
                 min-height: 100vh;
                 padding: 20px;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
             }
 
             .main-container {
@@ -75,7 +154,13 @@
 
     <th:block layout:fragment="extra-css"></th:block>
 </head>
-
+<script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/fonts/service-worker.js")
+                .then(() => console.log("Service Worker registrado"))
+                .catch(err => console.error("Error SW:", err));
+    }
+</script>
 <body>
     <div class="main-container">
 
@@ -94,8 +179,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/pokedex/atrapaPokeballs}">
+                            <a class="nav-link" th:href="@{/pokedex/atrapaBallas}">
                                 Mini Juego 1</a>
+                        </li>
+                        <li class="nav-item" sec:authorize="isAuthenticated() and hasRole('ADMIN')">
+                            <a class="nav-link" th:href="@{/pokedex/usuarios}">
+                                Usuarios
+                            </a>
                         </li>
                         <li class="nav-item" sec:authorize="isAnonymous()">
                             <a class="nav-link" th:href="@{/pokedex/login}">
@@ -140,20 +230,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        document.getElementById("logoutBtn").addEventListener("click", function () {
-            Swal.fire({
-                title: '¿Quieres cerrar sesión?',
-                text: "Tu sesión actual se cerrará",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById("logoutForm").submit();
-                }
-            });
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        Swal.fire({
+            title: '¿Quieres cerrar sesión?',
+            text: "Tu sesión actual se cerrará",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cerrar sesión',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("logoutForm").submit();
+            }
         });
+    });
     </script>
 
 <th:block layout:fragment="extra-scripts"></th:block>

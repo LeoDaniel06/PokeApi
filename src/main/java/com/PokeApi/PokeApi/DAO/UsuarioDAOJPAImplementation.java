@@ -4,7 +4,9 @@ import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,24 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public Result GetAllUsuarios() {
+        Result result = new Result();
+        try {
+            TypedQuery<UsuarioJPA> queryUsuario
+                    = entityManager.createQuery("FROM UsuarioJPA", UsuarioJPA.class);
+            List<UsuarioJPA> usuarios = queryUsuario.getResultList();
+            result.objects = (List<Object>) (List<?>) usuarios;
+            result.correct = true;
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
 
     @Override
     @Transactional
@@ -167,6 +187,8 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
             }
             usuarioBase.setUserName(usuarioJPA.getUserName());
             usuarioBase.setNombre(usuarioJPA.getNombre());
+            usuarioBase.setApellidoPaterno(usuarioJPA.getApellidoPaterno());
+            usuarioBase.setApellidoMaterno(usuarioJPA.getApellidoMaterno());
             usuarioBase.setSexo(usuarioJPA.getSexo());
             usuarioBase.setCorreo(usuarioJPA.getCorreo());
             entityManager.merge(usuarioBase);
@@ -181,48 +203,81 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
     }
 
     @Override
-    @Transactional()
-    public Result GetByEmail(String correo) {
-        Result result = new Result();
-        try {
-            UsuarioJPA usuario = entityManager
-                    .createQuery("SELECT u FROM UsuarioJPA u WHERE u.correo = :correo", UsuarioJPA.class)
-                    .setParameter("correo", correo)
-                    .getSingleResult();
+@Transactional
+public Result GetByEmail(String correo) {
+    Result result = new Result();
 
-            result.correct = true;
-            result.object = usuario;
+    try {
+        UsuarioJPA usuario = entityManager
+                .createQuery(
+                        "SELECT u FROM UsuarioJPA u WHERE u.correo = :correo",
+                        UsuarioJPA.class
+                )
+                .setParameter("correo", correo)
+                .getSingleResult();
 
-        } catch (Exception ex) {
-            result.correct = false;
-            result.errorMessage = ex.getLocalizedMessage();
-            result.ex = ex;
-        }
+        result.correct = true;
+        result.object = usuario;
 
-        return result;
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
     }
 
-    @Transactional
-    @Override
-    public Result UpdatePassword(int IdUsuario, String password) {
-        Result result = new Result();
-        try {
-            entityManager.createNativeQuery(
-                    "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
-                    .setParameter("password", password)
-                    .setParameter("idUsuario", IdUsuario)
-                    .executeUpdate();
+    return result;
+}
 
-            result.correct = true;
-            result.status = 202;
 
-        } catch (Exception ex) {
-            result.correct = false;
-            result.errorMessage = ex.getLocalizedMessage();
-            result.ex = ex;
-        }
+@Override
+@Transactional
+public Result UpdatePassword(int idUsuario, String password) {
+    Result result = new Result();
 
-        return result;
+    try {
+        entityManager.createNativeQuery(
+                "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
+                .setParameter("password", password)
+                .setParameter("idUsuario", idUsuario)
+                .executeUpdate();
+
+        result.correct = true;
+        result.status = 202;
+
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
     }
 
+    return result;
+}
+
+
+// ---------- DELETE USUARIO ----------
+@Override
+@Transactional
+public Result DeleteUsuario(int idUsuario) {
+    Result result = new Result();
+
+    try {
+        UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+
+        if (usuario == null) {
+            result.correct = false;
+            result.errorMessage = "El usuario no existe";
+            return result;
+        }
+
+        entityManager.remove(usuario);
+        result.correct = true;
+
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
+    }
+
+    return result;
+}
 }

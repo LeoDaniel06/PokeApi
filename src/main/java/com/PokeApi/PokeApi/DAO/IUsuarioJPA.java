@@ -6,6 +6,8 @@ import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 
 public interface IUsuarioJPA {
     
+    Result GetAllUsuarios();
+    Result DeleteUsuario(int idUsuario);
     Result Add(UsuarioJPA usuario);
     Result VerificarCuenta(int idUsuario);
     Result GetById(int idUsuario);
