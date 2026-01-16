@@ -440,4 +440,9 @@ public class PokeApiController {
         return "redirect:/pokedex/usuarios";
     }
 
+    //-----Recuperar Contraseña -----//
+    @GetMapping("/recuperarPass")
+    public String RecuperarPassword(){
+        return "FormPassword";
+    }
 }

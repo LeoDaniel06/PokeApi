@@ -37,6 +37,10 @@ public class SpringSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/thread",
+                        "/recuperarPass",
+                        "/recuperarPass/enviarCodigo",
+                        "/recuperarPass/actualizarPass",
+                        "/pokedex/recuperarPass",
                         "/pokedex/login",
                         "/pokedex/registro",
                         "/pokedex/verificar",

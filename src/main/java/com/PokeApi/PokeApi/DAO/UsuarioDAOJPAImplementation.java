@@ -201,31 +201,83 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         }
         return result;
     }
-//----------DELETE USUARIO----------//
 
     @Override
-    @Transactional
-    public Result DeleteUsuario(int idUsuario) {
-        Result result = new Result();
+@Transactional
+public Result GetByEmail(String correo) {
+    Result result = new Result();
 
-        try {
-            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+    try {
+        UsuarioJPA usuario = entityManager
+                .createQuery(
+                        "SELECT u FROM UsuarioJPA u WHERE u.correo = :correo",
+                        UsuarioJPA.class
+                )
+                .setParameter("correo", correo)
+                .getSingleResult();
 
-            if (usuario == null) {
-                result.correct = false;
-                result.errorMessage = "El usuario no existe";
-                return result;
-            }
-            entityManager.remove(usuario);
+        result.correct = true;
+        result.object = usuario;
 
-            result.correct = true;
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
+    }
 
-        } catch (Exception ex) {
+    return result;
+}
+
+
+@Override
+@Transactional
+public Result UpdatePassword(int idUsuario, String password) {
+    Result result = new Result();
+
+    try {
+        entityManager.createNativeQuery(
+                "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
+                .setParameter("password", password)
+                .setParameter("idUsuario", idUsuario)
+                .executeUpdate();
+
+        result.correct = true;
+        result.status = 202;
+
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
+    }
+
+    return result;
+}
+
+
+// ---------- DELETE USUARIO ----------
+@Override
+@Transactional
+public Result DeleteUsuario(int idUsuario) {
+    Result result = new Result();
+
+    try {
+        UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+
+        if (usuario == null) {
             result.correct = false;
-            result.errorMessage = ex.getLocalizedMessage();
-            result.ex = ex;
+            result.errorMessage = "El usuario no existe";
+            return result;
         }
 
-        return result;
+        entityManager.remove(usuario);
+        result.correct = true;
+
+    } catch (Exception ex) {
+        result.correct = false;
+        result.errorMessage = ex.getLocalizedMessage();
+        result.ex = ex;
     }
+
+    return result;
+}
 }

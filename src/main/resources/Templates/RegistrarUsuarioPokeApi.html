@@ -388,8 +388,9 @@
                                th:field="*{nombre}"
                                placeholder="Ej: Ketchum" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
                         <input type="text" 
@@ -399,8 +400,9 @@
                                th:field="*{apellidoPaterno}"
                                placeholder="Ej: Ketchum" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="apellidoPaterno" class="form-label">Apellido Materno</label>
                         <input type="text" 
@@ -410,6 +412,7 @@
                                th:field="*{apellidoMaterno}"
                                placeholder="Ej: Oak" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -421,6 +424,7 @@
                                th:field="*{userName}"
                                placeholder="Ej: ash_maestro" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -432,6 +436,7 @@
                                th:field="*{correo}"
                                placeholder="Ej: ash@pokemon.com" 
                                required>
+                        <span id="name-error" style="color: red;"></span>
                     </div>
 
                     <div class="mb-3">
@@ -450,6 +455,7 @@
                                     aria-label="Mostrar contraseña">
                                 <i class="bi bi-eye-fill" id="eyeIcon"></i>
                             </button>
+                            <span id="name-error" style="color: red;"></span>
                         </div>
                     </div>
 
@@ -537,101 +543,196 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const pantallaCarga = document.getElementById('pantallaCargaInicial');
-                
-                setTimeout(() => {
-                    pantallaCarga.classList.add('ocultar');
-                    setTimeout(() => {
-                        pantallaCarga.style.display = 'none';
-                    }, 500);
-                }, 2000);
-            });
 
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
+                            $(document).ready(function () {
 
-            togglePassword.addEventListener('click', function () {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
+                                //----- Validación Regex Nombre(s) -----
+                                $('#nombre').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#name-error');
 
-                if (type === 'password') {
-                    eyeIcon.className = 'bi bi-eye-fill';
-                } else {
-                    eyeIcon.className = 'bi bi-eye-slash-fill';
-                }
-            });
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Nombre(s) inválido(s)');
+                                    }
+                                });
 
-            document.addEventListener("DOMContentLoaded", () => {
-                const form = document.getElementById("registroForm");
-                const modal = new bootstrap.Modal(document.getElementById("modalCargaRegistro"));
-                const barra = document.getElementById("barraProgresoRegistro");
-                const progress = document.getElementById("porcentajeCargaRegistro");
-                const texto = document.getElementById("region");
+                                //----- Validación Regex Apellido Paterno -----
+                                $('#apellidoPaterno').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:[-\s][A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#ap-error');
 
-                const regiones = [
-                    "Kanto", "Johto", "Hoenn", "Sinnoh",
-                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
-                ];
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Apellido Paterno inválido');
+                                    }
+                                });
 
-                let indice = 0;
-                let intervaloTexto;
+                                //----- Validación Regex Apellido Materno -----
+                                $('#apellidoMaterno').blur(function () {
+                                    const nameRegex = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*(?:[-\s][A-ZÁÉÍÓÚÑ][a-záéíóúñ]*)*$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#am-error');
 
-                form.addEventListener("submit", (e) => {
-                    e.preventDefault();
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Apellido Materno inválido');
+                                    }
+                                });
 
-                    modal.show();
-                    texto.classList.add("visible");
+                                //----- Validación Regex Username -----
+                                $('#username').blur(function () {
+                                    const nameRegex = /^[a-zA-Z0-9_]{4,16}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#username-error');
 
-                    let progreso = 0;
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Username inválido');
+                                    }
+                                });
 
-                    const intervalo = setInterval(() => {
-                        progreso += 1;
-                        barra.style.width = progreso + "%";
-                        progress.textContent = progreso + "%";
+                                //----- Validación Regex Correo -----
+                                $('#correo').blur(function () {
+                                    const nameRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#email-error');
 
-                        if (progreso >= 100) {
-                            clearInterval(intervalo);
-                            clearInterval(intervaloTexto);
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Correo inválido');
+                                    }
+                                });
 
-                            setTimeout(() => {
-                                form.submit();
-                            }, 500);
-                        }
-                    }, 50);
+                                //----- Validación Regex Password -----
+                                $('#password').blur(function () {
+                                    const nameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,16}$/;
+                                    const nameValue = $(this).val();
+                                    const errorSpan = $('#password-error');
 
-                    intervaloTexto = setInterval(() => {
-                        texto.classList.remove("visible");
+                                    if (nameRegex.test(nameValue)) {
+                                        $(this).css('border-color', 'green');
+                                        errorSpan.text(' ');
+                                    } else {
+                                        $(this).css('border-color', 'red');
+                                        errorSpan.text('Password inválido');
+                                    }
+                                });
 
-                        setTimeout(() => {
-                            indice = (indice + 1) % regiones.length;
-                            texto.textContent = regiones[indice];
-                            texto.classList.add("visible");
-                        }, 500);
-                    }, 1900);
-                });
-            });
+                            });
+                            
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const pantallaCarga = document.getElementById('pantallaCargaInicial');
 
-            document.addEventListener("DOMContentLoaded", () => {
-                const sensors = [
-                    document.querySelector(".sensor-red"),
-                    document.querySelector(".sensor-yellow"),
-                    document.querySelector(".sensor-green")
-                ];
+                                setTimeout(() => {
+                                    pantallaCarga.classList.add('ocultar');
+                                    setTimeout(() => {
+                                        pantallaCarga.style.display = 'none';
+                                    }, 500);
+                                }, 2000);
+                            });
 
-                let index = 0;
+                            const togglePassword = document.getElementById('togglePassword');
+                            const passwordInput = document.getElementById('password');
+                            const eyeIcon = document.getElementById('eyeIcon');
 
-                function startSensorSequence() {
-                    sensors.forEach(s => s.classList.remove("active"));
-                    sensors[index].classList.add("active");
-                    index = (index + 1) % sensors.length;
-                }
+                            togglePassword.addEventListener('click', function () {
+                                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                                passwordInput.setAttribute('type', type);
 
-                setInterval(startSensorSequence, 600);
-            });
+                                if (type === 'password') {
+                                    eyeIcon.className = 'bi bi-eye-fill';
+                                } else {
+                                    eyeIcon.className = 'bi bi-eye-slash-fill';
+                                }
+                            });
+
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const form = document.getElementById("registroForm");
+                                const modal = new bootstrap.Modal(document.getElementById("modalCargaRegistro"));
+                                const barra = document.getElementById("barraProgresoRegistro");
+                                const progress = document.getElementById("porcentajeCargaRegistro");
+                                const texto = document.getElementById("region");
+
+                                const regiones = [
+                                    "Kanto", "Johto", "Hoenn", "Sinnoh",
+                                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
+                                ];
+
+                                let indice = 0;
+                                let intervaloTexto;
+
+                                form.addEventListener("submit", (e) => {
+                                    e.preventDefault();
+
+                                    modal.show();
+                                    texto.classList.add("visible");
+
+                                    let progreso = 0;
+
+                                    const intervalo = setInterval(() => {
+                                        progreso += 1;
+                                        barra.style.width = progreso + "%";
+                                        progress.textContent = progreso + "%";
+
+                                        if (progreso >= 100) {
+                                            clearInterval(intervalo);
+                                            clearInterval(intervaloTexto);
+
+                                            setTimeout(() => {
+                                                form.submit();
+                                            }, 500);
+                                        }
+                                    }, 50);
+
+                                    intervaloTexto = setInterval(() => {
+                                        texto.classList.remove("visible");
+
+                                        setTimeout(() => {
+                                            indice = (indice + 1) % regiones.length;
+                                            texto.textContent = regiones[indice];
+                                            texto.classList.add("visible");
+                                        }, 500);
+                                    }, 1900);
+                                });
+                            });
+
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const sensors = [
+                                    document.querySelector(".sensor-red"),
+                                    document.querySelector(".sensor-yellow"),
+                                    document.querySelector(".sensor-green")
+                                ];
+
+                                let index = 0;
+
+                                function startSensorSequence() {
+                                    sensors.forEach(s => s.classList.remove("active"));
+                                    sensors[index].classList.add("active");
+                                    index = (index + 1) % sensors.length;
+                                }
+
+                                setInterval(startSensorSequence, 600);
+                            });
         </script>
 
     </body>
