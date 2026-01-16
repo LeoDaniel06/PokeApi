@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Selecciona tu equipo</title>
+
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f0f8ff;
+                text-align: center;
+                margin: 0;
+                padding: 20px;
+            }
+            h1, h2 {
+                color: #333;
+            }
+            #search {
+                padding: 10px;
+                width: 300px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                border: 1px solid #aaa;
+                font-size: 16px;
+            }
+            #pokemon-list {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            #pokemon-list img, #team img {
+                width: 80px;
+                height: 80px;
+                display: block;
+                margin: 0 auto 5px;
+            }
+            #pokemon-list div {
+                padding: 10px 15px;
+                background-color: #fff;
+                border: 2px solid #ccc;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                width: 120px;
+                text-transform: capitalize;
+            }
+            #pokemon-list div:hover {
+                border-color: #007bff;
+                transform: scale(1.05);
+            }
+            #team {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            #team div {
+                padding: 10px 15px;
+                background-color: #ffe0b2;
+                border: 2px solid #ff9800;
+                border-radius: 8px;
+                width: 120px;
+                text-transform: capitalize;
+            }
+            #start-battle {
+                padding: 12px 25px;
+                font-size: 16px;
+                background-color: #4caf50;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            #start-battle:hover {
+                background-color: #45a049;
+            }
+
+            /* Paginación */
+            #pagination {
+                margin: 15px 0;
+            }
+            #pagination button {
+                margin: 2px;
+                padding: 5px 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                cursor: pointer;
+            }
+            #pagination button:disabled {
+                background-color: #ccc;
+                cursor: default;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Selecciona tu equipo de 3 Pokémon</h1>
+
+        <input type="text" id="search" placeholder="Busca un Pokémon...">
+
+        <div id="pokemon-list"></div>
+        <div id="pagination"></div>
+
+        <h2>Tu equipo</h2>
+        <div id="team"></div>
+
+        <button id="start-battle">¡Comenzar batalla!</button>
+
+        <script>
+            let pokemonList = [];
+            let filteredList = [];
+            let team = [];
+            let currentPage = 1;
+            const itemsPerPage = 20;
+
+            const searchInput = document.getElementById('search');
+            const listContainer = document.getElementById('pokemon-list');
+            const paginationContainer = document.getElementById('pagination');
+            const teamContainer = document.getElementById('team');
+            const startBtn = document.getElementById('start-battle');
+
+            // Cargar lista inicial
+            async function loadPokemonList() {
+                if (localStorage.getItem('pokemon_list')) {
+                    pokemonList = JSON.parse(localStorage.getItem('pokemon_list'));
+                } else {
+                    const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+                    const data = await res.json();
+                    pokemonList = data.results;
+                    localStorage.setItem('pokemon_list', JSON.stringify(pokemonList));
+                }
+                filteredList = [...pokemonList];
+                currentPage = 1;
+                renderPage(filteredList, currentPage);
+            }
+
+            // Obtener detalle de Pokémon solo al agregar al equipo
+            async function getPokemonDetail(nameOrId) {
+                const cached = localStorage.getItem(`poke_${nameOrId}`);
+                if (cached)
+                    return JSON.parse(cached);
+
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nameOrId}`);
+                const data = await res.json();
+                return data; // ya no guardamos toda la info en localStorage
+            }
+
+            // Mapear Pokémon para equipo (solo info mínima)
+            function mapPokemonForTeam(data) {
+                return {
+                    id: data.id,
+                    name: data.name,
+                    sprite: data.sprites.front_default,
+                    hp: data.stats[0].base_stat * 2,
+                    maxHp: data.stats[0].base_stat * 2,
+                    atk: data.stats[1].base_stat,
+                    def: data.stats[2].base_stat,
+                    type: data.types[0].type.name
+                };
+            }
+
+            // Renderizar página
+            function renderPage(list, page = currentPage) {
+                currentPage = page;
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pagedItems = list.slice(start, end);
+
+                listContainer.innerHTML = '';
+
+                pagedItems.forEach(p => {
+                    const id = p.url.split('/').filter(Boolean).pop();
+                    const sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+
+                    const div = document.createElement('div');
+                    div.innerHTML = `<img src="${sprite}" alt="${p.name}"><p>${p.name}</p>`;
+
+                    div.addEventListener('click', async () => {
+                        const detail = await getPokemonDetail(p.name);
+                        addToTeam(mapPokemonForTeam(detail));
+                    });
+
+                    listContainer.appendChild(div);
+                });
+
+                renderPagination(list.length);
+            }
+
+            // Renderizar paginación
+            function renderPagination(totalItems) {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                paginationContainer.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.disabled = i === currentPage;
+                    btn.addEventListener('click', () => renderPage(filteredList, i));
+                    paginationContainer.appendChild(btn);
+                }
+            }
+
+            // Renderizar equipo
+            function renderTeam() {
+                teamContainer.innerHTML = '';
+                team.forEach(p => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<img src="${p.sprite}" alt="${p.name}"><p>${p.name}</p>`;
+                    teamContainer.appendChild(div);
+                });
+            }
+
+            // Agregar Pokémon al equipo
+            function addToTeam(pokemon) {
+                if (team.length >= 3)
+                    return alert("Equipo completo");
+                if (team.find(p => p.id === pokemon.id))
+                    return;
+                team.push(pokemon);
+                renderTeam();
+            }
+
+            // Búsqueda
+            searchInput.addEventListener('input', e => {
+                const term = e.target.value.toLowerCase();
+                filteredList = pokemonList.filter(p => p.name.includes(term));
+                renderPage(filteredList, 1);
+            });
+
+            // Botón de batalla
+            startBtn.addEventListener('click', () => {
+                if (team.length !== 3)
+                    return alert("Selecciona 3 Pokémon");
+                localStorage.setItem('player_team', JSON.stringify(team)); // ahora mucho más ligero
+                window.location.href = '/pokedex/battle';
+            });
+
+            // Carga inicial
+            loadPokemonList();
+        </script>
+    </body>
+</html>
