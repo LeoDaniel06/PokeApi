@@ -4,7 +4,9 @@ import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,24 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public Result GetAllUsuarios() {
+        Result result = new Result();
+        try {
+            TypedQuery<UsuarioJPA> queryUsuario
+                    = entityManager.createQuery("FROM UsuarioJPA", UsuarioJPA.class);
+            List<UsuarioJPA> usuarios = queryUsuario.getResultList();
+            result.objects = (List<Object>) (List<?>) usuarios;
+            result.correct = true;
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
 
     @Override
     @Transactional
@@ -153,9 +173,10 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         return result;
     }
 //----------UPDATE DATOS----------//
+
     @Override
     @Transactional
-    public Result updateUsuario(UsuarioJPA usuarioJPA){
+    public Result updateUsuario(UsuarioJPA usuarioJPA) {
         Result result = new Result();
         try {
             UsuarioJPA usuarioBase = entityManager.find(UsuarioJPA.class, usuarioJPA.getIdUsuario());
@@ -166,6 +187,8 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
             }
             usuarioBase.setUserName(usuarioJPA.getUserName());
             usuarioBase.setNombre(usuarioJPA.getNombre());
+            usuarioBase.setApellidoPaterno(usuarioJPA.getApellidoPaterno());
+            usuarioBase.setApellidoMaterno(usuarioJPA.getApellidoMaterno());
             usuarioBase.setSexo(usuarioJPA.getSexo());
             usuarioBase.setCorreo(usuarioJPA.getCorreo());
             entityManager.merge(usuarioBase);
@@ -176,6 +199,33 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
             result.errorMessage = ex.getLocalizedMessage();
             result.ex = ex;
         }
+        return result;
+    }
+//----------DELETE USUARIO----------//
+
+    @Override
+    @Transactional
+    public Result DeleteUsuario(int idUsuario) {
+        Result result = new Result();
+
+        try {
+            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "El usuario no existe";
+                return result;
+            }
+            entityManager.remove(usuario);
+
+            result.correct = true;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
         return result;
     }
 }

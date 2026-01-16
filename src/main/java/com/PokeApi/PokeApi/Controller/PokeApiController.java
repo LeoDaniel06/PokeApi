@@ -71,17 +71,26 @@ public class PokeApiController {
     public String getAll() {
         return "PokemonGetAll";
     }
-    @GetMapping("/atrapaPokeballs")
-    public String Minijuego1(){
-        return "AtrapaPokeballs";
-    }
+    //----------GET ALL USUARIOS----------//    
 
-//    @GetMapping
-//    public String getAll(Model model) {
-//        List<String> listapokemones = pokeService.pokeHilo();
-//        model.addAttribute("pokemones", listapokemones);
-//        return "prueba";
-//    }
+    @GetMapping("/usuarios")
+    public String GetAllUsuarios(Model model) {
+        Result result = usuarioDAOJPAImplementation.GetAllUsuarios();
+        if (result.correct && result.objects != null) {
+            List<UsuarioJPA> usuarios = (List<UsuarioJPA>) (List<?>) result.objects;
+            model.addAttribute("usuarios", usuarios);
+        } else {
+            model.addAttribute("error", "No se pudieron obtener los usuarios: " + result.errorMessage);
+        }
+        return "UsuariosGetAll";
+    }
+    //----------MINI JUEGO----------//
+
+    @GetMapping("/atrapaBallas")
+    public String Minijuego1() {
+        return "AtrapaBallas";
+    }
+    //----------IR A PERFIL----------//
 
     @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {
@@ -212,10 +221,6 @@ public class PokeApiController {
     public String ResgistrarUsuario(@ModelAttribute UsuarioJPA usuario,
             RedirectAttributes redirectAttributes) {
 
-        /*  int idRol
-        RolJPA rol = new RolJPA();
-        rol.setIdRol(idRol);
-        usuario.setRolJPA(rol);*/
         Result result = usuarioDAOJPAImplementation.Add(usuario);
         if (result.correct) {
             try {
@@ -268,7 +273,7 @@ public class PokeApiController {
 
         return "VerificacionPokeApi";
     }
-//----------GET FAVORITOS----------//
+    //----------GET FAVORITOS----------//
 
     @GetMapping("/favoritos")
     @ResponseBody
@@ -296,7 +301,7 @@ public class PokeApiController {
                 .toList();
     }
 
-//----------DetailUsuario----------//
+    //----------DetailUsuario----------//
     @GetMapping("/perfilUsuario/{idUsuario}")
     public String UsuarioByID(@PathVariable int idUsuario,
             Model model,
@@ -313,8 +318,17 @@ public class PokeApiController {
 
         int idSesion = userDetails.getId();
 
-        if (idSesion != idUsuario) {
-            return "redirect:/acceso-denegado";
+        String rol = userDetails.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (rol.startsWith("ROLE_")) {
+            rol = rol.substring(5);
+        }
+
+        if (!rol.equals("ADMIN") && idSesion != idUsuario) {
+            return "redirect:/pokedex/acceso-denegado";
         }
 
         Result result = usuarioDAOJPAImplementation.GetById(idUsuario);
@@ -325,9 +339,11 @@ public class PokeApiController {
         }
 
         model.addAttribute("usuario", (UsuarioJPA) result.object);
+        model.addAttribute("esAdmin", rol.equals("ADMIN")); // útil para la vista
+
         return "UsuarioDetails";
     }
-//----------UPDATE IMAGEN----------//
+    //----------UPDATE IMAGEN----------//
 
     @PostMapping("/update-imagen")
     public String updateImagen(@RequestParam("idUsuario") int idUsuario,
@@ -351,7 +367,7 @@ public class PokeApiController {
         }
         return "redirect:/pokedex/perfilUsuario/" + idUsuario;
     }
-//----------UPDATE DATOS USUARIO----------//
+    //----------UPDATE DATOS USUARIO----------//
 
     @PostMapping("/update-datos")
     public String UpdateDatosUsuario(@ModelAttribute UsuarioJPA usuario,
@@ -367,10 +383,61 @@ public class PokeApiController {
         Result result = usuarioDAOJPAImplementation.updateUsuario(usuario);
         if (result.correct) {
             redirectAttributes.addFlashAttribute("Succes", "Datos Actualizados correctamente");
-        } else{
+        } else {
             redirectAttributes.addFlashAttribute("error", result.errorMessage);
         }
         return "redirect:/pokedex/perfilUsuario/" + usuario.getIdUsuario();
+    }
+// ---------- DELETE USUARIO ----------
+
+    @PostMapping("/delete")
+    public String deleteUsuario(@RequestParam int idUsuario,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/pokedex/login";
+        }
+
+        UsuarioDetails userDetails
+                = (UsuarioDetails) authentication.getPrincipal();
+
+        String rol = userDetails.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        if (rol.startsWith("ROLE_")) {
+            rol = rol.substring(5);
+        }
+
+        if (!rol.equals("ADMIN")) {
+            return "redirect:/pokedex/acceso-denegado";
+        }
+
+        if (userDetails.getId() == idUsuario) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "No puedes eliminar tu propia cuenta"
+            );
+            return "redirect:/pokedex/usuarios";
+        }
+
+        Result result = usuarioDAOJPAImplementation.DeleteUsuario(idUsuario);
+
+        if (result.correct) {
+            redirectAttributes.addFlashAttribute(
+                    "success",
+                    "Usuario eliminado correctamente"
+            );
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    result.errorMessage
+            );
+        }
+
+        return "redirect:/pokedex/usuarios";
     }
 
 }
