@@ -38,6 +38,7 @@ public class UserDetailsJPAService implements UserDetailsService {
                 usuario.getIdUsuario(), 
                 usuario.getUserName(),
                 usuario.getPassword(),
+                usuario.getIsverified(),
                 authorities
         );
     }

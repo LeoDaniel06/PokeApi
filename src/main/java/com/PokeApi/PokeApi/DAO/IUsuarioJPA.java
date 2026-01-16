@@ -13,6 +13,8 @@ public interface IUsuarioJPA {
     Result GetById(int idUsuario);
     Result UpdateImagen(int idUsuario, String NuevaImagenB64);
     Result updateUsuario(UsuarioJPA usuarioJPA);
+    Result GetByUsername(String username);
+    Result GetByCorreo(String correo);
     Result GetByEmail(String correo);
     Result UpdatePassword(int IdUsuario, String password);
 }

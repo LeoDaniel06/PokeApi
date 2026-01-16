@@ -71,8 +71,8 @@ public class PokeApiController {
     public String getAll() {
         return "PokemonGetAll";
     }
-    //----------GET ALL USUARIOS----------//    
 
+    // AÑADIDO: GetAllUsuarios
     @GetMapping("/usuarios")
     public String GetAllUsuarios(Model model) {
         Result result = usuarioDAOJPAImplementation.GetAllUsuarios();
@@ -84,7 +84,6 @@ public class PokeApiController {
         }
         return "UsuariosGetAll";
     }
-    //----------MINI JUEGO----------//
 
     @GetMapping("/atrapaBallas")
     public String Minijuego1() {
@@ -161,8 +160,31 @@ public class PokeApiController {
 
     // ---------- LOGIN ----------
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login(
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String mensaje,
+            @RequestParam(required = false) String emailUsuario,
+            Model model) {
+
         model.addAttribute("loginRequest", new LoginRequest());
+
+        if (error != null && !error.isEmpty()) {
+            model.addAttribute("error", error);
+        }
+
+        if (tipo != null && !tipo.isEmpty()) {
+            model.addAttribute("tipo", tipo);
+        }
+
+        if (mensaje != null && !mensaje.isEmpty()) {
+            model.addAttribute("mensaje", mensaje);
+        }
+
+        if (emailUsuario != null && !emailUsuario.isEmpty()) {
+            model.addAttribute("emailUsuario", emailUsuario);
+        }
+
         return "LoginPokeApi";
     }
 
@@ -170,9 +192,30 @@ public class PokeApiController {
     public String login(
             @ModelAttribute LoginRequest loginRequest,
             HttpServletResponse response,
+            RedirectAttributes redirectAttributes,
             Model model) {
 
         try {
+            Result resultUsuario = usuarioDAOJPAImplementation.GetByUsername(loginRequest.getUsername());
+
+            if (!resultUsuario.correct) {
+                System.out.println("Usuario NO encontrado");
+                model.addAttribute("error", "Usuario no encontrado");
+                model.addAttribute("tipo", "danger");
+                model.addAttribute("loginRequest", loginRequest);
+                return "LoginPokeApi";
+            }
+
+            UsuarioJPA usuario = (UsuarioJPA) resultUsuario.object;
+
+            if (usuario.getIsverified() == 0) {
+                model.addAttribute("error", "Tu cuenta NO está verificada. Revisa tu correo: " + usuario.getCorreo());
+                model.addAttribute("tipo", "warning");
+                model.addAttribute("emailUsuario", usuario.getCorreo());
+                model.addAttribute("loginRequest", loginRequest);
+                return "LoginPokeApi";
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
@@ -182,8 +225,7 @@ public class PokeApiController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UsuarioDetails usuarioDetails
-                    = (UsuarioDetails) authentication.getPrincipal();
+            UsuarioDetails usuarioDetails = (UsuarioDetails) authentication.getPrincipal();
 
             String jwtToken = jwtUtils.generateToken(usuarioDetails);
 
@@ -202,18 +244,62 @@ public class PokeApiController {
                 rol = rol.substring(5);
             }
 
-            if (rol.equals("ADMIN")) {
-                return "redirect:/pokedex";
-            } else if (rol.equals("ENTRENADOR")) {
+            System.out.println("Login exitoso, rol: " + rol);
+
+            if (rol.equals("ADMIN") || rol.equals("ENTRENADOR")) {
                 return "redirect:/pokedex";
             } else {
                 return "redirect:/pokedex/login";
             }
 
         } catch (Exception ex) {
-            model.addAttribute("Error", "Credenciales Incorrectas");
+            System.out.println("ERROR en autenticación: " + ex.getMessage());
+            ex.printStackTrace();
+            model.addAttribute("error", "Credenciales Incorrectas");
+            model.addAttribute("tipo", "danger");
+            model.addAttribute("loginRequest", loginRequest);
             return "LoginPokeApi";
         }
+    }
+
+    // AÑADIDO: Reenviar verificación
+    @PostMapping("/reenviarVerificacion")
+    @ResponseBody
+    public Result reenviarVerificacion(@RequestParam String correo) {
+        Result result = new Result();
+
+        try {
+            Result usuarioResult = usuarioDAOJPAImplementation.GetByCorreo(correo);
+
+            if (!usuarioResult.correct) {
+                result.correct = false;
+                result.errorMessage = "No se encontró ninguna cuenta con ese correo electrónico";
+                System.out.println("Usuario NO encontrado");
+                return result;
+            }
+
+            UsuarioJPA usuario = (UsuarioJPA) usuarioResult.object;
+            System.out.println("Usuario encontrado: " + usuario.getUserName());
+            System.out.println("IsVerified: " + usuario.getIsverified());
+
+            if (usuario.getIsverified() == 1) {
+                result.correct = false;
+                result.errorMessage = "Esta cuenta ya está verificada";
+                System.out.println("Cuenta ya verificada");
+                return result;
+            }
+
+            emailService.enviarCorreoVerificacion(usuario);
+
+            result.correct = true;
+            result.errorMessage = "Correo de verificación enviado exitosamente a " + usuario.getCorreo();
+
+        } catch (Exception e) {
+            result.correct = false;
+            result.errorMessage = "Error al enviar el correo: " + e.getMessage();
+        }
+
+        return result;
     }
 
     // ---------- REGISTRO ----------
@@ -283,8 +369,8 @@ public class PokeApiController {
 
         return "VerificacionPokeApi";
     }
-    //----------GET FAVORITOS----------//
 
+    //----------GET FAVORITOS----------//
     @GetMapping("/favoritos")
     @ResponseBody
     public List<Integer> obtenerFavoritos(Authentication authentication) {
@@ -349,12 +435,12 @@ public class PokeApiController {
         }
 
         model.addAttribute("usuario", (UsuarioJPA) result.object);
-        model.addAttribute("esAdmin", rol.equals("ADMIN")); // útil para la vista
+        model.addAttribute("esAdmin", rol.equals("ADMIN"));
 
         return "UsuarioDetails";
     }
-    //----------UPDATE IMAGEN----------//
 
+    //----------UPDATE IMAGEN----------//
     @PostMapping("/update-imagen")
     public String updateImagen(@RequestParam("idUsuario") int idUsuario,
             @RequestParam("imagen") MultipartFile imagen,
@@ -377,8 +463,8 @@ public class PokeApiController {
         }
         return "redirect:/pokedex/perfilUsuario/" + idUsuario;
     }
-    //----------UPDATE DATOS USUARIO----------//
 
+    //----------UPDATE DATOS USUARIO----------//
     @PostMapping("/update-datos")
     public String UpdateDatosUsuario(@ModelAttribute UsuarioJPA usuario,
             RedirectAttributes redirectAttributes,
@@ -398,8 +484,8 @@ public class PokeApiController {
         }
         return "redirect:/pokedex/perfilUsuario/" + usuario.getIdUsuario();
     }
-// ---------- DELETE USUARIO ----------
 
+    // AÑADIDO: DELETE USUARIO
     @PostMapping("/delete")
     public String deleteUsuario(@RequestParam int idUsuario,
             Authentication authentication,
@@ -450,9 +536,9 @@ public class PokeApiController {
         return "redirect:/pokedex/usuarios";
     }
 
-    //-----Recuperar Contraseña -----//
+    // AÑADIDO: Recuperar Contraseña
     @GetMapping("/recuperarPass")
-    public String RecuperarPassword(){
+    public String RecuperarPassword() {
         return "FormPassword";
     }
 }

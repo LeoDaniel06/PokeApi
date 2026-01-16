@@ -4,6 +4,7 @@ import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
 import com.PokeApi.PokeApi.JPA.UsuarioJPA;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -46,7 +47,7 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         try {
             if (usuario == null) {
                 result.correct = false;
-                result.errorMessage = "EL USsuario no puede ser nulo";
+                result.errorMessage = "El usuario no puede ser nulo";
                 result.status = 400;
                 return result;
             }
@@ -54,9 +55,7 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
             if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
                 if (!usuario.getPassword().startsWith("$2a$")) {
                     usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
                 }
-
             }
 
             try {
@@ -69,7 +68,7 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
 
             } catch (Exception ex) {
                 result.correct = false;
-                result.errorMessage = "Rol 'Admin' no encontrado en la base de datos";
+                result.errorMessage = "Rol 'Entrenador' no encontrado en la base de datos";
                 result.status = 404;
                 return result;
             }
@@ -84,7 +83,7 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
 
         } catch (Exception ex) {
             result.correct = false;
-            result.errorMessage = "No se Resgistro el Usuario";
+            result.errorMessage = "No se Registró el Usuario";
             result.ex = ex;
             result.status = 500;
         }
@@ -150,7 +149,6 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         }
         return result;
     }
-//----------UPDATE IMAGEN----------//
 
     @Override
     @Transactional
@@ -172,7 +170,6 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         }
         return result;
     }
-//----------UPDATE DATOS----------//
 
     @Override
     @Transactional
@@ -202,82 +199,142 @@ public class UsuarioDAOJPAImplementation implements IUsuarioJPA {
         return result;
     }
 
+    // AÑADIDO: Método GetByUsername
     @Override
-@Transactional
-public Result GetByEmail(String correo) {
-    Result result = new Result();
+    @Transactional
+    public Result GetByUsername(String username) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuarioJPA = entityManager.createQuery(
+                    "SELECT u FROM UsuarioJPA u WHERE u.userName = :username", UsuarioJPA.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
 
-    try {
-        UsuarioJPA usuario = entityManager
-                .createQuery(
-                        "SELECT u FROM UsuarioJPA u WHERE u.correo = :correo",
-                        UsuarioJPA.class
-                )
-                .setParameter("correo", correo)
-                .getSingleResult();
-
-        result.correct = true;
-        result.object = usuario;
-
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = ex.getLocalizedMessage();
-        result.ex = ex;
-    }
-
-    return result;
-}
-
-
-@Override
-@Transactional
-public Result UpdatePassword(int idUsuario, String password) {
-    Result result = new Result();
-
-    try {
-        entityManager.createNativeQuery(
-                "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
-                .setParameter("password", password)
-                .setParameter("idUsuario", idUsuario)
-                .executeUpdate();
-
-        result.correct = true;
-        result.status = 202;
-
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = ex.getLocalizedMessage();
-        result.ex = ex;
-    }
-
-    return result;
-}
-
-
-// ---------- DELETE USUARIO ----------
-@Override
-@Transactional
-public Result DeleteUsuario(int idUsuario) {
-    Result result = new Result();
-
-    try {
-        UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
-
-        if (usuario == null) {
+            if (usuarioJPA != null) {
+                Hibernate.initialize(usuarioJPA.getRolJPA());
+                result.object = usuarioJPA;
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+            }
+        } catch (NoResultException ex) {
             result.correct = false;
-            result.errorMessage = "El usuario no existe";
-            return result;
+            result.errorMessage = "Usuario no encontrado";
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+
+    // AÑADIDO: Método GetByCorreo (renombrado de GetByEmail)
+    @Override
+    @Transactional
+    public Result GetByCorreo(String correo) {
+        Result result = new Result();
+        try {
+            UsuarioJPA usuarioJPA = entityManager.createQuery(
+                    "SELECT u FROM UsuarioJPA u WHERE u.correo = :correo", UsuarioJPA.class)
+                    .setParameter("correo", correo)
+                    .getSingleResult();
+
+            if (usuarioJPA != null) {
+                Hibernate.initialize(usuarioJPA.getRolJPA());
+                result.object = usuarioJPA;
+                result.correct = true;
+            } else {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+            }
+        } catch (NoResultException ex) {
+            result.correct = false;
+            result.errorMessage = "Usuario no encontrado con ese correo";
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+
+    // AÑADIDO: Método GetByEmail (del documento 3)
+    @Override
+    @Transactional
+    public Result GetByEmail(String correo) {
+        Result result = new Result();
+
+        try {
+            UsuarioJPA usuario = entityManager
+                    .createQuery(
+                            "SELECT u FROM UsuarioJPA u WHERE u.correo = :correo",
+                            UsuarioJPA.class
+                    )
+                    .setParameter("correo", correo)
+                    .getSingleResult();
+
+            result.correct = true;
+            result.object = usuario;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
         }
 
-        entityManager.remove(usuario);
-        result.correct = true;
-
-    } catch (Exception ex) {
-        result.correct = false;
-        result.errorMessage = ex.getLocalizedMessage();
-        result.ex = ex;
+        return result;
     }
 
-    return result;
-}
+    // AÑADIDO: Método UpdatePassword
+    @Override
+    @Transactional
+    public Result UpdatePassword(int idUsuario, String password) {
+        Result result = new Result();
+
+        try {
+            entityManager.createNativeQuery(
+                    "UPDATE USUARIO SET password = :password WHERE idusuario = :idUsuario")
+                    .setParameter("password", password)
+                    .setParameter("idUsuario", idUsuario)
+                    .executeUpdate();
+
+            result.correct = true;
+            result.status = 202;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    // AÑADIDO: Método DeleteUsuario
+    @Override
+    @Transactional
+    public Result DeleteUsuario(int idUsuario) {
+        Result result = new Result();
+
+        try {
+            UsuarioJPA usuario = entityManager.find(UsuarioJPA.class, idUsuario);
+
+            if (usuario == null) {
+                result.correct = false;
+                result.errorMessage = "El usuario no existe";
+                return result;
+            }
+
+            entityManager.remove(usuario);
+            result.correct = true;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
 }

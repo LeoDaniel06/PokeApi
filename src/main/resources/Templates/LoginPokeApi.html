@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{Layout}">
@@ -6,7 +7,26 @@
     <th:block layout:fragment="extra-css">
         <link rel="icon" href="https://www.freeiconspng.com/thumbs/pokeball-png/poke-ball-icon-27.png">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <style>
+            @font-face {
+                font-family: 'PokemonSolid';
+                src: url('/fonts/pokemon-solid.ttf') format('truetype');
+            }
+
+            @font-face {
+                font-family: 'PokemonHollow';
+                src: url('/fonts/pokemon-hollow.ttf') format('truetype');
+            }
+
+            .pkm {
+                font-family: 'PokemonSolid', sans-serif;
+            }
+
+            .pkm-hollow {
+                font-family: 'PokemonHollow', sans-serif;
+            }
+
             body {
                 background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
                 background-repeat: no-repeat;
@@ -127,30 +147,6 @@
                 text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
             }
 
-            .form-check {
-                background-color: rgba(255, 255, 255, 0.1);
-                padding: 10px 15px;
-                border-radius: 8px;
-                margin-bottom: 8px;
-            }
-
-            .form-check-label {
-                color: white !important;
-                font-weight: 600;
-            }
-
-            .form-check-input:checked {
-                background-color: #ff4136;
-                border-color: #ff4136;
-            }
-
-            .gender-container {
-                background-color: rgba(255, 255, 255, 0.05);
-                padding: 15px;
-                border-radius: 10px;
-                border: 2px solid rgba(255, 65, 54, 0.3);
-            }
-
             .alert {
                 border-radius: 10px;
                 margin-bottom: 20px;
@@ -183,134 +179,11 @@
                 padding-right: 45px;
             }
 
-            /*            progress{
-                            clip: rect(1px, 1px, 1px, 1px);
-                            clip-path: inset(50%);
-                            height: 1px;
-                            width: 1px;
-                            margin: -1px;
-                            overflow: hidden;
-                            padding: 0;
-                            position: absolute;
-                        }
-            
-                        .pokebola-barra {
-                            background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png");
-                            background-repeat: repeat-x;
-                            background-size: 30px 30px;
-                            background-position: center;
-                            animation: girarPokebola 1.2s linear infinite;
-                        }
-            
-                        @keyframes girarPokebola {
-                            from {
-                                background-position-x: 0;
-                            }
-                            to {
-                                background-position-x: 30px;
-                            }
-                        }*/
-
-
-            /*            #carga {
-                            position: fixed;
-                            inset: 0;
-                            background: black;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            z-index: 9999;
-                        }
-            
-                        #carga video {
-                            width: 280px;
-                        }*/
-
-            .swal2-popup {
-                overflow: visible !important;
-                padding-top: 65px !important;
-            }
-
-            .pokemon-alert {
-                position: relative;
-                border-radius: 26px;
-                border: 6px solid;
-                animation: popupIn 0.4s ease-out;
-            }
-
-            .rayquaza-theme {
-                background: linear-gradient(180deg, #0f3d2e, #06251b);
-                border-color: #00ff9c;
-                color: #eafff6;
-            }
-
-            .charizard-theme {
-                background: linear-gradient(180deg, #3b1a00, #1a0c00);
-                border-color: #ff6a00;
-                color: #ffe2c6;
-            }
-
-            .pokemon-alert::before,
-            .pokemon-alert::after {
-                content: "";
-                position: absolute;
-                top: -70px;
-                width: 42px;
-                height: 85px;
-                border-radius: 22px;
-                animation: earFloat 2s infinite ease-in-out;
-            }
-
-            .pokemon-alert::before {
-                left: 55px;
-                transform: rotate(-18deg);
-            }
-
-            .pokemon-alert::after {
-                right: 55px;
-                transform: rotate(18deg);
-            }
-
-            .rayquaza-theme::before,
-            .rayquaza-theme::after {
-                background: linear-gradient(180deg, #00ff9c, #0f3d2e);
-                box-shadow: 0 0 12px rgba(0, 255, 156, 0.6);
-            }
-
-            .charizard-theme::before,
-            .charizard-theme::after {
-                background: linear-gradient(180deg, #ffb347, #ff6a00);
-                box-shadow: 0 0 12px rgba(255, 106, 0, 0.6);
-            }
-
-            @keyframes popupIn {
-                from {
-                    transform: scale(0.7);
-                    opacity: 0;
-                }
-                to {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            @keyframes earFloat {
-                0%, 100% {
-                    transform: translateY(0) rotate(-18deg);
-                }
-                50% {
-                    transform: translateY(-6px) rotate(-25deg);
-                }
-            }
-
             .pokemon-sprite{
                 width: 100px;
-                /*                right: 20px;*/
                 pointer-events: none;
                 transform: scaleX(-1);
             }
-
 
             .pokedex-container {
                 background-color: #dc3545 !important;
@@ -319,7 +192,6 @@
                 box-shadow: inset -10px -10px 0px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.4);
                 color: white;
             }
-
 
             .pokedex-screen {
                 background-color: #333;
@@ -416,55 +288,99 @@
                     <h1 class="fw-bold" style="color: white">¡Bienvenido Entrenador!</h1>
                     <p class="text" style="color: white">Por favor ingresa tu usuario y contraseña</p>
                 </div>
+
+                <!-- AÑADIDO: Alerta de cuenta no verificada con reenvío -->
+                <div th:if="${tipo == 'warning'}" 
+                     class="alert alert-warning alert-dismissible fade show" 
+                     role="alert"
+                     style="background-color: rgba(255, 193, 7, 0.9); border: 2px solid #ffc107;">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.5rem; color: #856404;"></i>
+                        <div class="flex-grow-1">
+                            <strong style="color: #856404;">¡Cuenta no verificada!</strong>
+                            <p class="mb-2" style="color: #856404;" th:text="${error}"></p>
+                            <small style="color: #856404;">
+                                ¿No recibiste el correo? 
+                                <a href="#" 
+                                   th:attr="data-email=${emailUsuario}"
+                                   onclick="reenviarCorreo(event, this.getAttribute('data-email'))" 
+                                   class="text-decoration-underline fw-bold" 
+                                   style="color: #ff4136; cursor: pointer;">
+                                    Reenviar verificación
+                                </a>
+                            </small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${tipo != null and tipo == 'danger'}" 
+                     class="alert alert-danger alert-dismissible fade show" 
+                     role="alert"
+                     style="background-color: rgba(220, 53, 69, 0.9); border: 2px solid #dc3545;">
+                    <strong style="color: white;">Error:</strong>
+                    <span th:text="${error}" style="color: white;"></span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${tipo != null and tipo == 'success'}" 
+                     class="alert alert-success alert-dismissible fade show" 
+                     role="alert"
+                     style="background-color: rgba(40, 167, 69, 0.9); border: 2px solid #28a745;">
+                    <i class="bi bi-check-circle-fill me-2" style="font-size: 1.2rem; color: white;"></i>
+                    <span th:text="${mensaje}" style="color: white;"></span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+
                 <form id="loginForm" th:action="@{/pokedex/login}" method="post" th:object="${loginRequest}">
                     <div class="mb-3">
                         <label for="username" class="form-label" style="color: white">Usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario"  th:field="*{username}">
-                        <span id="username-error" style="color: red;"></span>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required th:field="*{username}">
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label" style="color: white">Contraseña</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"  th:field="*{password}">
-                        <span id="username-error" style="color: red;"></span>
+                        <div class="password-container">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required th:field="*{password}">
+                            <button type="button" 
+                                    class="password-toggle" 
+                                    id="togglePassword"
+                                    aria-label="Mostrar contraseña">
+                                <i class="bi bi-eye-fill" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AÑADIDO: Enlace a recuperar contraseña -->
+                    <div class="mb-3 text-end">
+                        <a href="/pokedex/recuperarPass" 
+                           style="color: #ffc107; font-size: 0.9rem; text-decoration: none;">
+                            ¿Olvidaste tu contraseña?
+                        </a>
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-danger">Iniciar Sesion</button>
+                        <button type="submit" class="btn btn-primary btn-danger">Iniciar Sesión</button>
                     </div>
 
-                    <!--                    <div class="mb-3">
-                                            <p class="text" style="color: white">No te has Registrado?</p>
-                                            <p class="text" style="color: white;">
-                                                Regístrate aquí: 
-                                                <a href="/pokedex/registro" 
-                                                   style="color: blue; font-weight: bold; text-decoration: underline;">
-                                                    Crear Usuario
-                                                </a>
-                                            </p>
-                                        </div>-->
-
-                    <div class="mb-3">
-                        <p class="text" style="color: white">Se te olvido la Contraseña?</p>
+                    <div class="mb-3 mt-3">
+                        <p class="text" style="color: white">¿No te has Registrado?</p>
                         <p class="text" style="color: white;">
-                            Recuperala aqui­: 
-                            <a href="/pokedex/recuperarPass" 
+                            Regístrate aquí: 
+                            <a href="/pokedex/registro" 
                                style="color: blue; font-weight: bold; text-decoration: underline;">
-                                Olvide la Contraseña
+                                Crear Usuario
                             </a>
                         </p>
                     </div>
-
-
                 </form> 
-
             </div>
         </div>
 
+        <!-- Modal de carga -->
         <div class="modal fade" id="modalCarga" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content pokedex-container">
-
                     <div class="pokedex-sensors d-flex gap-2 p-3">
                         <div class="sensor-main"></div>
                         <div class="sensor-red"></div>
@@ -502,20 +418,27 @@
             </div>
         </div>
 
-
-        <!--        <div id="carga" style="visibility: hidden;">
-                    <video autoplay loop muted playsinline>
-                        <source src="/videoCarga/Fondo de carga.mp4" type="video/mp4">
-                    </video>
-                    <p style="color:white; margin-top:10px;">Cargando Pokédex...</p>
-                </div>-->
-
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                if (type === 'password') {
+                    eyeIcon.className = 'bi bi-eye-fill';
+                } else {
+                    eyeIcon.className = 'bi bi-eye-slash-fill';
+                }
+            });
+
+            // Modal de carga al enviar formulario
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");
-                const usernameInput = document.getElementById("username");
-                const passwordInput = document.getElementById("password");
                 const modal = new bootstrap.Modal(document.getElementById("modalCarga"));
                 const barra = document.getElementById("barraProgreso");
                 const progress = document.getElementById("porcentajeCarga");
@@ -523,78 +446,17 @@
                 form.addEventListener("submit", (e) => {
                     e.preventDefault();
 
-                    const username = usernameInput.value.trim();
-                    const password = passwordInput.value.trim();
-
-                    if (username === "" || password === "") {
-                        Swal.fire({
-                            html: `
-                    <div class="text-center">
-                    <img src="https://www.pngplay.com/wp-content/uploads/11/Rayquaza-Pokemon-PNG-Images-HD.png"
-                        style="width:120px"
-                        class="mb-3 animate__animated animate__fadeInDown">
-
-                    <h4 class="fw-bold" style="color:#00ff9c">
-                            ¡Rayquaza te observa!
-                    </h4>
-                    <p>
-                        Ingresa tu <strong>usuario</strong> y <strong>contraseña</strong>
-                    </p>
-                    <h6>Antes de que te lanze un ¡Ascenso Draco!</h6>
-                    </div>
-                `,
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#00ff9c',
-                            customClass: {
-                                popup: 'pokemon-alert rayquaza-theme shadow-lg',
-                                confirmButton: 'btn btn-success fw-bold px-4'
-                            }
-                        });
-                        return;
-                    }
-
-                    if (username.length < 4 || password.length < 8) {
-                        Swal.fire({
-                            html: `
-                    <div class="text-center">
-                        <img src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/006.png"
-                            style="width:120px"
-                            class="mb-3 animate__animated animate__shakeX">
-
-                        <h4 class="fw-bold text-warning">
-                            Â¡Datos incorrectos!
-                        </h4>
-                        <p>
-                            Usuario mi­nimo <strong>4 caracteres</strong><br>
-                            Contraseña mÃ­nimo <strong>8 a 16 caracteres</strong>
-                        </p>
-                    </div>
-                `,
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#ff6a00',
-                            customClass: {
-                                popup: 'pokemon-alert charizard-theme shadow-lg',
-                                confirmButton: 'btn btn-warning fw-bold px-4'
-                            }
-                        });
-                        return;
-                    }
-
                     modal.show();
-
 
                     let progreso = 0;
 
                     const intervalo = setInterval(() => {
                         progreso += 1;
                         barra.style.width = progreso + "%";
-//                        barra.textContent = progreso + "%";
                         progress.textContent = progreso + "%";
 
                         if (progreso >= 100) {
                             clearInterval(intervalo);
-
-
                             setTimeout(() => {
                                 form.submit();
                             }, 300);
@@ -603,41 +465,7 @@
                 });
             });
 
-            //-----Validacion ReGex UserName------//
-            $(document).ready(function () {
-                $('#username').blur('blur', function () {
-                    const nameRegex = /^[a-zA-Z0-9_]{4,16}$/;
-                    const nameValue = $(this).val();
-                    const errorSpan = $('#username-error');
-
-                    if (nameRegex.test(nameValue)) {
-                        $(this).css('border-color', 'green');
-                        errorSpan.text(' ');
-                    } else {
-                        $(this).css('border-color', 'red');
-                        errorSpan.text('User Name invalido');
-                    }
-                });
-            });
-
-            //-----Validacion ReGex Password------//
-            $(document).ready(function () {
-                $('#password').blur('blur', function () {
-                    const nameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,16}$/;
-                    const nameValue = $(this).val();
-                    const errorSpan = $('#password-error');
-
-                    if (nameRegex.test(nameValue)) {
-                        $(this).css('border-color', 'green');
-                        errorSpan.text(' ');
-                    } else {
-                        $(this).css('border-color', 'red');
-                        errorSpan.text('Password invalido');
-                    }
-                });
-            });
-
-
+            // Animación de región
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");
                 const texto = document.getElementById("region");
@@ -668,8 +496,7 @@
                 });
             });
 
-
-
+            // Sensores
             document.addEventListener("DOMContentLoaded", () => {
                 const sensors = [
                     document.querySelector(".sensor-red"),
@@ -681,7 +508,6 @@
 
                 function startSensorSequence() {
                     sensors.forEach(s => s.classList.remove("active"));
-
                     sensors[index].classList.add("active");
                     index = (index + 1) % sensors.length;
                 }
@@ -689,24 +515,89 @@
                 setInterval(startSensorSequence, 600);
             });
 
+            // AÑADIDO: Función reenviar verificación
+            function reenviarCorreo(event, email) {
+                event.preventDefault();
+
+                if (!email) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Oops!',
+                        text: 'No se pudo obtener el correo electrónico',
+                        background: 'rgba(30, 30, 30, 0.95)',
+                        color: '#fff',
+                        confirmButtonColor: '#ff4136',
+                        confirmButtonText: 'Entendido',
+                        iconColor: '#ff4136'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Enviando correo...',
+                    html: '<img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGg2YW9sbHh6eTIxYTRjdGJ2dXE2NTg0Z3MyMGJ0eXNwa2RhaGMzdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/nMy8HTFQRWpudNwbxQ/giphy.gif" style="width: 100px; transform: scaleX(-1);">',
+                    background: 'rgba(30, 30, 30, 0.95)',
+                    color: '#fff',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/pokedex/reenviarVerificacion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'correo=' + encodeURIComponent(email)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.correct) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Correo Enviado!',
+                            html: `
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+                                     style="width: 60px; animation: bounce 0.5s infinite alternate; margin-bottom: 15px;">
+                                <p style="margin-top: 10px;">${data.errorMessage}</p>
+                                <p style="font-size: 0.9em; color: #ffc107;">Revisa tu bandeja de entrada</p>
+                            `,
+                            background: 'rgba(30, 30, 30, 0.95)',
+                            color: '#fff',
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: '¡Perfecto!',
+                            iconColor: '#28a745'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.errorMessage,
+                            background: 'rgba(30, 30, 30, 0.95)',
+                            color: '#fff',
+                            confirmButtonColor: '#ff4136',
+                            confirmButtonText: 'Intentar de nuevo',
+                            iconColor: '#ff4136'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo reenviar el correo. Por favor intenta de nuevo.',
+                        background: 'rgba(30, 30, 30, 0.95)',
+                        color: '#fff',
+                        confirmButtonColor: '#ff4136',
+                        confirmButtonText: 'Entendido',
+                        iconColor: '#ff4136'
+                    });
+                });
+            }
         </script>
     </div>
-
-    <!--    <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const form = document.getElementById("loginForm");
-                const carga = document.getElementById("carga");
-    
-                form.addEventListener("submit", (e) => {
-    
-                    carga.style.visibility = "visible";
-    
-                    setTimeout(() => {
-                        form.submit();
-                    }, 20000);
-                });
-            });
-        </script>-->
-
 </body>
 </html>

@@ -22,27 +22,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
     public JwtAuthFilter(UserDetailsJPAService usuarioDetailsJPAService,
-                         JwtUtils jwtUtils) {
+            JwtUtils jwtUtils) {
         this.usuarioDetailsJPAService = usuarioDetailsJPAService;
         this.jwtUtils = jwtUtils;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
 
-        
         if (path.startsWith("/pokedex/login")
                 || path.startsWith("/pokedex/registro")
+                || path.startsWith("/pokedex/verificar")
                 || path.startsWith("/fonts/")
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
-                || path.startsWith("/images/") 
-                || path.startsWith("/api/thread")){
+                || path.startsWith("/images/")
+                || path.startsWith("/api/thread")) {
 
             filterChain.doFilter(request, response);
             return;
@@ -62,8 +62,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails =
-                        usuarioDetailsJPAService.loadUserByUsername(username);
+                UserDetails userDetails
+                        = usuarioDetailsJPAService.loadUserByUsername(username);
 
                 if (jwtUtils.isTokenValid(jwt, userDetails)) {
 
@@ -71,11 +71,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             idUsuario.intValue(),
                             userDetails.getUsername(),
                             userDetails.getPassword(),
+                            ((UsuarioDetails) userDetails).getIsVerified(),
                             userDetails.getAuthorities()
                     );
 
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
+                    UsernamePasswordAuthenticationToken authToken
+                            = new UsernamePasswordAuthenticationToken(
                                     usuarioDetails,
                                     null,
                                     usuarioDetails.getAuthorities()
@@ -92,7 +93,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            
+
         }
 
         filterChain.doFilter(request, response);

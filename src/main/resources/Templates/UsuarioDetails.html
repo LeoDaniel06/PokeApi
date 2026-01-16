@@ -172,11 +172,11 @@
 
                             <div class="pokedex-card">
 
-                                <div class="pokedex-header">
+                                <div class="pokedex-header pkm">
                                     PERFIL DEL ENTRENADOR
                                 </div>
                                 <a th:href="@{/pokedex}" class="back-arrow">❮</a>
-                                <div class="text-center mt-4">
+                                <div class="text-center mt-4 pkm">
 
                                     <form th:action="@{/pokedex/update-imagen}"
                                           method="post"
@@ -224,7 +224,7 @@
                                     <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
 
                                     <div class="info-item">
-                                        <span class="info-label ">Usuario</span>
+                                        <span class="info-label pkm">Usuario</span>
                                         <input class="form-control info-input text-center"
                                                type="text"
                                                name="userName"
@@ -233,7 +233,7 @@
                                     </div>
 
                                     <div class="info-item">
-                                        <span class="info-label">Nombre</span>
+                                        <span class="info-label pkm">Nombre</span>
                                         <input class="form-control info-input text-center"
                                                type="text"
                                                name="nombre"
@@ -241,7 +241,7 @@
                                                disabled>
                                     </div>
                                     <div class="info-item">
-                                        <span class="info-label">Apellido Paterno</span>
+                                        <span class="info-label pkm">Apellido Paterno</span>
                                         <input class="form-control info-input text-center"
                                                type="text"
                                                name="apellidoPaterno"
@@ -249,7 +249,7 @@
                                                disabled>
                                     </div>
                                     <div class="info-item">
-                                        <span class="info-label">Apellido Materno</span>
+                                        <span class="info-label pkm">Apellido Materno</span>
                                         <input class="form-control info-input text-center"
                                                type="text"
                                                name="apellidoMaterno"
@@ -258,7 +258,7 @@
                                     </div>
 
                                     <div class="info-item">
-                                        <span class="info-label">Género</span>
+                                        <span class="info-label pkm">Género</span>
                                         <select class="form-select info-input text-center"
                                                 name="sexo"
                                                 disabled>
@@ -271,7 +271,7 @@
                                     </div>
 
                                     <div class="info-item">
-                                        <span class="info-label">Correo</span>
+                                        <span class="info-label pkm">Correo</span>
                                         <input class="form-control info-input text-center"
                                                type="email"
                                                name="correo"
@@ -280,14 +280,14 @@
                                     </div>
 
                                     <div class="info-item">
-                                        <span class="info-label">Rol</span>
+                                        <span class="info-label pkm">Rol</span>
                                         <input class="form-control text-center"
                                                type="text"
                                                th:value="${usuario.rolJPA.nombreRol}"
                                                disabled>
                                     </div>  
 
-                                    <div class="info-item">
+                                    <div class="info-item pkm">
                                         <span class="info-label">Estado</span>
 
                                         <span class="info-value"
@@ -296,7 +296,7 @@
                                         </span>
                                     </div>
 
-                                    <div class="text-center mt-4 d-flex justify-content-center gap-2">
+                                    <div class="text-center mt-4 d-flex justify-content-center gap-2 pkm">
                                         <button type="button"
                                                 id="btnEditar"
                                                 class="btn btn-pokemon">
@@ -305,7 +305,7 @@
 
                                         <button type="button"
                                                 id="btnCancelar"
-                                                class="btn btn-secondary d-none"
+                                                class="btn btn-secondary d-none pkm"
                                                 onclick="cancelarEdicion()">
                                             Cancelar
                                         </button>

@@ -22,13 +22,24 @@ public class PokeService {
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<PokemonDTO> cachePokemon = new ArrayList<>();
     private final RestTemplate restTemplate;
+    
+    // AÑADIDO: Cache para códigos de recuperación
+    private static class CodigoCache {
+        String codigo;
+        long expiracion;
+        CodigoCache(String codigo, long expiracion) {
+            this.codigo = codigo;
+            this.expiracion = expiracion;
+        }
+    }
+    private final Map<String, CodigoCache> cache = new ConcurrentHashMap<>();
+    private static final long TIEMPO_EXPIRACION = 10 * 60 * 1000;
 
     public PokeService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     public synchronized List<PokemonDTO> obtenerPokemones() {
-
         if (!cachePokemon.isEmpty()) {
             return cachePokemon;
         }
@@ -63,7 +74,7 @@ public class PokeService {
     public String getPokemon(int id) {
         return restTemplate.getForObject("http://pokeapi.co/v2/pokemon/" + id, String.class);
     }
-
+    
     @Cacheable(value = "pokemonSpecies", key = "#id")
     public String getPokemonSpecies(int id) {
         return restTemplate.getForObject(
@@ -72,25 +83,10 @@ public class PokeService {
         );
     }
 
-    private static class CodigoCache {
-
-        String codigo;
-        long expiracion;
-
-        CodigoCache(String codigo, long expiracion) {
-            this.codigo = codigo;
-            this.expiracion = expiracion;
-        }
-    }
-
-    private final Map<String, CodigoCache> cache = new ConcurrentHashMap<>();
-
-    private static final long TIEMPO_EXPIRACION = 10 * 60 * 1000;
-
+    // AÑADIDO: Métodos para recuperación de contraseña
     public String generarCodigo(String correo) {
         String codigo = String.valueOf((int) (100000 + Math.random() * 900000));
         long expiracion = System.currentTimeMillis() + TIEMPO_EXPIRACION;
-
         cache.put(correo, new CodigoCache(codigo, expiracion));
         return codigo;
     }
@@ -110,5 +106,4 @@ public class PokeService {
     public void eliminarCodigo(String correo) {
         cache.remove(correo);
     }
-
 }
