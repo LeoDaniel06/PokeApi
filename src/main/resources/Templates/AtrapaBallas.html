@@ -266,11 +266,9 @@
                 let paused = false;
                 let musicStarted = false;
 
-                // High score
                 let highScore = localStorage.getItem('highScore') || 0;
                 highScoreEl.textContent = highScore;
 
-                // Bayas con efectos
                 const berries = [
                     {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oran-berry.png", type: "score", value: 1, weight: 50},
                     {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/sitrus-berry.png", type: "score1", value: 5, weight: 30},
@@ -278,7 +276,6 @@
                     {img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cheri-berry.png", type: "score3", value: 15, weight: 8}
                 ];
 
-                // Movimiento + inicio música
                 playArea.addEventListener('mousemove', (e) => {
                     if (!gameRunning)
                         return;
@@ -327,7 +324,6 @@
                         const i = item.getBoundingClientRect();
                         const h = hitbox.getBoundingClientRect();
 
-                        // Colisión
                         if (i.bottom >= h.top && i.left < h.right && i.right > h.left) {
 
                             switch (berry.type) {
@@ -357,7 +353,6 @@
                             setTimeout(() => item.remove(), 300);
                         }
 
-                        // Se cayó
                         if (y > playArea.clientHeight) {
                             lives--;
                             livesEl.textContent = lives;
