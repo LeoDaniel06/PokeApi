@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{Layout}">
@@ -26,6 +25,51 @@
             .pkm-hollow {
                 font-family: 'PokemonHollow', sans-serif;
             }
+            
+
+#tubesCanvas {
+    display: none !important;
+}
+
+
+body {
+    background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+
+    display: flex;
+    position: relative;
+    min-height: 100vh;
+}
+
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+    pointer-events: none;
+}
+
+
+/*
+.pokemon-navbar,
+.pokemon-footer {
+    display: none !important;
+}
+*/
+
+
+.container {
+    position: relative;
+    z-index: 1;
+}
 
             body {
                 background-image: url('https://images4.alphacoders.com/119/1198340.jpg');
@@ -271,9 +315,183 @@
                 opacity: 0;
                 transition: opacity 0.5s ease-in-out;
             }
+            
             .visible {
                 opacity: 1;
             }
+            .swal2-popup {
+                overflow: visible !important;
+                padding-top: 65px !important;
+            }
+
+            .pokemon-alert {
+                position: relative;
+                border-radius: 26px;
+                border: 6px solid;
+                animation: popupIn 0.4s ease-out;
+            }
+
+            .rayquaza-theme {
+                background: linear-gradient(180deg, #0f3d2e, #06251b);
+                border-color: #00ff9c;
+                color: #eafff6;
+            }
+
+            .charizard-theme {
+                background: linear-gradient(180deg, #3b1a00, #1a0c00);
+                border-color: #ff6a00;
+                color: #ffe2c6;
+            }
+
+            .pokemon-alert::before,
+            .pokemon-alert::after {
+                content: "";
+                position: absolute;
+                top: -70px;
+                width: 42px;
+                height: 85px;
+                border-radius: 22px;
+                animation: earFloat 2s infinite ease-in-out;
+            }
+
+            .pokemon-alert::before {
+                left: 55px;
+                transform: rotate(-18deg);
+            }
+
+            .pokemon-alert::after {
+                right: 55px;
+                transform: rotate(18deg);
+            }
+
+            .rayquaza-theme::before,
+            .rayquaza-theme::after {
+                background: linear-gradient(180deg, #00ff9c, #0f3d2e);
+                box-shadow: 0 0 12px rgba(0, 255, 156, 0.6);
+            }
+
+            .charizard-theme::before,
+            .charizard-theme::after {
+                background: linear-gradient(180deg, #ffb347, #ff6a00);
+                box-shadow: 0 0 12px rgba(255, 106, 0, 0.6);
+            }
+
+            @keyframes popupIn {
+                from {
+                    transform: scale(0.7);
+                    opacity: 0;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes earFloat {
+                0%, 100% {
+                    transform: translateY(0) rotate(-18deg);
+                }
+                50% {
+                    transform: translateY(-6px) rotate(-25deg);
+                }
+            }
+
+            .pokemon-sprite{
+                width: 100px;
+                /*                right: 20px;*/
+                pointer-events: none;
+                transform: scaleX(-1);
+            }
+
+
+            .pokedex-container {
+                background-color: #dc3545 !important;
+                border: 8px solid #8b0000;
+                border-radius: 20px 20px 20px 60px !important;
+                box-shadow: inset -10px -10px 0px rgba(0,0,0,0.2), 10px 10px 20px rgba(0,0,0,0.4);
+                color: white;
+            }
+
+
+            .pokedex-screen {
+                background-color: #333;
+                border: 15px solid #dedede;
+                border-radius: 10px;
+                box-shadow: inset 0 0 15px #000;
+            }
+
+            .sensor-main {
+                width: 50px;
+                height: 50px;
+                background: radial-gradient(circle, #00f 0%, #000 100%);
+                border: 4px solid white;
+                border-radius: 50%;
+                animation: blink 1.5s infinite alternate;
+            }
+
+            @keyframes blink {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.6;
+                }
+            }
+
+            .sensor-red,
+            .sensor-yellow,
+            .sensor-green {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                border: 1px solid #000;
+                opacity: 0.2;
+            }
+
+            .sensor-red {
+                background: #ff0000;
+            }
+            .sensor-yellow {
+                background: #ffff00;
+            }
+            .sensor-green {
+                background: #00ff00;
+            }
+
+            .sensor-red.active,
+            .sensor-yellow.active,
+            .sensor-green.active {
+                opacity: 1;
+                box-shadow: 0 0 8px currentColor;
+            }
+
+            .font-pixel {
+                font-family: 'Courier New', Courier, monospace;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .custom-progress-container {
+                height: 25px;
+                background-color: #222 !important;
+                border: 2px solid #555;
+            }
+
+            .btn-pokedex-blue {
+                width: 40px;
+                height: 10px;
+                background: #007bff;
+                border-radius: 5px;
+                border-bottom: 3px solid #004a99;
+            }
+
+            .textoAnimado {
+                font-size: 1rem;
+                font-weight: bold;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+
         </style>
     </th:block>
 
@@ -289,7 +507,7 @@
                     <p class="text" style="color: white">Por favor ingresa tu usuario y contraseña</p>
                 </div>
 
-                <!-- AÑADIDO: Alerta de cuenta no verificada con reenvío -->
+                
                 <div th:if="${tipo == 'warning'}" 
                      class="alert alert-warning alert-dismissible fade show" 
                      role="alert"
@@ -335,23 +553,24 @@
                 <form id="loginForm" th:action="@{/pokedex/login}" method="post" th:object="${loginRequest}">
                     <div class="mb-3">
                         <label for="username" class="form-label" style="color: white">Usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required th:field="*{username}">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Usuario"  th:field="*{username}">
+                        <span style="color: red;" id='username-error'></span>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label" style="color: white">Contraseña</label>
                         <div class="password-container">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required th:field="*{password}">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"  th:field="*{password}">
                             <button type="button" 
                                     class="password-toggle" 
                                     id="togglePassword"
                                     aria-label="Mostrar contraseña">
                                 <i class="bi bi-eye-fill" id="eyeIcon"></i>
                             </button>
+                            <span style="color: red;" id='password-error'></span>
                         </div>
                     </div>
 
-                    <!-- AÑADIDO: Enlace a recuperar contraseña -->
                     <div class="mb-3 text-end">
                         <a href="/pokedex/recuperarPass" 
                            style="color: #ffc107; font-size: 0.9rem; text-decoration: none;">
@@ -377,7 +596,7 @@
             </div>
         </div>
 
-        <!-- Modal de carga -->
+
         <div class="modal fade" id="modalCarga" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content pokedex-container">
@@ -418,9 +637,10 @@
             </div>
         </div>
 
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            // Toggle password visibility
+
             const togglePassword = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -436,9 +656,11 @@
                 }
             });
 
-            // Modal de carga al enviar formulario
+
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");
+                const usernameInput = document.getElementById("username");
+                const passwordInput = document.getElementById("password");
                 const modal = new bootstrap.Modal(document.getElementById("modalCarga"));
                 const barra = document.getElementById("barraProgreso");
                 const progress = document.getElementById("porcentajeCarga");
@@ -446,23 +668,170 @@
                 form.addEventListener("submit", (e) => {
                     e.preventDefault();
 
+                    const username = usernameInput.value.trim();
+                    const password = passwordInput.value.trim();
+
+                    if (username === "" || password === "") {
+                        Swal.fire({
+                            html: `
+                    <div class="text-center">
+                    <img src="https://www.pngplay.com/wp-content/uploads/11/Rayquaza-Pokemon-PNG-Images-HD.png"
+                        style="width:120px"
+                        class="mb-3 animate__animated animate__fadeInDown">
+
+                    <h4 class="fw-bold" style="color:#00ff9c">
+                            ¡Rayquaza te observa!
+                    </h4>
+                    <p>
+                        Ingresa tu <strong>usuario</strong> y <strong>contraseña</strong>
+                    </p>
+                    <h6>Antes de que te lanze un ¡Ascenso Draco!</h6>
+                    </div>
+                `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#00ff9c',
+                            customClass: {
+                                popup: 'pokemon-alert rayquaza-theme shadow-lg',
+                                confirmButton: 'btn btn-success fw-bold px-4'
+                            }
+                        });
+                        return;
+                    }
+
+                    if (username.length < 4 || password.length < 8) {
+                        Swal.fire({
+                            html: `
+                    <div class="text-center">
+                        <img src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/006.png"
+                            style="width:120px"
+                            class="mb-3 animate__animated animate__shakeX">
+
+                        <h4 class="fw-bold text-warning">
+                            Â¡Datos incorrectos!
+                        </h4>
+                        <p>
+                            Usuario mi­nimo <strong>4 caracteres</strong><br>
+                            Contraseña mÃ­nimo <strong>8 a 16 caracteres</strong>
+                        </p>
+                    </div>
+                `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#ff6a00',
+                            customClass: {
+                                popup: 'pokemon-alert charizard-theme shadow-lg',
+                                confirmButton: 'btn btn-warning fw-bold px-4'
+                            }
+                        });
+                        return;
+                    }
+
                     modal.show();
+
 
                     let progreso = 0;
 
                     const intervalo = setInterval(() => {
                         progreso += 1;
                         barra.style.width = progreso + "%";
+//                        barra.textContent = progreso + "%";
                         progress.textContent = progreso + "%";
 
                         if (progreso >= 100) {
                             clearInterval(intervalo);
+
+
                             setTimeout(() => {
                                 form.submit();
                             }, 300);
                         }
                     }, 150);
                 });
+            });
+
+            //-----Validacion ReGex UserName------//
+            $(document).ready(function () {
+                $('#username').blur('blur', function () {
+                    const nameRegex = /^[a-zA-Z0-9_]{4,16}$/;
+                    const nameValue = $(this).val();
+                    const errorSpan = $('#username-error');
+
+                    if (nameRegex.test(nameValue)) {
+                        $(this).css('border-color', 'green');
+                        errorSpan.text(' ');
+                    } else {
+                        $(this).css('border-color', 'red');
+                        errorSpan.text('User Name invalido');
+                    }
+                });
+            });
+
+            //-----Validacion ReGex Password------//
+            $(document).ready(function () {
+                $('#password').blur('blur', function () {
+                    const nameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-])[A-Za-z\d@$!%*?&.#_-]{8,16}$/;
+                    const nameValue = $(this).val();
+                    const errorSpan = $('#password-error');
+
+                    if (nameRegex.test(nameValue)) {
+                        $(this).css('border-color', 'green');
+                        errorSpan.text(' ');
+                    } else {
+                        $(this).css('border-color', 'red');
+                        errorSpan.text('Password invalido');
+                    }
+                });
+            });
+
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("loginForm");
+                const texto = document.getElementById("region");
+
+                const regiones = [
+                    "Kanto", "Johto", "Hoenn", "Sinnoh",
+                    "Teselia", "Kalos", "Alola", "Galar", "Paldea"
+                ];
+
+                let indice = 0;
+                let intervaloTexto;
+
+                texto.classList.add("visible");
+
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    intervaloTexto = setInterval(() => {
+                        texto.classList.remove("visible");
+
+                        setTimeout(() => {
+                            indice = (indice + 1) % regiones.length;
+                            texto.textContent = regiones[indice];
+                            texto.classList.add("visible");
+                        }, 300);
+
+                    }, 1900);
+                });
+            });
+
+
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const sensors = [
+                    document.querySelector(".sensor-red"),
+                    document.querySelector(".sensor-yellow"),
+                    document.querySelector(".sensor-green")
+                ];
+
+                let index = 0;
+
+                function startSensorSequence() {
+                    sensors.forEach(s => s.classList.remove("active"));
+
+                    sensors[index].classList.add("active");
+                    index = (index + 1) % sensors.length;
+                }
+
+                setInterval(startSensorSequence, 600);
             });
 
             // Animación de región
@@ -516,87 +885,87 @@
             });
 
             // AÑADIDO: Función reenviar verificación
-            function reenviarCorreo(event, email) {
-                event.preventDefault();
-
-                if (!email) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: '¡Oops!',
-                        text: 'No se pudo obtener el correo electrónico',
-                        background: 'rgba(30, 30, 30, 0.95)',
-                        color: '#fff',
-                        confirmButtonColor: '#ff4136',
-                        confirmButtonText: 'Entendido',
-                        iconColor: '#ff4136'
-                    });
-                    return;
-                }
-
-                Swal.fire({
-                    title: 'Enviando correo...',
-                    html: '<img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGg2YW9sbHh6eTIxYTRjdGJ2dXE2NTg0Z3MyMGJ0eXNwa2RhaGMzdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/nMy8HTFQRWpudNwbxQ/giphy.gif" style="width: 100px; transform: scaleX(-1);">',
-                    background: 'rgba(30, 30, 30, 0.95)',
-                    color: '#fff',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                fetch('/pokedex/reenviarVerificacion', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'correo=' + encodeURIComponent(email)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.correct) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Correo Enviado!',
-                            html: `
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
-                                     style="width: 60px; animation: bounce 0.5s infinite alternate; margin-bottom: 15px;">
-                                <p style="margin-top: 10px;">${data.errorMessage}</p>
-                                <p style="font-size: 0.9em; color: #ffc107;">Revisa tu bandeja de entrada</p>
-                            `,
-                            background: 'rgba(30, 30, 30, 0.95)',
-                            color: '#fff',
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: '¡Perfecto!',
-                            iconColor: '#28a745'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.errorMessage,
-                            background: 'rgba(30, 30, 30, 0.95)',
-                            color: '#fff',
-                            confirmButtonColor: '#ff4136',
-                            confirmButtonText: 'Intentar de nuevo',
-                            iconColor: '#ff4136'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de conexión',
-                        text: 'No se pudo reenviar el correo. Por favor intenta de nuevo.',
-                        background: 'rgba(30, 30, 30, 0.95)',
-                        color: '#fff',
-                        confirmButtonColor: '#ff4136',
-                        confirmButtonText: 'Entendido',
-                        iconColor: '#ff4136'
-                    });
-                });
-            }
+//            function reenviarCorreo(event, email) {
+//                event.preventDefault();
+//
+//                if (!email) {
+//                    Swal.fire({
+//                        icon: 'error',
+//                        title: '¡Oops!',
+//                        text: 'No se pudo obtener el correo electrónico',
+//                        background: 'rgba(30, 30, 30, 0.95)',
+//                        color: '#fff',
+//                        confirmButtonColor: '#ff4136',
+//                        confirmButtonText: 'Entendido',
+//                        iconColor: '#ff4136'
+//                    });
+//                    return;
+//                }
+//
+//                Swal.fire({
+//                    title: 'Enviando correo...',
+//                    html: '<img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGg2YW9sbHh6eTIxYTRjdGJ2dXE2NTg0Z3MyMGJ0eXNwa2RhaGMzdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/nMy8HTFQRWpudNwbxQ/giphy.gif" style="width: 100px; transform: scaleX(-1);">',
+//                    background: 'rgba(30, 30, 30, 0.95)',
+//                    color: '#fff',
+//                    showConfirmButton: false,
+//                    allowOutsideClick: false,
+//                    didOpen: () => {
+//                        Swal.showLoading();
+//                    }
+//                });
+//
+//                fetch('/pokedex/reenviarVerificacion', {
+//                    method: 'POST',
+//                    headers: {
+//                        'Content-Type': 'application/x-www-form-urlencoded',
+//                    },
+//                    body: 'correo=' + encodeURIComponent(email)
+//                })
+//                .then(response => response.json())
+//                .then(data => {
+//                    if (data.correct) {
+//                        Swal.fire({
+//                            icon: 'success',
+//                            title: '¡Correo Enviado!',
+//                            html: `
+//                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Pok%C3%A9_Ball_icon.svg/1026px-Pok%C3%A9_Ball_icon.svg.png" 
+//                                     style="width: 60px; animation: bounce 0.5s infinite alternate; margin-bottom: 15px;">
+//                                <p style="margin-top: 10px;">${data.errorMessage}</p>
+//                                <p style="font-size: 0.9em; color: #ffc107;">Revisa tu bandeja de entrada</p>
+//                            `,
+//                            background: 'rgba(30, 30, 30, 0.95)',
+//                            color: '#fff',
+//                            confirmButtonColor: '#28a745',
+//                            confirmButtonText: '¡Perfecto!',
+//                            iconColor: '#28a745'
+//                        });
+//                    } else {
+//                        Swal.fire({
+//                            icon: 'error',
+//                            title: 'Error',
+//                            text: data.errorMessage,
+//                            background: 'rgba(30, 30, 30, 0.95)',
+//                            color: '#fff',
+//                            confirmButtonColor: '#ff4136',
+//                            confirmButtonText: 'Intentar de nuevo',
+//                            iconColor: '#ff4136'
+//                        });
+//                    }
+//                })
+//                .catch(error => {
+//                    console.error('Error:', error);
+//                    Swal.fire({
+//                        icon: 'error',
+//                        title: 'Error de conexión',
+//                        text: 'No se pudo reenviar el correo. Por favor intenta de nuevo.',
+//                        background: 'rgba(30, 30, 30, 0.95)',
+//                        color: '#fff',
+//                        confirmButtonColor: '#ff4136',
+//                        confirmButtonText: 'Entendido',
+//                        iconColor: '#ff4136'
+//                    });
+//                });
+//            }
         </script>
     </div>
 </body>
