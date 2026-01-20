@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Batalla Pokémon RPG - Estilo Rojo Fuego</title>
+        <style>
+            body {
+                margin: 0;
+                font-family: 'Press Start 2P', monospace;
+                background: #7ec0ee; /* cielo */
+            }
+
+            .battle-container {
+                position: relative;
+                width: 100%;
+                height: 500px;
+                background: url('/mnt/data/5d510005-031e-43e1-8e16-15c761c3248b.png') no-repeat bottom center;
+                background-size: cover;
+            }
+
+            .pokemon {
+                position: absolute;
+                width: 120px;
+                image-rendering: pixelated;
+                transition: transform 0.2s;
+            }
+
+            #player-pokemon {
+                bottom: 80px;
+                right: 120px;
+                z-index: 2;
+                transform: scaleX(1);
+            }
+
+            #cpu-pokemon {
+                top: 80px;
+                left: 120px;
+                z-index: 2;
+                transform: scaleX(-1);
+            }
+
+            .shadow {
+                position: absolute;
+                width: 60px;
+                height: 20px;
+                background: rgba(0,0,0,0.5);
+                border-radius: 50%;
+                filter: blur(2px);
+            }
+
+            #player-shadow {
+                bottom: 60px;
+                right: 150px;
+            }
+
+            #cpu-shadow {
+                top: 160px;
+                left: 150px;
+            }
+
+            .battle-log {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                height: 100px;
+                background: #000;
+                color: #fff;
+                border-top: 4px solid #fff;
+                padding: 8px;
+                font-size: 12px;
+                overflow-y: auto;
+                box-sizing: border-box;
+            }
+
+            .actions {
+                position: absolute;
+                bottom: 110px;
+                right: 20px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+            }
+
+            .actions button {
+                font-family: inherit;
+                font-size: 10px;
+                padding: 4px;
+                background: #fff;
+                border: 2px solid #000;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .actions button:hover {
+                background: #ccc;
+            }
+
+            .hp-bar-container {
+                position: absolute;
+                width: 100px;
+                height: 12px;
+                background: #555;
+                border: 2px solid #fff;
+                border-radius: 6px;
+                bottom: 60px;
+                font-size: 10px;
+            }
+
+            #player-hp-bar {
+                left: calc(100% - 240px);
+            }
+
+            #cpu-hp-bar {
+                left: 120px;
+                top: 60px;
+            }
+
+            .hp-fill {
+                height: 100%;
+                border-radius: 6px;
+                transition: width 0.3s, background-color 0.3s;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div class="battle-container">
+            <!-- Sombras -->
+            <div class="shadow" id="cpu-shadow"></div>
+            <div class="shadow" id="player-shadow"></div>
+
+            <!-- Pokémon -->
+            <img class="pokemon" id="cpu-pokemon" src="" alt="CPU Pokémon">
+            <img class="pokemon" id="player-pokemon" src="" alt="Jugador Pokémon">
+
+            <!-- Barras de HP estilo RPG -->
+            <div class="hp-bar-container" id="cpu-hp-bar"><div class="hp-fill" id="cpu-hp" style="width:100%;background:#4caf50;"></div></div>
+            <div class="hp-bar-container" id="player-hp-bar"><div class="hp-fill" id="player-hp" style="width:100%;background:#4caf50;"></div></div>
+
+            <!-- Log de batalla -->
+            <div class="battle-log" id="battle-log">¡La batalla comienza!</div>
+
+            <!-- Acciones -->
+            <div class="actions">
+                <button id="attack-btn-1">Luchar</button>
+                <button id="attack-btn-2">Mochila</button>
+                <button id="attack-btn-3">Pokémon</button>
+                <button id="attack-btn-4">Huir</button>
+            </div>
+        </div>
+
+        <script>
+            const playerTeam = JSON.parse(localStorage.getItem('player_team')) || [];
+            const cpuTeam = [];
+            const battleLog = document.getElementById('battle-log');
+
+            function mapCpuPokemon(apiData) {
+                return {
+                    id: apiData.id,
+                    name: apiData.name,
+                    hp: apiData.stats[0].base_stat * 2,
+                    maxHp: apiData.stats[0].base_stat * 2,
+                    atk: apiData.stats[1].base_stat,
+                    def: apiData.stats[2].base_stat,
+                    type: apiData.types[0].type.name,
+                    sprite: apiData.sprites.front_default
+                };
+            }
+
+            async function generateCpuTeam() {
+                for (let i = 0; i < 3; i++) {
+                    const id = Math.floor(Math.random() * 1025) + 1;
+                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                    const data = await res.json();
+                    cpuTeam.push(mapCpuPokemon(data));
+                }
+            }
+
+            let playerIndex = 0, cpuIndex = 0;
+            let playerPokemon, cpuPokemon;
+
+            async function startBattle() {
+                await generateCpuTeam();
+                playerPokemon = playerTeam[playerIndex];
+                cpuPokemon = cpuTeam[cpuIndex];
+                renderPokemon();
+                log('¡La batalla comienza!');
+            }
+
+            function renderPokemon() {
+                document.getElementById('player-pokemon').src = playerPokemon.sprite;
+                document.getElementById('cpu-pokemon').src = cpuPokemon.sprite;
+
+                document.getElementById('player-hp').style.width = `${(playerPokemon.hp / playerPokemon.maxHp) * 100}%`;
+                document.getElementById('player-hp').style.backgroundColor = hpColor(playerPokemon.hp, playerPokemon.maxHp);
+
+                document.getElementById('cpu-hp').style.width = `${(cpuPokemon.hp / cpuPokemon.maxHp) * 100}%`;
+                document.getElementById('cpu-hp').style.backgroundColor = hpColor(cpuPokemon.hp, cpuPokemon.maxHp);
+            }
+
+            function hpColor(hp, maxHp) {
+                const pct = hp / maxHp;
+                if (pct > 0.5)
+                    return '#4caf50';
+                if (pct > 0.2)
+                    return '#ffc107';
+                return '#f44336';
+            }
+
+            function log(text) {
+                battleLog.innerHTML += `<p>${text}</p>`;
+                battleLog.scrollTop = battleLog.scrollHeight;
+            }
+
+            function attack(attacker, defender) {
+                if (!attacker || !defender)
+                    return false;
+                const damage = Math.max(5, Math.floor(attacker.atk - defender.def / 2));
+                defender.hp -= damage;
+                if (defender.hp < 0)
+                    defender.hp = 0;
+
+                const img = attacker === playerPokemon ? document.getElementById('player-pokemon') : document.getElementById('cpu-pokemon');
+                img.style.transform = 'translateX(10px)';
+                setTimeout(() => img.style.transform = 'translateX(0px)', 150);
+                log(`${attacker.name} hace ${damage} de daño a ${defender.name}`);
+                renderPokemon();
+                return defender.hp <= 0;
+            }
+
+            function nextTurn() {
+                if (attack(playerPokemon, cpuPokemon)) {
+                    log(`${cpuPokemon.name} se debilitó`);
+                    cpuIndex++;
+                    if (cpuIndex >= cpuTeam.length) {
+                        log('¡Ganaste la batalla!');
+                        disableAttacks();
+                        return;
+                    }
+                    cpuPokemon = cpuTeam[cpuIndex];
+                    log(`CPU envía a ${cpuPokemon.name}`);
+                }
+                if (cpuPokemon.hp > 0) {
+                    if (attack(cpuPokemon, playerPokemon)) {
+                        log(`${playerPokemon.name} se debilitó`);
+                        playerIndex++;
+                        if (playerIndex >= playerTeam.length) {
+                            log('¡Perdiste la batalla!');
+                            disableAttacks();
+                            return;
+                        }
+                        playerPokemon = playerTeam[playerIndex];
+                        log(`Envías a ${playerPokemon.name}`);
+                    }
+                }
+            }
+
+            function disableAttacks() {
+                document.querySelectorAll('.actions button').forEach(b => b.disabled = true);
+            }
+
+            document.querySelectorAll('.actions button').forEach(b => b.addEventListener('click', nextTurn));
+
+            startBattle();
+        </script>
+
+    </body>
+</html>

@@ -89,6 +89,17 @@ public class PokeApiController {
     public String Minijuego1() {
         return "AtrapaBallas";
     }
+    
+    @GetMapping("/select-pokemon")
+    public String minijuegoPeleas() {
+        return "select";
+    }
+    
+    @GetMapping("/battle")
+    public String pelea() {
+        return "battle";
+    }
+    //----------IR A PERFIL----------//
 
     @GetMapping("/detail/{id}")
     public String detalle(@PathVariable int id, Model model) {

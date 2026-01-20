@@ -46,7 +46,7 @@ public class PokeService {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1600"))
+                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1375"))
                     .GET()
                     .build();
 
