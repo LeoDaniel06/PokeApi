@@ -3,39 +3,134 @@
     <head>
         <meta charset="UTF-8">
         <title>Batalla Pokémon RPG - Estilo Rojo Fuego</title>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
         <style>
             body {
                 margin: 0;
                 font-family: 'Press Start 2P', monospace;
-                background: #7ec0ee; /* cielo */
+                background: #7ec0ee;
+            }
+
+            /* ================== POKEDEX ================== */
+            .pokedex {
+                width: 1200px;
+                margin: 20px auto;
+                background: #c62828;
+                border-radius: 30px;
+                padding: 20px;
+                box-shadow: inset -8px -8px 0 #8e0000,
+                    inset 8px 8px 0 #ff5252;
+            }
+
+            /* ================== LAYOUT ================== */
+            .battle-layout {
+                display: grid;
+                grid-template-columns: 220px 1fr 220px;
+                gap: 14px;
+            }
+
+            .side-panel {
+                background: #b71c1c;
+                border-radius: 16px;
+                padding: 10px;
+                box-shadow: inset -4px -4px 0 #7f0000,
+                    inset 4px 4px 0 #ff5252;
+                color: #fff;
+                font-size: 10px;
+            }
+
+            .panel-title {
+                text-align: center;
+                margin-bottom: 8px;
+                font-weight: bold;
+            }
+
+            /* ================== EQUIPO ================== */
+            .team-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .team-slot {
+                background: #000;
+                border: 2px solid #fff;
+                border-radius: 8px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .team-slot img {
+                width: 40px;
+                image-rendering: pixelated;
+            }
+
+            /* ================== ITEMS ================== */
+            .menu-btn {
+                width: 100%;
+                margin-bottom: 6px;
+                font-family: inherit;
+                font-size: 10px;
+                padding: 8px;
+                border-radius: 8px;
+                border: 2px solid #000;
+                cursor: pointer;
+                background: #fff;
+            }
+
+            .items-list {
+                background: #000;
+                border: 2px solid #fff;
+                border-radius: 8px;
+                padding: 6px;
+            }
+
+            .items-list div {
+                padding: 4px;
+                border-bottom: 1px solid #555;
+            }
+
+            .items-list div:last-child {
+                border-bottom: none;
+            }
+
+            /* ================== SCREEN ================== */
+            .screen {
+                background: #000;
+                border-radius: 20px;
+                padding: 10px;
+                border: 6px solid #222;
             }
 
             .battle-container {
                 position: relative;
                 width: 100%;
-                height: 500px;
+                height: 420px;
                 background: url('/mnt/data/5d510005-031e-43e1-8e16-15c761c3248b.png') no-repeat bottom center;
                 background-size: cover;
+                border-radius: 10px;
+                overflow: hidden;
             }
 
             .pokemon {
                 position: absolute;
-                width: 120px;
+                width: 150px;
                 image-rendering: pixelated;
                 transition: transform 0.2s;
+                z-index: 2;
             }
 
             #player-pokemon {
-                bottom: 80px;
-                right: 120px;
-                z-index: 2;
-                transform: scaleX(1);
+                bottom: 50px;
+                right: 110px;
             }
 
             #cpu-pokemon {
                 top: 80px;
                 left: 120px;
-                z-index: 2;
                 transform: scaleX(-1);
             }
 
@@ -49,104 +144,156 @@
             }
 
             #player-shadow {
-                bottom: 60px;
-                right: 150px;
+                bottom: 70px;
+                right: 200px;
             }
 
             #cpu-shadow {
                 top: 160px;
-                left: 150px;
+                left: 160px;
             }
 
-            .battle-log {
+            /* ================== HUD ================== */
+            .hud {
                 position: absolute;
-                bottom: 0;
+                width: 160px;
+                background: #f8f8f8;
+                border: 3px solid #000;
+                box-shadow: 4px 4px 0 #000;
+                border-radius: 8px;
+                padding: 6px;
+                font-size: 10px;
+                color: #000;
+                z-index: 3;
+            }
+
+            .cpu-hud {
+                top: 40px;
+                left: 60px;
+            }
+
+            .player-hud {
+                bottom: 210px;
+                right: 40px;
+            }
+
+            .hp-bar {
                 width: 100%;
-                height: 100px;
-                background: #000;
-                color: #fff;
-                border-top: 4px solid #fff;
-                padding: 8px;
-                font-size: 12px;
-                overflow-y: auto;
-                box-sizing: border-box;
+                height: 10px;
+                background: #b0b0b0;
+                border: 2px solid #000;
+                border-radius: 6px;
+                margin-top: 2px;
+            }
+
+            .hp-fill {
+                height: 100%;
+                border-radius: 4px;
+            }
+
+            /* ================== CONTROLES ================== */
+            .controls-panel {
+                margin-top: 14px;
+                background: #b71c1c;
+                padding: 12px;
+                border-radius: 16px;
             }
 
             .actions {
-                position: absolute;
-                bottom: 110px;
-                right: 20px;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 4px;
+                gap: 8px;
             }
 
             .actions button {
                 font-family: inherit;
                 font-size: 10px;
-                padding: 4px;
+                padding: 10px;
                 background: #fff;
                 border: 2px solid #000;
+                border-radius: 8px;
                 cursor: pointer;
-                transition: all 0.2s;
             }
 
-            .actions button:hover {
-                background: #ccc;
+            /* ================== LOG ================== */
+            .battle-log {
+                margin-top: 10px;
+                height: 80px;
+                background: #000;
+                color: #fff;
+                border: 4px solid #fff;
+                border-radius: 10px;
+                padding: 8px;
+                font-size: 12px;
+                overflow-y: auto;
             }
-
-            .hp-bar-container {
-                position: absolute;
-                width: 100px;
-                height: 12px;
-                background: #555;
-                border: 2px solid #fff;
-                border-radius: 6px;
-                bottom: 60px;
-                font-size: 10px;
-            }
-
-            #player-hp-bar {
-                left: calc(100% - 240px);
-            }
-
-            #cpu-hp-bar {
-                left: 120px;
-                top: 60px;
-            }
-
-            .hp-fill {
-                height: 100%;
-                border-radius: 6px;
-                transition: width 0.3s, background-color 0.3s;
-            }
-
         </style>
     </head>
+
     <body>
 
-        <div class="battle-container">
-            <!-- Sombras -->
-            <div class="shadow" id="cpu-shadow"></div>
-            <div class="shadow" id="player-shadow"></div>
+        <div class="pokedex">
 
-            <!-- Pokémon -->
-            <img class="pokemon" id="cpu-pokemon" src="" alt="CPU Pokémon">
-            <img class="pokemon" id="player-pokemon" src="" alt="Jugador Pokémon">
+            <div class="battle-layout">
 
-            <!-- Barras de HP estilo RPG -->
-            <div class="hp-bar-container" id="cpu-hp-bar"><div class="hp-fill" id="cpu-hp" style="width:100%;background:#4caf50;"></div></div>
-            <div class="hp-bar-container" id="player-hp-bar"><div class="hp-fill" id="player-hp" style="width:100%;background:#4caf50;"></div></div>
+                <!-- PANEL IZQUIERDO -->
+                <div class="side-panel">
+                    <div class="panel-title">EQUIPO</div>
+                    <div class="team-grid" id="player-team-panel">
+                    </div>
+                </div>
 
-            <!-- Log de batalla -->
-            <div class="battle-log" id="battle-log">¡La batalla comienza!</div>
+                <!-- CENTRO -->
+                <div>
+                    <div class="screen">
+                        <div class="battle-container">
 
-            <!-- Acciones -->
-            <div class="actions">
-                <button id="attack-btn-1">Luchar</button>
-                <button id="attack-btn-2">Mochila</button>
-                <button id="attack-btn-3">Pokémon</button>
-                <button id="attack-btn-4">Huir</button>
+                            <div class="shadow" id="cpu-shadow"></div>
+                            <div class="shadow" id="player-shadow"></div>
+
+                            <img class="pokemon" id="cpu-pokemon" src="">
+                            <img class="pokemon" id="player-pokemon" src="">
+
+                            <div class="hud cpu-hud">
+                                <div id="cpu-name">CPU</div>
+                                <div class="hp-bar"><div class="hp-fill" id="cpu-hp"></div></div>
+                            </div>
+
+                            <div class="hud player-hud">
+                                <div id="player-name">Jugador</div>
+                                <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-panel">
+                        <div class="actions">
+                            <button>Ataque 1</button>
+                            <button>Ataque 2</button>
+                            <button>Ataque 3</button>
+                            <button>Ataque 4</button>
+                        </div>
+                    </div>
+
+                    <div class="battle-log" id="battle-log">
+                        ¡La batalla comienza!
+                    </div>
+                </div>
+
+                <!-- PANEL DERECHO -->
+                <div class="side-panel">
+                    <div class="panel-title">MENÚ</div>
+                    <button class="menu-btn">Cambiar Pokémon</button>
+                    <button class="menu-btn">Usar objeto</button>
+
+                    <div class="items-list">
+                        <div>Poción</div>
+                        <div>Superpoción</div>
+                        <div>Hiperpoción</div>
+                        <div>Revivir</div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -169,7 +316,7 @@
             }
 
             async function generateCpuTeam() {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 6; i++) {
                     const id = Math.floor(Math.random() * 1025) + 1;
                     const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
                     const data = await res.json();
@@ -185,6 +332,7 @@
                 playerPokemon = playerTeam[playerIndex];
                 cpuPokemon = cpuTeam[cpuIndex];
                 renderPokemon();
+                renderPlayerTeamPanel();
                 log('¡La batalla comienza!');
             }
 
@@ -192,12 +340,20 @@
                 document.getElementById('player-pokemon').src = playerPokemon.sprite;
                 document.getElementById('cpu-pokemon').src = cpuPokemon.sprite;
 
-                document.getElementById('player-hp').style.width = `${(playerPokemon.hp / playerPokemon.maxHp) * 100}%`;
-                document.getElementById('player-hp').style.backgroundColor = hpColor(playerPokemon.hp, playerPokemon.maxHp);
+                document.getElementById('player-name').textContent = playerPokemon.name;
+                document.getElementById('cpu-name').textContent = cpuPokemon.name;
 
-                document.getElementById('cpu-hp').style.width = `${(cpuPokemon.hp / cpuPokemon.maxHp) * 100}%`;
-                document.getElementById('cpu-hp').style.backgroundColor = hpColor(cpuPokemon.hp, cpuPokemon.maxHp);
+                document.getElementById('player-hp').style.width =
+                        `${(playerPokemon.hp / playerPokemon.maxHp) * 100}%`;
+                document.getElementById('player-hp').style.backgroundColor =
+                        hpColor(playerPokemon.hp, playerPokemon.maxHp);
+
+                document.getElementById('cpu-hp').style.width =
+                        `${(cpuPokemon.hp / cpuPokemon.maxHp) * 100}%`;
+                document.getElementById('cpu-hp').style.backgroundColor =
+                        hpColor(cpuPokemon.hp, cpuPokemon.maxHp);
             }
+
 
             function hpColor(hp, maxHp) {
                 const pct = hp / maxHp;
@@ -263,6 +419,36 @@
             document.querySelectorAll('.actions button').forEach(b => b.addEventListener('click', nextTurn));
 
             startBattle();
+
+            function renderPlayerTeamPanel() {
+                const panel = document.getElementById('player-team-panel');
+                panel.innerHTML = '';
+
+                playerTeam.forEach((pokemon, index) => {
+                    const slot = document.createElement('div');
+                    slot.classList.add('team-slot');
+
+                    const img = document.createElement('img');
+                    img.src = pokemon.sprite;
+                    img.alt = pokemon.name;
+                    img.title = pokemon.name;
+
+                    // Pokémon activo resaltado
+                    if (index === playerIndex) {
+                        slot.style.border = '2px solid #4caf50';
+                    }
+
+                    slot.appendChild(img);
+                    panel.appendChild(slot);
+                });
+
+                // Rellenar hasta 6 slots si hay menos
+                for (let i = playerTeam.length; i < 6; i++) {
+                    const emptySlot = document.createElement('div');
+                    emptySlot.classList.add('team-slot');
+                    panel.appendChild(emptySlot);
+                }
+            }
         </script>
 
     </body>
