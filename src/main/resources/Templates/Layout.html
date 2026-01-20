@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,6 @@
             .pkm {
                 font-family: 'PokemonSolid', sans-serif;
             }
-
             .pkm-hollow {
                 font-family: 'PokemonHollow', sans-serif;
             }
@@ -47,6 +47,21 @@
             body {
                 position: relative;
                 min-height: 100vh;
+                padding: 20px;
+            }
+
+            /* Efectos de ambiente */
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+                background:
+                    radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.5), transparent 50%),
+                    radial-gradient(circle at 50% 15%, rgba(102, 126, 234, 0.35), transparent 55%),
+                    radial-gradient(circle at 50% 15%, rgba(255, 203, 5, 0.25), transparent 60%);
+                animation: ambientLight 20s ease-in-out infinite;
             }
 
             /* Canvas de fondo Tubes */
@@ -57,6 +72,52 @@
                 bottom: 0;
                 left: 0;
                 z-index: 0;
+                background:
+                    radial-gradient(circle at 8% 12%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 18% 38%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 32% 65%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 48% 28%, rgba(255,255,255,1), transparent 2.8%),
+                    radial-gradient(circle at 62% 52%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 78% 18%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 92% 42%, rgba(255,255,255,1), transparent 3.2%),
+                    radial-gradient(circle at 12% 78%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 38% 88%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 70% 85%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 22% 18%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 55% 18%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 82% 72%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 65% 22%, rgba(255,255,255,1), transparent 3.5%),
+                    radial-gradient(circle at 88% 88%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 42% 12%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 15% 55%, rgba(255,255,255,1), transparent 3%),
+                    radial-gradient(circle at 75% 35%, rgba(255,255,255,1), transparent 3.2%);
+                animation: sparkle 6s ease-in-out infinite;
+            }
+
+            @keyframes sparkle {
+                0%, 100% {
+                    opacity: 0.18;
+                    filter: blur(1.5px);
+                }
+                50% {
+                    opacity: 2;
+                    filter: blur(0.4px);
+                }
+            }
+
+            @keyframes ambientLight {
+                0%   {
+                    filter: blur(0px);
+                    opacity: 0.8;
+                }
+                50%  {
+                    filter: blur(8px);
+                    opacity: 1;
+                }
+                100% {
+                    filter: blur(0px);
+                    opacity: 0.8;
+                }
                 overflow: hidden;
             }
 
@@ -68,7 +129,7 @@
                 padding: 20px;
             }
 
-            /* Navbar mejorado estilo Pokemon.com */
+            /* Navbar estilo Pokemon.com */
             .pokemon-navbar {
                 position: relative;
                 z-index: 1000;
@@ -101,7 +162,6 @@
                 flex: 1;
                 position: relative;
             }
-
             .pokemon-navbar .nav-link {
                 color: #ffffff;
                 font-weight: 600;
@@ -124,7 +184,6 @@
                 font-size: 2rem;
                 transition: transform 0.3s ease;
             }
-
             .pokemon-navbar .nav-link span {
                 font-size: 0.9rem;
                 display: block;
@@ -136,42 +195,36 @@
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(120, 144, 156, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(2) .nav-link:hover {
                 background: rgba(239, 83, 80, 0.8);
                 color: #ffffff;
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(239, 83, 80, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(3) .nav-link:hover {
                 background: rgba(255, 202, 40, 0.8);
                 color: #ffffff;
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(255, 202, 40, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(4) .nav-link:hover {
                 background: rgba(102, 187, 106, 0.8);
                 color: #ffffff;
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(102, 187, 106, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(5) .nav-link:hover {
                 background: rgba(66, 165, 245, 0.8);
                 color: #ffffff;
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(66, 165, 245, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(6) .nav-link:hover {
                 background: rgba(171, 71, 188, 0.8);
                 color: #ffffff;
                 transform: translateY(-3px);
                 box-shadow: 0 4px 15px rgba(171, 71, 188, 0.5);
             }
-
             .pokemon-navbar .nav-item:nth-child(7) .nav-link:hover {
                 background: rgba(255, 112, 67, 0.8);
                 color: #ffffff;
@@ -226,7 +279,6 @@
                 margin-bottom: 0;
             }
 
-            /* Footer */
             .pokemon-footer {
                 background: rgba(255, 255, 255, 0.15);
                 backdrop-filter: blur(20px);
@@ -249,9 +301,8 @@
                 font-weight: 600;
                 text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
             }
-
             #logoutBtn:hover {
-                color: #ffffff;
+                color: #fff;
             }
 
             .content-wrapper {
@@ -259,16 +310,13 @@
                 z-index: 1;
             }
 
-            /* Responsive */
             @media (max-width: 992px) {
                 .pokemon-navbar .nav-link {
                     padding: 15px 10px;
                 }
-
                 .pokemon-navbar .nav-link i {
                     font-size: 1.5rem;
                 }
-
                 .pokemon-navbar .nav-link span {
                     font-size: 0.75rem;
                 }
@@ -278,7 +326,6 @@
                 .pokemon-navbar .nav-item::after {
                     display: none;
                 }
-
                 .pokemon-navbar .navbar-collapse {
                     background: rgba(30, 30, 30, 0.95);
                     backdrop-filter: blur(20px);
@@ -286,7 +333,6 @@
                     margin-top: 10px;
                     padding: 10px;
                 }
-
                 .pokemon-navbar .nav-item {
                     border-bottom: 1px solid #e0e0e0;
                 }
@@ -303,13 +349,13 @@
         <nav class="pokemon-navbar navbar navbar-expand-lg">
             <div class="container-fluid p-0">
                 <a class="navbar-brand pkm" href="/pokedex">Pokédex</a>
-
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse pkm" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
+
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/pokedex}">
                                 <i class="fas fa-home"></i>
@@ -318,9 +364,7 @@
                         </li>
 
                         <li class="nav-item" sec:authorize="isAuthenticated()">
-                            <a class="nav-link"
-                               id="btnFavoritos"
-                               th:href="@{/pokedex(favoritos=true)}">
+                            <a class="nav-link" th:href="@{/pokedex(favoritos=true)}">
                                 <i class="fas fa-heart"></i>
                                 <span>Favoritos</span>
                             </a>
@@ -333,7 +377,7 @@
                                data-bs-toggle="dropdown"
                                aria-expanded="false">
                                 <i class="fas fa-gamepad"></i>
-                                <span>Mini Juego</span>
+                                <span>Atrapa Ballas</span>
                             </a>
 
                             <ul class="dropdown-menu">
@@ -365,8 +409,7 @@
                         </li>
 
                         <li class="nav-item" sec:authorize="isAuthenticated()">
-                            <a class="nav-link"
-                               th:href="@{/pokedex/perfilUsuario/{id}(id=${#authentication.principal.id})}">
+                            <a class="nav-link" th:href="@{/pokedex/perfilUsuario/{id}(id=${#authentication.principal.id})}">
                                 <i class="fas fa-user-circle"></i>
                                 <span>Perfil</span>
                             </a>
@@ -387,6 +430,7 @@
                                 </button>
                             </form>
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -489,12 +533,8 @@
                             showConfirmButton: false,
                             allowOutsideClick: false,
                             timer: 1500,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        }).then(() => {
-                            document.getElementById("logoutForm").submit();
-                        });
+                            didOpen: () => Swal.showLoading()
+                        }).then(() => document.getElementById("logoutForm").submit());
                     }
                 });
             });

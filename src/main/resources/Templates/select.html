@@ -213,7 +213,7 @@
 
             // Agregar Pokémon al equipo
             function addToTeam(pokemon) {
-                if (team.length >= 3)
+                if (team.length >= 6)
                     return alert("Equipo completo");
                 if (team.find(p => p.id === pokemon.id))
                     return;
@@ -230,8 +230,8 @@
 
             // Botón de batalla
             startBtn.addEventListener('click', () => {
-                if (team.length !== 3)
-                    return alert("Selecciona 3 Pokémon");
+                if (team.length !== 6)
+                    return alert("Selecciona 6 Pokémon");
                 localStorage.setItem('player_team', JSON.stringify(team)); // ahora mucho más ligero
                 window.location.href = '/pokedex/battle';
             });
