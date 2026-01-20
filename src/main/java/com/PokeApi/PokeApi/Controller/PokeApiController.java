@@ -2,6 +2,7 @@ package com.PokeApi.PokeApi.Controller;
 
 import com.PokeApi.PokeApi.DAO.RolJPADAOImplementation;
 import com.PokeApi.PokeApi.DAO.UsuarioDAOJPAImplementation;
+import com.PokeApi.PokeApi.DTO.PokemonPerfilDTO;
 import com.PokeApi.PokeApi.JPA.FavoritosJPA;
 import com.PokeApi.PokeApi.JPA.Result;
 import com.PokeApi.PokeApi.JPA.RolJPA;
@@ -433,8 +434,20 @@ public class PokeApiController {
             model.addAttribute("error", result.errorMessage);
             return "error";
         }
+        
+        Result resultFaV = favoritosService.getFavoritos(idUsuario);
+        
+        List<PokemonPerfilDTO> equipo = new ArrayList<>();
+        if(resultFaV.correct && resultFaV.objects != null){
+            equipo = resultFaV.objects.stream()
+                    .limit(6)
+                    .map(o ->(Integer) o)
+                    .map(idPokemon -> pokeService.obtenerPokemonPorId((int) idPokemon))
+                    .toList();
+        }
 
         model.addAttribute("usuario", (UsuarioJPA) result.object);
+        model.addAttribute("equipo", equipo);
         model.addAttribute("esAdmin", rol.equals("ADMIN"));
 
         return "UsuarioDetails";

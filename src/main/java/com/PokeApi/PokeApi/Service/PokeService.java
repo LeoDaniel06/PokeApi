@@ -1,12 +1,14 @@
 package com.PokeApi.PokeApi.Service;
 
 import com.PokeApi.PokeApi.DTO.PokemonDTO;
+import com.PokeApi.PokeApi.DTO.PokemonPerfilDTO;
 import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,11 +24,13 @@ public class PokeService {
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<PokemonDTO> cachePokemon = new ArrayList<>();
     private final RestTemplate restTemplate;
-    
-    // AÑADIDO: Cache para códigos de recuperación
+    private final Map<Integer, PokemonDTO> cachePerfil = new ConcurrentHashMap<>();
+
     private static class CodigoCache {
+
         String codigo;
         long expiracion;
+
         CodigoCache(String codigo, long expiracion) {
             this.codigo = codigo;
             this.expiracion = expiracion;
@@ -46,7 +50,7 @@ public class PokeService {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=1375"))
+                    .uri(URI.create("https://pokeapi.co/api/v2/pokemon?limit=386"))
                     .GET()
                     .build();
 
@@ -69,6 +73,50 @@ public class PokeService {
             throw new RuntimeException("Error cargando Pokémon", e);
         }
     }
+
+    public PokemonPerfilDTO obtenerPokemonPorId(int idPokemon) {
+
+        String url = "https://pokeapi.co/api/v2/pokemon/" + idPokemon;
+
+        JsonNode root = restTemplate.getForObject(url, JsonNode.class);
+
+        PokemonPerfilDTO dto = new PokemonPerfilDTO();
+
+        dto.setIdPokemon(root.get("id").asInt());
+        dto.setNombre(root.get("name").asText());
+
+        dto.setImagen(
+                root.path("sprites")
+                        .path("other")
+                        .path("official-artwork")
+                        .path("front_default")
+                        .asText()
+        );
+
+        List<String> tipos = new ArrayList<>();
+        root.get("types").forEach(t -> {
+            tipos.add(
+                    t.get("type")
+                            .get("name")
+                            .asText()
+            );
+        });
+        dto.setTipos(tipos);
+
+        List<String> movimientos = new ArrayList<>();
+        root.get("moves").forEach(m
+                -> movimientos.add(m.get("move").get("name").asText())
+        );
+
+        Collections.shuffle(movimientos);
+        dto.setMovimientos(movimientos.subList(0, Math.min(4, movimientos.size())));
+
+        dto.setNivel((int) (Math.random() * 30 + 50));
+        return dto;
+    }
+
+
+
 
     @Cacheable(value = "pokemon", key = "#id")
     public String getPokemon(int id) {

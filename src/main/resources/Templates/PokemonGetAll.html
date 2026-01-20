@@ -507,7 +507,7 @@
         let todosLosPokemon = [];
         let paginaActual = 1;
         let favoritosUsuario = new Set();
-        const pokemonPorPagina = 52;
+        const pokemonPorPagina = 100;
         function urlTieneFavoritos() {
             const params = new URLSearchParams(window.location.search);
             return params.get('favoritos') === 'true';
